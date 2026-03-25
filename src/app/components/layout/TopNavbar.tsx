@@ -46,7 +46,7 @@ export function TopNavbar({
           <div className="min-w-0">
             <div className="flex items-center gap-3">
               <h1 className="truncate text-xl font-semibold tracking-[-0.05em] text-white sm:text-2xl">
-                Sentinel Fire Command
+                OKAB Smart Fire Detection
               </h1>
               <div className="hidden items-center gap-2 rounded-full border border-cyan-300/18 bg-cyan-300/10 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-cyan-100 md:flex">
                 <Radio className="h-3.5 w-3.5 animate-pulse" />
@@ -54,7 +54,7 @@ export function TopNavbar({
               </div>
             </div>
             <p className="mt-1 truncate text-sm text-slate-400">
-              {focusedCamera.name} in focus. {focusedCamera.summary}
+              {focusedCamera.name} active. {focusedCamera.summary}
             </p>
           </div>
         </div>
@@ -62,7 +62,7 @@ export function TopNavbar({
         <div className="flex items-center gap-3">
           <div className="hidden min-w-[260px] items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-slate-400 xl:flex">
             <Search className="h-4 w-4" />
-            <span className="truncate">Search cameras, teams, or incident IDs</span>
+            <span className="truncate">Search towers, zones, or alert IDs</span>
           </div>
 
           <div className="hidden items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 lg:flex">
@@ -81,7 +81,7 @@ export function TopNavbar({
           </div>
 
           <ActionButton variant="secondary" className="hidden sm:inline-flex">
-            {alertCount} active alerts
+            {alertCount} fire alerts
           </ActionButton>
 
           <motion.button
@@ -98,4 +98,3 @@ export function TopNavbar({
     </header>
   );
 }
-

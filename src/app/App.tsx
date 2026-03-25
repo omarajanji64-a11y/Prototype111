@@ -13,7 +13,7 @@ import { AppShell } from "./components/layout/AppShell";
 import { EmberBackground } from "./components/layout/EmberBackground";
 import {
   cameraFeeds,
-  facilityZones,
+  forestZones,
   initialAlerts,
   type NavigationId,
 } from "./data/dashboard";
@@ -111,7 +111,7 @@ export default function App() {
 
                 <div className="grid gap-6 2xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
                   <AnalyticsChart />
-                  <MapCard zones={facilityZones} onFocusCamera={focusCamera} />
+                  <MapCard zones={forestZones} onFocusCamera={focusCamera} />
                 </div>
               </motion.div>
             )}

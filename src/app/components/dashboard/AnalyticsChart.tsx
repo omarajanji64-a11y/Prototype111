@@ -41,17 +41,17 @@ export function AnalyticsChart() {
     <div className="grid gap-6 xl:grid-cols-2">
       <GlassPanel variants={cardVariants} className="p-5 sm:p-6">
         <div className="relative">
-          <SectionTitle
-            eyebrow="Signal analytics"
-            title="Detection activity"
-            description="Animated confidence and anomaly trends across the last 24 hours."
-            action={
-              <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/14 bg-cyan-300/10 px-4 py-2 text-sm text-cyan-100">
-                <Activity className="h-4 w-4" />
-                24h live
-              </div>
-            }
-          />
+        <SectionTitle
+          eyebrow="Environmental analytics"
+          title="Fire probability trend"
+          description="Temperature, gas, and humidity anomalies tracked over the last 24 hours."
+          action={
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/14 bg-cyan-300/10 px-4 py-2 text-sm text-cyan-100">
+              <Activity className="h-4 w-4" />
+              24h prototype log
+            </div>
+          }
+        />
 
           <div className="mt-6 h-[320px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -109,17 +109,17 @@ export function AnalyticsChart() {
 
       <GlassPanel variants={cardVariants} className="p-5 sm:p-6">
         <div className="relative">
-          <SectionTitle
-            eyebrow="Alert pressure"
-            title="Escalation frequency"
-            description="Stacked alerts animate in by severity for a quick view of incident weight."
-            action={
-              <div className="inline-flex items-center gap-2 rounded-full border border-orange-300/14 bg-orange-300/10 px-4 py-2 text-sm text-orange-100">
-                <Flame className="h-4 w-4" />
-                7-day window
-              </div>
-            }
-          />
+        <SectionTitle
+          eyebrow="Weekly insights"
+          title="Alert distribution"
+          description="Severity distribution helps teams evaluate intervention load and risk patterns."
+          action={
+            <div className="inline-flex items-center gap-2 rounded-full border border-orange-300/14 bg-orange-300/10 px-4 py-2 text-sm text-orange-100">
+              <Flame className="h-4 w-4" />
+              7-day review
+            </div>
+          }
+        />
 
           <div className="mt-6 h-[320px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -174,4 +174,3 @@ export function AnalyticsChart() {
     </div>
   );
 }
-

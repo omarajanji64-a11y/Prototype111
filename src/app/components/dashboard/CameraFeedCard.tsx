@@ -82,7 +82,7 @@ export function CameraFeedCard({ camera, isFocused, onFocus }: CameraFeedCardPro
             transition={{ duration: 1.8, repeat: Number.POSITIVE_INFINITY }}
             className="h-2.5 w-2.5 rounded-full bg-red-400 shadow-[0_0_18px_rgba(248,113,113,0.92)]"
           />
-          Live feed
+          Live tower
         </div>
 
         <div className="absolute bottom-4 right-4 rounded-full border border-white/14 bg-slate-950/55 px-3 py-1.5 text-xs text-slate-100 backdrop-blur-md">
@@ -161,7 +161,7 @@ export function CameraFeedCard({ camera, isFocused, onFocus }: CameraFeedCardPro
           <div className="rounded-[20px] border border-white/8 bg-white/[0.04] p-3">
             <div className="flex items-center gap-2 text-slate-400">
               <Zap className="h-4 w-4" />
-              <span className="text-xs uppercase tracking-[0.18em]">AI</span>
+              <span className="text-xs uppercase tracking-[0.18em]">Fire Prob.</span>
             </div>
             <p className="mt-2 text-lg font-semibold tracking-[-0.04em] text-white">{camera.confidence}%</p>
           </div>
@@ -177,4 +177,3 @@ export function CameraFeedCard({ camera, isFocused, onFocus }: CameraFeedCardPro
     </motion.button>
   );
 }
-

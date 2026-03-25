@@ -54,31 +54,31 @@ export function OverviewHero({
         <div className="relative">
           <div className="flex flex-wrap items-center gap-3">
             <div className="rounded-full border border-cyan-300/18 bg-cyan-300/10 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.26em] text-cyan-100">
-              Live response overview
+              Project summary
             </div>
             <div className="rounded-full border border-orange-300/16 bg-orange-300/10 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-orange-100">
-              {alertCount} active incidents
+              {alertCount} active fire alerts
             </div>
           </div>
 
           <div className="mt-6 max-w-3xl">
             <h2 className="text-4xl font-semibold leading-[1.02] tracking-[-0.08em] text-white sm:text-5xl">
-              Premium incident visibility for every camera, alert, and response lane.
+              OKAB detects forest and rural fires early with AI, IoT towers, and UAV support.
             </h2>
             <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300/82">
-              Sentinel combines thermal detection, AI confidence scoring, and operator workflows into
-              one fluid control surface so teams can react faster without losing context.
+              The system continuously monitors temperature, gas, and humidity through a LoRa-connected
+              tower network, confirms anomalies with multi-tower logic, and triggers fast intervention.
             </p>
           </div>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <ActionButton icon={Siren} variant="primary">
-              Dispatch response team
+              Simulate UAV dispatch
             </ActionButton>
             <ActionButton icon={Video} variant="secondary" onClick={onOpenCameraWall}>
-              Open camera wall
+              Open tower feeds
             </ActionButton>
-            <ActionButton icon={ArrowRight}>Review automation queue</ActionButton>
+            <ActionButton icon={ArrowRight}>Review project scope</ActionButton>
           </div>
 
           <motion.div
@@ -113,7 +113,7 @@ export function OverviewHero({
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-[0.72rem] font-semibold uppercase tracking-[0.26em] text-slate-500">
-                Focused camera
+                Focused tower
               </p>
               <h3 className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-white">
                 {focusedCamera.name}
@@ -150,7 +150,7 @@ export function OverviewHero({
 
           <div className="mt-6 rounded-[24px] border border-white/8 bg-white/[0.04] p-4">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-400">Threat escalation signal</span>
+              <span className="text-slate-400">Fire probability score</span>
               <span className="font-medium text-white">{accent.value}%</span>
             </div>
             <div className="mt-3 h-3 overflow-hidden rounded-full bg-white/[0.06]">
@@ -165,7 +165,7 @@ export function OverviewHero({
 
             <div className="mt-4 flex flex-wrap gap-3">
               <div className="rounded-full border border-white/8 bg-white/[0.045] px-3 py-2 text-sm text-slate-300">
-                {criticalCount} critical incidents
+                {criticalCount} critical alerts
               </div>
               <div className="rounded-full border border-white/8 bg-white/[0.045] px-3 py-2 text-sm text-slate-300">
                 {warningCount} warnings in watch mode
@@ -180,4 +180,3 @@ export function OverviewHero({
     </motion.section>
   );
 }
-

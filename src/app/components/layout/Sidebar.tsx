@@ -55,8 +55,8 @@ export function Sidebar({
               variants={sidebarLabelVariants}
               className={cn("overflow-hidden", !isExpanded && "pointer-events-none")}
             >
-              <p className="text-sm font-semibold tracking-[-0.03em] text-white">Sentinel Core</p>
-              <p className="text-xs text-slate-400">Fire response orchestration</p>
+              <p className="text-sm font-semibold tracking-[-0.03em] text-white">OKAB Core</p>
+              <p className="text-xs text-slate-400">Forest early detection prototype</p>
             </motion.div>
           </div>
 
@@ -133,9 +133,9 @@ export function Sidebar({
               variants={sidebarLabelVariants}
               className={cn("space-y-1", !isExpanded && "pointer-events-none")}
             >
-              <p className="text-sm font-medium text-white">Adaptive AI Mesh</p>
+              <p className="text-sm font-medium text-white">Student-Built System</p>
               <p className="text-xs text-slate-400">
-                8 edge processors synced. Drift budget holding below 1.3%.
+                3 mini towers + LoRa + Raspberry Pi + UAV simulation.
               </p>
             </motion.div>
           </div>
@@ -144,4 +144,3 @@ export function Sidebar({
     </motion.aside>
   );
 }
-

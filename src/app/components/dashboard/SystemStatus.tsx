@@ -63,10 +63,10 @@ export function SystemStatus() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-[0.72rem] font-semibold uppercase tracking-[0.26em] text-slate-500">
-                Processing matrix
+                Prototype metrics
               </p>
               <h3 className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-white">
-                Real-time performance under live load
+                Feasibility and sustainability indicators
               </h3>
             </div>
 
@@ -76,7 +76,7 @@ export function SystemStatus() {
                 transition={{ duration: 1.8, repeat: Number.POSITIVE_INFINITY }}
                 className="h-2.5 w-2.5 rounded-full bg-emerald-300 shadow-[0_0_18px_rgba(110,231,183,0.9)]"
               />
-              AI processing active
+              LoRa network online
             </div>
           </div>
 
@@ -123,11 +123,10 @@ export function SystemStatus() {
 
           <div className="mt-6 flex flex-wrap items-center gap-3 rounded-[24px] border border-white/8 bg-white/[0.04] px-5 py-4 text-sm text-slate-300">
             <Activity className="h-4 w-4 text-cyan-200" />
-            Predictive escalation workflows synced with operator console and edge nodes.
+            Designed for school-level implementation with low-cost, scalable hardware.
           </div>
         </div>
       </GlassPanel>
     </motion.section>
   );
 }
-

@@ -25,14 +25,14 @@ export function CameraGrid({
     <GlassPanel variants={cardVariants} className="p-5 sm:p-6">
       <div className="relative">
         <SectionTitle
-          eyebrow="Camera wall"
-          title="AI-enhanced live feeds"
-          description="Smoothly animated overlays highlight flames, smoke, and thermal drift without obscuring the feed."
+          eyebrow="Tower network"
+          title="Live tower monitoring"
+          description="Temperature, gas, and humidity anomalies are visualized in real time for early fire detection."
           action={
             <div className="flex flex-wrap items-center gap-3">
-              <ActionButton icon={Filter}>Priority filters</ActionButton>
+              <ActionButton icon={Filter}>Sensor filters</ActionButton>
               <ActionButton icon={LayoutGrid} variant="secondary">
-                {alertCount} incidents surfaced
+                {alertCount} fire alerts
               </ActionButton>
             </div>
           }
@@ -57,4 +57,3 @@ export function CameraGrid({
     </GlassPanel>
   );
 }
-

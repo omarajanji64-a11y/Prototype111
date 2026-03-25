@@ -27,9 +27,9 @@ export function AlertPanel({ alerts, onDismiss, onFocusCamera }: AlertPanelProps
     <GlassPanel variants={cardVariants} className="h-full p-5 sm:p-6 lg:sticky lg:top-[104px]">
       <div className="relative">
         <SectionTitle
-          eyebrow="Operator queue"
-          title="Incident rail"
-          description="Prioritized alerts stay anchored with a smooth escalation path for operators."
+          eyebrow="Emergency queue"
+          title="Real-time alert rail"
+          description="Multi-tower confirmation and fast notification support early intervention in risk zones."
           action={<ActionButton variant="secondary">{criticalCount} critical</ActionButton>}
         />
 
@@ -96,10 +96,10 @@ export function AlertPanel({ alerts, onDismiss, onFocusCamera }: AlertPanelProps
                       icon={LocateFixed}
                       onClick={() => onFocusCamera(alert.cameraId)}
                     >
-                      Focus camera
+                      Focus tower
                     </ActionButton>
                     <ActionButton icon={Siren} variant="primary">
-                      Escalate workflow
+                      Launch UAV task
                     </ActionButton>
                   </div>
                 </div>
@@ -109,10 +109,9 @@ export function AlertPanel({ alerts, onDismiss, onFocusCamera }: AlertPanelProps
         </div>
 
         <div className="mt-5 rounded-[24px] border border-white/8 bg-white/[0.04] px-4 py-3 text-sm text-slate-300">
-          Average escalation handoff is holding at 48 seconds across active incidents.
+          Average sensor-to-alert notification time is currently 11 seconds in prototype tests.
         </div>
       </div>
     </GlassPanel>
   );
 }
-

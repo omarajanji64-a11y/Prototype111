@@ -2,14 +2,14 @@ import { LocateFixed, Radar } from "lucide-react";
 import { motion } from "motion/react";
 
 import { cardVariants, createStagger, listItemVariants } from "../../animations/variants";
-import type { FacilityZone } from "../../data/dashboard";
+import type { ForestZone } from "../../data/dashboard";
 import { ActionButton } from "../shared/ActionButton";
 import { GlassPanel } from "../shared/GlassPanel";
 import { SectionTitle } from "../shared/SectionTitle";
 import { StatusBadge } from "../shared/StatusBadge";
 
 interface MapCardProps {
-  zones: FacilityZone[];
+  zones: ForestZone[];
   onFocusCamera: (cameraId: string) => void;
 }
 
@@ -24,13 +24,13 @@ export function MapCard({ zones, onFocusCamera }: MapCardProps) {
     <GlassPanel variants={cardVariants} className="p-5 sm:p-6">
       <div className="relative">
         <SectionTitle
-          eyebrow="Facility mesh"
-          title="Live response map"
-          description="Zones pulse and transition smoothly as thermal risk changes across the site."
+          eyebrow="Forest coverage"
+          title="Rural risk map"
+          description="Forest, agricultural, and village-edge zones are monitored for early fire intervention."
           action={
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/14 bg-cyan-300/10 px-4 py-2 text-sm text-cyan-100">
               <Radar className="h-4 w-4" />
-              Live positioning
+              LoRa positioning
             </div>
           }
         />
@@ -109,16 +109,16 @@ export function MapCard({ zones, onFocusCamera }: MapCardProps) {
 
                 <div className="mt-4 flex flex-wrap gap-2">
                   <div className="rounded-full border border-white/8 bg-white/[0.05] px-3 py-2 text-sm text-slate-300">
-                    Camera {zone.cameraId}
+                    Tower {zone.cameraId}
                   </div>
                   <div className="rounded-full border border-white/8 bg-white/[0.05] px-3 py-2 text-sm text-slate-300">
-                    Load {zone.load}
+                    Risk {zone.risk}
                   </div>
                 </div>
 
                 <div className="mt-4">
                   <ActionButton icon={LocateFixed} onClick={() => onFocusCamera(zone.cameraId)}>
-                    Focus this zone
+                    Focus tower
                   </ActionButton>
                 </div>
               </motion.div>
@@ -129,4 +129,3 @@ export function MapCard({ zones, onFocusCamera }: MapCardProps) {
     </GlassPanel>
   );
 }
-
