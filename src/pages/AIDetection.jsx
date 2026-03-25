@@ -60,6 +60,10 @@ function formatConfidence(confidence) {
   return Math.round(confidence * 100);
 }
 
+function getDetectionLabel(type) {
+  return type === "fire" ? "Fire 🔥" : "Smoke";
+}
+
 function getSeverity(confidence) {
   if (confidence > ALERT_THRESHOLD) return "CRITICAL";
   return "WARNING";
@@ -172,6 +176,91 @@ function getCoverMetrics(videoWidth, videoHeight, frameWidth, frameHeight) {
     offsetX: (frameWidth - width) / 2,
     offsetY: (frameHeight - height) / 2,
   };
+}
+
+function drawDetectionAnnotations(context, detections, frameWidth, frameHeight, videoWidth, videoHeight) {
+  const { scale, offsetX, offsetY } = getCoverMetrics(videoWidth, videoHeight, frameWidth, frameHeight);
+
+  detections.forEach((detection) => {
+    const x = detection.x * scale + offsetX;
+    const y = detection.y * scale + offsetY;
+    const width = detection.width * scale;
+    const height = detection.height * scale;
+    const strokeStyle = detection.type === "fire" ? "#ef4444" : "#9ca3af";
+    const fillStyle = detection.type === "fire" ? "rgba(239,68,68,0.12)" : "rgba(156,163,175,0.12)";
+    const label = `${getDetectionLabel(detection.type)} ${formatConfidence(detection.confidence)}%`;
+
+    context.save();
+    context.strokeStyle = strokeStyle;
+    context.fillStyle = fillStyle;
+    context.lineWidth = 2;
+    drawRoundedRect(context, x, y, width, height, 18);
+    context.fill();
+    context.stroke();
+    context.closePath();
+
+    context.font = "600 12px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
+    const labelWidth = context.measureText(label).width + 18;
+    const labelX = clamp(x, 0, frameWidth - labelWidth);
+    const labelY = Math.max(10, y - 30);
+    context.fillStyle = "rgba(13,17,23,0.92)";
+    drawRoundedRect(context, labelX, labelY, labelWidth, 22, 999);
+    context.fill();
+    context.closePath();
+    context.fillStyle = strokeStyle;
+    context.fillText(label, labelX + 9, labelY + 15);
+    context.restore();
+  });
+}
+
+function captureDetectionSnapshot(video, detections) {
+  if (!video || !video.videoWidth || !video.videoHeight || detections.length === 0) {
+    return null;
+  }
+
+  try {
+    const snapshotCanvas = document.createElement("canvas");
+    const snapshotWidth = 480;
+    const snapshotHeight = Math.round((snapshotWidth * 9) / 16);
+    snapshotCanvas.width = snapshotWidth;
+    snapshotCanvas.height = snapshotHeight;
+    const context = snapshotCanvas.getContext("2d");
+
+    if (!context) {
+      return null;
+    }
+
+    const { scale, offsetX, offsetY } = getCoverMetrics(
+      video.videoWidth,
+      video.videoHeight,
+      snapshotWidth,
+      snapshotHeight,
+    );
+
+    context.fillStyle = "#000000";
+    context.fillRect(0, 0, snapshotWidth, snapshotHeight);
+    context.drawImage(
+      video,
+      offsetX,
+      offsetY,
+      video.videoWidth * scale,
+      video.videoHeight * scale,
+    );
+    context.fillStyle = "rgba(0, 0, 0, 0.05)";
+    context.fillRect(0, 0, snapshotWidth, snapshotHeight);
+    drawDetectionAnnotations(
+      context,
+      detections,
+      snapshotWidth,
+      snapshotHeight,
+      video.videoWidth,
+      video.videoHeight,
+    );
+
+    return snapshotCanvas.toDataURL("image/jpeg", 0.76);
+  } catch {
+    return null;
+  }
 }
 
 function parseOutputTensor(tensor, videoWidth, videoHeight, sourceLabel) {
@@ -314,41 +403,14 @@ function drawDetections(canvas, video, detections) {
   }
 
   context.clearRect(0, 0, canvas.width, canvas.height);
-
-  const videoWidth = video.videoWidth || renderWidth;
-  const videoHeight = video.videoHeight || renderHeight;
-  const { scale, offsetX, offsetY } = getCoverMetrics(videoWidth, videoHeight, canvas.width, canvas.height);
-
-  detections.forEach((detection) => {
-    const x = detection.x * scale + offsetX;
-    const y = detection.y * scale + offsetY;
-    const width = detection.width * scale;
-    const height = detection.height * scale;
-    const strokeStyle = detection.type === "fire" ? "#ef4444" : "#9ca3af";
-    const fillStyle = detection.type === "fire" ? "rgba(239,68,68,0.12)" : "rgba(156,163,175,0.12)";
-    const label = `${detection.type === "fire" ? "Fire 🔥" : "Smoke"} ${formatConfidence(detection.confidence)}%`;
-
-    context.save();
-    context.strokeStyle = strokeStyle;
-    context.fillStyle = fillStyle;
-    context.lineWidth = 2;
-    drawRoundedRect(context, x, y, width, height, 18);
-    context.fill();
-    context.stroke();
-    context.closePath();
-
-    context.font = "600 12px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
-    const labelWidth = context.measureText(label).width + 18;
-    const labelX = clamp(x, 0, canvas.width - labelWidth);
-    const labelY = Math.max(10, y - 30);
-    context.fillStyle = "rgba(13,17,23,0.92)";
-    drawRoundedRect(context, labelX, labelY, labelWidth, 22, 999);
-    context.fill();
-    context.closePath();
-    context.fillStyle = strokeStyle;
-    context.fillText(label, labelX + 9, labelY + 15);
-    context.restore();
-  });
+  drawDetectionAnnotations(
+    context,
+    detections,
+    canvas.width,
+    canvas.height,
+    video.videoWidth || renderWidth,
+    video.videoHeight || renderHeight,
+  );
 }
 
 export function useDetectionEngine(videoRef, canvasRef, isRunning, source) {
@@ -483,6 +545,11 @@ export function useDetectionEngine(videoRef, canvasRef, isRunning, source) {
         const outputs = await session.run({
           [inputName]: new ort.Tensor("float32", input, [1, 3, INPUT_SIZE, INPUT_SIZE]),
         });
+
+        if (cancelled) {
+          return;
+        }
+
         const outputName = session.outputNames?.[0] || Object.keys(outputs)[0];
         const parsedDetections = parseOutputTensor(
           outputs[outputName],
@@ -494,6 +561,7 @@ export function useDetectionEngine(videoRef, canvasRef, isRunning, source) {
         drawDetections(overlay, video, parsedDetections);
 
         if (parsedDetections.length > 0) {
+          const snapshot = captureDetectionSnapshot(video, parsedDetections);
           const todayKey = getTodayKey();
 
           if (todayRef.current.key !== todayKey) {
@@ -504,13 +572,27 @@ export function useDetectionEngine(videoRef, canvasRef, isRunning, source) {
           }
 
           todayRef.current.count += parsedDetections.length;
-          const nextDetections = [...parsedDetections, ...detectionsRef.current].slice(0, MAX_LOG_ITEMS);
+          const nextDetections = [
+            ...parsedDetections.map((detection) => ({
+              ...detection,
+              snapshot,
+            })),
+            ...detectionsRef.current,
+          ].slice(0, MAX_LOG_ITEMS);
           detectionsRef.current = nextDetections;
           setDetections(nextDetections);
         }
       } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
         setEngineError(error instanceof Error ? error.message : "Inference failed.");
         clearCanvas(overlay);
+        return;
+      }
+
+      if (cancelled) {
         return;
       }
 
@@ -870,6 +952,7 @@ export default function AIDetection() {
                 muted
                 autoPlay
                 playsInline
+                crossOrigin="anonymous"
                 onError={() => {
                   if (activeSource === "IP Camera") {
                     setSourceError("Unable to load the current IP camera stream.");
@@ -983,39 +1066,63 @@ export default function AIDetection() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     className="rounded-2xl border border-white/5 bg-[#0d1117] p-4"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-3">
-                        <div
-                          className={`flex h-10 w-10 items-center justify-center rounded-xl ${
-                            detection.type === "fire"
-                              ? "bg-red-500/12 text-red-300"
-                              : "bg-gray-500/12 text-gray-300"
-                          }`}
-                        >
-                          {detection.type === "fire" ? (
-                            <Flame className="h-4.5 w-4.5" />
-                          ) : (
-                            <CloudFog className="h-4.5 w-4.5" />
-                          )}
+                    <div className="space-y-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3">
+                          <div
+                            className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+                              detection.type === "fire"
+                                ? "bg-red-500/12 text-red-300"
+                                : "bg-gray-500/12 text-gray-300"
+                            }`}
+                          >
+                            {detection.type === "fire" ? (
+                              <Flame className="h-4.5 w-4.5" />
+                            ) : (
+                              <CloudFog className="h-4.5 w-4.5" />
+                            )}
+                          </div>
+
+                          <div>
+                            <p className="text-sm font-semibold text-white">
+                              {getDetectionLabel(detection.type)} {formatConfidence(detection.confidence)}%
+                            </p>
+                            <p className="mt-1 text-xs text-gray-400">{formatElapsed(detection.timestamp, clock)}</p>
+                          </div>
                         </div>
 
-                        <div>
-                          <p className="text-sm font-semibold text-white">
-                            {detection.type === "fire" ? "🔥 Fire" : "💨 Smoke"} {formatConfidence(detection.confidence)}%
-                          </p>
-                          <p className="mt-1 text-xs text-gray-400">{formatElapsed(detection.timestamp, clock)}</p>
-                          <div className="mt-2 flex flex-wrap items-center gap-2">
-                            <span className="inline-flex rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[0.66rem] font-medium uppercase tracking-[0.14em] text-gray-300">
-                              {detection.source}
-                            </span>
-                          </div>
+                        <div
+                          className={`rounded-full border px-2.5 py-1 text-[0.66rem] font-semibold tracking-[0.14em] ${severityClasses}`}
+                        >
+                          {severity}
                         </div>
                       </div>
 
-                      <div
-                        className={`rounded-full border px-2.5 py-1 text-[0.66rem] font-semibold tracking-[0.14em] ${severityClasses}`}
-                      >
-                        {severity}
+                      {detection.snapshot ? (
+                        <div className="overflow-hidden rounded-2xl border border-white/5 bg-black">
+                          <img
+                            src={detection.snapshot}
+                            alt={`${getDetectionLabel(detection.type)} screenshot`}
+                            className="aspect-video w-full object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex aspect-video items-center justify-center rounded-2xl border border-dashed border-white/10 bg-black/30 px-4 text-center text-xs text-gray-500">
+                          Snapshot unavailable for this source. The detection metadata is still logged.
+                        </div>
+                      )}
+
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="inline-flex rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[0.66rem] font-medium uppercase tracking-[0.14em] text-gray-300">
+                          {detection.source}
+                        </span>
+                        <span className="inline-flex rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[0.66rem] font-medium uppercase tracking-[0.14em] text-gray-300">
+                          {getDetectionLabel(detection.type)}
+                        </span>
+                        <span className="inline-flex rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[0.66rem] font-medium uppercase tracking-[0.14em] text-gray-300">
+                          {formatConfidence(detection.confidence)}% confidence
+                        </span>
                       </div>
                     </div>
                   </motion.div>
