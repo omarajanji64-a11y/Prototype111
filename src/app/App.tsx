@@ -6,6 +6,7 @@ import { AlertPanel } from "./components/dashboard/AlertPanel";
 import { AnalyticsChart } from "./components/dashboard/AnalyticsChart";
 import { CameraGrid } from "./components/dashboard/CameraGrid";
 import { DashboardSkeleton } from "./components/dashboard/DashboardSkeleton";
+import { EmberScene } from "./components/dashboard/EmberScene";
 import { MapCard } from "./components/dashboard/MapCard";
 import { OverviewHero } from "./components/dashboard/OverviewHero";
 import { SystemStatus } from "./components/dashboard/SystemStatus";
@@ -83,6 +84,8 @@ export default function App() {
                   warningCount={warningCount}
                   onOpenCameraWall={() => setActiveNav("cameras")}
                 />
+
+                <EmberScene />
 
                 <SystemStatus />
 
