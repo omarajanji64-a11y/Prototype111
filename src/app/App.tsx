@@ -6,9 +6,10 @@ import { AlertPanel } from "./components/dashboard/AlertPanel";
 import { AnalyticsChart } from "./components/dashboard/AnalyticsChart";
 import { CameraGrid } from "./components/dashboard/CameraGrid";
 import { DashboardSkeleton } from "./components/dashboard/DashboardSkeleton";
+import { HomeQuickActions } from "./components/dashboard/HomeQuickActions";
 import { MapCard } from "./components/dashboard/MapCard";
-import { OverviewHero } from "./components/dashboard/OverviewHero";
 import { SystemStatus } from "./components/dashboard/SystemStatus";
+import { UavResponsePanel } from "./components/dashboard/UavResponsePanel";
 import { AppShell } from "./components/layout/AppShell";
 import { EmberBackground } from "./components/layout/EmberBackground";
 import {
@@ -33,10 +34,74 @@ export default function App() {
     cameraFeeds.find((camera) => camera.id === focusedCameraId) ?? cameraFeeds[0];
   const criticalCount = alerts.filter((alert) => alert.severity === "critical").length;
   const warningCount = cameraFeeds.filter((camera) => camera.status === "warning").length;
+  const safeCount = cameraFeeds.filter((camera) => camera.status === "safe").length;
 
   const focusCamera = (cameraId: string) => {
     setFocusedCameraId(cameraId);
     setActiveNav("cameras");
+  };
+
+  const renderTaskView = () => {
+    if (activeNav === "overview") {
+      return (
+        <HomeQuickActions
+          alerts={alerts}
+          criticalCount={criticalCount}
+          warningTowerCount={warningCount}
+          safeTowerCount={safeCount}
+          onNavigate={setActiveNav}
+          onFocusTower={focusCamera}
+          onDismissAlert={(alertId) =>
+            setAlerts((currentAlerts) => currentAlerts.filter((alert) => alert.id !== alertId))
+          }
+        />
+      );
+    }
+
+    if (activeNav === "cameras") {
+      return (
+        <CameraGrid
+          cameras={cameraFeeds}
+          focusedCameraId={focusedCameraId}
+          alertCount={alerts.length}
+          onFocusCamera={focusCamera}
+        />
+      );
+    }
+
+    if (activeNav === "alerts") {
+      return (
+        <AlertPanel
+          alerts={alerts}
+          sticky={false}
+          onDismiss={(alertId) =>
+            setAlerts((currentAlerts) => currentAlerts.filter((alert) => alert.id !== alertId))
+          }
+          onFocusCamera={focusCamera}
+        />
+      );
+    }
+
+    if (activeNav === "analytics") {
+      return (
+        <div className="space-y-6 lg:space-y-8">
+          <SystemStatus />
+          <AnalyticsChart />
+        </div>
+      );
+    }
+
+    if (activeNav === "map") {
+      return <MapCard zones={forestZones} onFocusCamera={focusCamera} />;
+    }
+
+    return (
+      <UavResponsePanel
+        alerts={alerts}
+        onFocusTower={focusCamera}
+        onOpenAlerts={() => setActiveNav("alerts")}
+      />
+    );
   };
 
   return (
@@ -53,69 +118,37 @@ export default function App() {
 
         <div className="relative z-20">
           <AppShell
-          activeNav={activeNav}
-          onActiveChange={setActiveNav}
-          isSidebarExpanded={isSidebarExpanded}
-          onSidebarToggle={() => setIsSidebarExpanded((current) => !current)}
-          alertCount={alerts.length}
-          focusedCamera={focusedCamera}
-        >
-          <AnimatePresence mode="wait" initial={false}>
-            {isLoading ? (
-              <motion.div
-                key="dashboard-loading"
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.3 }}
-              >
-                <DashboardSkeleton />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="dashboard-content"
-                variants={pageVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                className="space-y-6 lg:space-y-8"
-              >
-                <OverviewHero
-                  focusedCamera={focusedCamera}
-                  alertCount={alerts.length}
-                  criticalCount={criticalCount}
-                  warningCount={warningCount}
-                  onOpenCameraWall={() => setActiveNav("cameras")}
-                />
-
-                <SystemStatus />
-
-                <div className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(360px,0.8fr)]">
-                  <CameraGrid
-                    cameras={cameraFeeds}
-                    focusedCameraId={focusedCameraId}
-                    alertCount={alerts.length}
-                    onFocusCamera={focusCamera}
-                  />
-
-                  <AlertPanel
-                    alerts={alerts}
-                    onDismiss={(alertId) =>
-                      setAlerts((currentAlerts) =>
-                        currentAlerts.filter((alert) => alert.id !== alertId),
-                      )
-                    }
-                    onFocusCamera={focusCamera}
-                  />
-                </div>
-
-                <div className="grid gap-6 2xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
-                  <AnalyticsChart />
-                  <MapCard zones={forestZones} onFocusCamera={focusCamera} />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+            activeNav={activeNav}
+            onActiveChange={setActiveNav}
+            isSidebarExpanded={isSidebarExpanded}
+            onSidebarToggle={() => setIsSidebarExpanded((current) => !current)}
+            alertCount={alerts.length}
+            focusedCamera={focusedCamera}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {isLoading ? (
+                <motion.div
+                  key="dashboard-loading"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <DashboardSkeleton />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key={`dashboard-${activeNav}`}
+                  variants={pageVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  className="space-y-6 lg:space-y-8"
+                >
+                  {renderTaskView()}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </AppShell>
         </div>
       </div>

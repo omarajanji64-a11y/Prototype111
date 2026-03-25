@@ -12,6 +12,7 @@ interface AlertPanelProps {
   alerts: AlertItem[];
   onDismiss: (alertId: string) => void;
   onFocusCamera: (cameraId: string) => void;
+  sticky?: boolean;
 }
 
 const severityTone = {
@@ -20,11 +21,19 @@ const severityTone = {
   medium: "from-cyan-300/16 via-cyan-200/[0.05] to-transparent",
 } as const;
 
-export function AlertPanel({ alerts, onDismiss, onFocusCamera }: AlertPanelProps) {
+export function AlertPanel({
+  alerts,
+  onDismiss,
+  onFocusCamera,
+  sticky = true,
+}: AlertPanelProps) {
   const criticalCount = alerts.filter((alert) => alert.severity === "critical").length;
 
   return (
-    <GlassPanel variants={cardVariants} className="h-full p-5 sm:p-6 lg:sticky lg:top-[104px]">
+    <GlassPanel
+      variants={cardVariants}
+      className={`h-full p-5 sm:p-6 ${sticky ? "lg:sticky lg:top-[104px]" : ""}`}
+    >
       <div className="relative">
         <SectionTitle
           eyebrow="Emergency queue"
