@@ -314,6 +314,7 @@ export function useDetectionEngine(videoRef, canvasRef, isRunning, source) {
     detectionsToday: 0,
     activeSource: "None",
     avgConfidence: 0,
+    modelError: "",
   });
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [modelError, setModelError] = useState("");
@@ -365,8 +366,9 @@ export function useDetectionEngine(videoRef, canvasRef, isRunning, source) {
       detectionsToday: detectionsRef.current.length,
       activeSource: isRunning ? formatSourceBadge(source) : "None",
       avgConfidence,
+      modelError,
     });
-  }, [detections, isRunning, source]);
+  }, [detections, isRunning, modelError, source]);
 
   useEffect(() => {
     if (!isRunning) {
@@ -458,7 +460,7 @@ export function useDetectionEngine(videoRef, canvasRef, isRunning, source) {
     };
   }, [canvasRef, isModelLoaded, isRunning, modelError, source, videoRef]);
 
-  return { detections, stats, isModelLoaded, modelError };
+  return { detections, stats, isModelLoaded };
 }
 
 export default function AIDetection() {
@@ -479,12 +481,13 @@ export default function AIDetection() {
   const audioContextRef = useRef(null);
   const latestAlertRef = useRef("");
 
-  const { detections, stats, isModelLoaded, modelError } = useDetectionEngine(
+  const { detections, stats, isModelLoaded } = useDetectionEngine(
     videoRef,
     canvasRef,
     isRunning,
     activeSource,
   );
+  const modelError = stats.modelError || "";
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -686,8 +689,8 @@ export default function AIDetection() {
 
   const latestThreeDetections = detections.slice(0, 3);
   const showScreenOverlay = activeSource === "Screen Share" && isRunning && !isOverlayDismissed;
-  const showVideoMessage = Boolean(sourceError || modelError || !isModelLoaded);
   const isIpSourceEmpty = activeSource === "IP Camera" && !ipCameraUrl.trim();
+  const showVideoMessage = Boolean(sourceError || modelError || !isModelLoaded || isIpSourceEmpty);
 
   return (
     <div className="min-h-screen bg-[#0d1117] text-white">
