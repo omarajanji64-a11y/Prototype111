@@ -8,6 +8,7 @@ import {
   MapPinned,
   ShieldCheck,
   Sparkles,
+  Video,
 } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -29,6 +30,7 @@ const iconMap: Record<NavigationId, LucideIcon> = {
   analytics: BarChart3,
   map: MapPinned,
   automation: Sparkles,
+  aiDetection: Video,
 };
 
 export function Sidebar({

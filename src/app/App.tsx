@@ -19,6 +19,7 @@ import {
   type NavigationId,
 } from "./data/dashboard";
 import { useDashboardBootstrap } from "./hooks/useDashboardBootstrap";
+import AIDetection from "../pages/AIDetection.jsx";
 
 const initialFocusedCamera =
   cameraFeeds.find((camera) => camera.status === "fire")?.id ?? cameraFeeds[0]?.id ?? "";
@@ -93,6 +94,10 @@ export default function App() {
 
     if (activeNav === "map") {
       return <MapCard zones={forestZones} onFocusCamera={focusCamera} />;
+    }
+
+    if (activeNav === "aiDetection") {
+      return <AIDetection />;
     }
 
     return (
