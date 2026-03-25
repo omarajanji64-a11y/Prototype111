@@ -37,6 +37,14 @@ export default defineConfig({
             return 'motion'
           }
 
+          if (
+            id.includes('@splinetool') ||
+            id.includes('/three/') ||
+            id.includes('three-stdlib')
+          ) {
+            return 'spline'
+          }
+
           if (id.includes('lucide-react')) {
             return 'icons'
           }

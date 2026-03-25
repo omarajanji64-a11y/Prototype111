@@ -6,11 +6,11 @@ import { AlertPanel } from "./components/dashboard/AlertPanel";
 import { AnalyticsChart } from "./components/dashboard/AnalyticsChart";
 import { CameraGrid } from "./components/dashboard/CameraGrid";
 import { DashboardSkeleton } from "./components/dashboard/DashboardSkeleton";
-import { EmberScene } from "./components/dashboard/EmberScene";
 import { MapCard } from "./components/dashboard/MapCard";
 import { OverviewHero } from "./components/dashboard/OverviewHero";
 import { SystemStatus } from "./components/dashboard/SystemStatus";
 import { AppShell } from "./components/layout/AppShell";
+import { EmberBackground } from "./components/layout/EmberBackground";
 import {
   cameraFeeds,
   facilityZones,
@@ -41,15 +41,18 @@ export default function App() {
 
   return (
     <MotionConfig reducedMotion="user" transition={transitionDefaults}>
-      <div className="min-h-screen bg-[#050816] text-white">
-        <div className="pointer-events-none fixed inset-0 overflow-hidden">
+      <div className="relative min-h-screen bg-[#050816] text-white">
+        <EmberBackground />
+
+        <div className="pointer-events-none fixed inset-0 z-10 overflow-hidden">
           <div className="aurora-shift absolute -left-[12%] top-[-8%] h-[540px] w-[540px] rounded-full bg-[radial-gradient(circle,rgba(34,211,238,0.14)_0%,transparent_66%)] blur-3xl" />
           <div className="aurora-shift absolute right-[-12%] top-[12%] h-[560px] w-[560px] rounded-full bg-[radial-gradient(circle,rgba(249,115,22,0.14)_0%,transparent_62%)] blur-3xl" />
           <div className="aurora-shift absolute bottom-[-18%] left-[22%] h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle,rgba(56,189,248,0.1)_0%,transparent_68%)] blur-3xl" />
           <div className="noise-overlay absolute inset-0 opacity-45" />
         </div>
 
-        <AppShell
+        <div className="relative z-20">
+          <AppShell
           activeNav={activeNav}
           onActiveChange={setActiveNav}
           isSidebarExpanded={isSidebarExpanded}
@@ -85,8 +88,6 @@ export default function App() {
                   onOpenCameraWall={() => setActiveNav("cameras")}
                 />
 
-                <EmberScene />
-
                 <SystemStatus />
 
                 <div className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(360px,0.8fr)]">
@@ -115,7 +116,8 @@ export default function App() {
               </motion.div>
             )}
           </AnimatePresence>
-        </AppShell>
+          </AppShell>
+        </div>
       </div>
     </MotionConfig>
   );
