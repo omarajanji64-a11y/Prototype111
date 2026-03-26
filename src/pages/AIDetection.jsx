@@ -4,8 +4,6 @@ import { AnimatePresence, motion } from "motion/react";
 import {
   Camera,
   ChevronDown,
-  CloudFog,
-  Flame,
   Link2,
   LoaderCircle,
   MonitorUp,
@@ -34,10 +32,6 @@ const NMS_THRESHOLD = 0.5;
 const ALERT_THRESHOLD = 0.8;
 const LOG_LIMIT = 50;
 const LOG_COOLDOWN_MS = 1200;
-
-function getSourceLabel(source) {
-  return SOURCE_TABS.find((tab) => tab.id === source)?.label ?? "Unknown";
-}
 
 function getSourceBadge(source) {
   return SOURCE_TABS.find((tab) => tab.id === source)?.badge ?? "None";
@@ -351,6 +345,7 @@ function useDetectionEngine(videoRef, canvasRef, isRunning, modelPath) {
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [isLoadingModel, setIsLoadingModel] = useState(true);
   const [modelError, setModelError] = useState("");
+  const [runtimeError, setRuntimeError] = useState("");
 
   const sessionRef = useRef(null);
   const processingCanvasRef = useRef(null);
@@ -366,6 +361,7 @@ function useDetectionEngine(videoRef, canvasRef, isRunning, modelPath) {
       setIsLoadingModel(true);
       setIsModelLoaded(false);
       setModelError("");
+      setRuntimeError("");
       clearCanvas(canvasRef.current);
 
       const previousSession = sessionRef.current;
@@ -416,6 +412,7 @@ function useDetectionEngine(videoRef, canvasRef, isRunning, modelPath) {
     window.clearTimeout(loopTimeoutRef.current);
 
     if (!isRunning || !isModelLoaded || !sessionRef.current) {
+      setRuntimeError("");
       clearCanvas(canvasRef.current);
       return () => {
         cancelled = true;
@@ -471,6 +468,7 @@ function useDetectionEngine(videoRef, canvasRef, isRunning, modelPath) {
 
         const outputTensor = Object.values(outputs)[0];
         const nextDetections = parseDetections(outputTensor, video.videoWidth, video.videoHeight);
+        setRuntimeError("");
         drawDetections(canvas, video, nextDetections);
 
         if (nextDetections.length > 0) {
@@ -515,7 +513,15 @@ function useDetectionEngine(videoRef, canvasRef, isRunning, modelPath) {
         }
       } catch (error) {
         if (!cancelled) {
-          setModelError(error instanceof Error ? error.message : "Inference failed for the selected model.");
+          const nextMessage =
+            error instanceof Error &&
+            (error.name === "SecurityError" || /cross-origin|taint/i.test(error.message))
+              ? "This stream blocks browser frame access, so live detection cannot read pixels from it."
+              : error instanceof Error && error.message
+                ? error.message
+                : "Live inference failed while reading the current source.";
+
+          setRuntimeError(nextMessage);
         }
       } finally {
         if (!cancelled) {
@@ -548,6 +554,7 @@ function useDetectionEngine(videoRef, canvasRef, isRunning, modelPath) {
     isModelLoaded,
     isLoadingModel,
     modelError,
+    runtimeError,
   };
 }
 
@@ -581,7 +588,7 @@ export default function AIDetection() {
   const [borderFlash, setBorderFlash] = useState({ visible: false, key: 0 });
   const [now, setNow] = useState(Date.now());
 
-  const { detections, stats, isModelLoaded, isLoadingModel, modelError } = useDetectionEngine(
+  const { detections, stats, isModelLoaded, isLoadingModel, modelError, runtimeError } = useDetectionEngine(
     videoRef,
     canvasRef,
     isRunning && isSourceReady,
@@ -887,6 +894,14 @@ export default function AIDetection() {
           ) : (
             <Link2 className="h-7 w-7 text-amber-400" />
           ),
+      };
+    }
+
+    if (runtimeError) {
+      return {
+        title: "Detection unavailable",
+        description: runtimeError,
+        icon: <TriangleAlert className="h-7 w-7 text-amber-400" />,
       };
     }
 
