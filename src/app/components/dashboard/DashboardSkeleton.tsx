@@ -1,8 +1,36 @@
 import { SkeletonBlock } from "../shared/SkeletonBlock";
 
-export function DashboardSkeleton() {
+interface DashboardSkeletonProps {
+  progress?: number;
+  statusLabel?: string;
+}
+
+export function DashboardSkeleton({
+  progress = 0,
+  statusLabel = "Preparing live monitoring resources…",
+}: DashboardSkeletonProps) {
   return (
     <div className="space-y-3 lg:space-y-4">
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="command-section-label">Initializing</p>
+            <h2 className="mt-2 text-2xl font-semibold text-[var(--text-primary)]">OKAB</h2>
+            <p className="mt-2 text-sm text-[var(--text-secondary)]">{statusLabel}</p>
+          </div>
+          <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-3 py-2 text-sm font-medium text-[var(--text-primary)]">
+            {progress}%
+          </div>
+        </div>
+
+        <div className="mt-4 h-2 overflow-hidden rounded-full bg-[var(--bg-surface)]">
+          <div
+            className="h-full rounded-full bg-[var(--accent-primary)] transition-[width] duration-300 ease-out"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
+
       <div className="grid gap-3 xl:grid-cols-[minmax(0,1.2fr)_minmax(360px,0.92fr)]">
         <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-6">
           <SkeletonBlock className="h-8 w-36 rounded-full" />

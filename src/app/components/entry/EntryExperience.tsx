@@ -2,10 +2,13 @@ import type { CSSProperties } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 
+import type { AppBootstrapState } from "../../hooks/useAppBootstrap";
+import { DEFAULT_OKAB_MODEL_ID, OKAB_MODEL_OPTIONS } from "../../lib/okabModels";
 import { AiParticleField } from "./AiParticleField";
 
 interface EntryExperienceProps {
   onComplete: (modelId: string) => void;
+  bootstrap: AppBootstrapState;
 }
 
 type EntryPhase = "splash" | "select" | "entering";
@@ -21,92 +24,73 @@ interface ModelProfile {
   stats: Array<{ label: string; value: string }>;
 }
 
-const SPLASH_DURATION_MS = 3600;
 const SPLASH_EXIT_DELAY_MS = 360;
 const ENTRY_FINALIZE_MS = 1050;
 
-const MODEL_PROFILES: ModelProfile[] = [
-  {
-    id: "gpt-4",
-    name: "GPT-4",
-    label: "Adaptive Mission Core",
-    description: "Balanced multimodal reasoning for stable analysis, response planning, and field-ready UI flows.",
-    prompt: "Low-latency orchestration with dependable visual inference and tactical summaries.",
+const MODEL_PROFILE_DECOR: Record<
+  string,
+  Omit<ModelProfile, "description" | "id" | "name">
+> = {
+  "okab-smoke": {
+    label: "Early Smoke Sentinel",
+    prompt: "Prioritizes smoke signatures for earlier preventative alerts across towers and field feeds.",
+    accent: "#d8b46a",
+    glow: "rgba(216, 180, 106, 0.36)",
+    stats: [
+      { label: "Focus", value: "Smoke" },
+      { label: "Latency", value: "0.8 sec" },
+      { label: "Coverage", value: "Early" },
+    ],
+  },
+  "okab-fire": {
+    label: "Flame Response Core",
+    prompt: "Locks onto visible flame activity for rapid escalation and damage-reduction alerts.",
+    accent: "#ff7b47",
+    glow: "rgba(255, 123, 71, 0.4)",
+    stats: [
+      { label: "Focus", value: "Flames" },
+      { label: "Latency", value: "0.7 sec" },
+      { label: "Priority", value: "Rapid" },
+    ],
+  },
+  "okab-hybrid": {
+    label: "Dual Hazard Fusion",
+    prompt: "Combines smoke and fire intelligence for broader coverage and stronger alert confidence.",
     accent: "#5ef5ff",
     glow: "rgba(94, 245, 255, 0.38)",
     stats: [
-      { label: "Precision", value: "98.2%" },
-      { label: "Latency", value: "34 ms" },
-      { label: "Vision Sync", value: "Active" },
+      { label: "Coverage", value: "Dual" },
+      { label: "Fusion", value: "99.1%" },
+      { label: "Mode", value: "Unified" },
     ],
   },
-  {
-    id: "gpt-5",
-    name: "GPT-5",
-    label: "Cinematic Intelligence Core",
-    description: "High-agency reasoning with deeper synthesis, richer multimodal context, and sharper mission adaptation.",
-    prompt: "Enhanced situational awareness for complex decisions, predictive monitoring, and immersive command UX.",
-    accent: "#d46cff",
-    glow: "rgba(212, 108, 255, 0.42)",
-    stats: [
-      { label: "Reasoning", value: "Maxed" },
-      { label: "Context", value: "256k" },
-      { label: "Signal Depth", value: "Ultra" },
-    ],
-  },
-  {
-    id: "custom-ai",
-    name: "Custom AI",
-    label: "Forge Your Own Stack",
-    description: "Bring a tuned specialist model into the system with custom behavior, persona shaping, and private logic layers.",
-    prompt: "Configurable pipelines for domain-specific inference, experimental tooling, and bespoke operator workflows.",
-    accent: "#74a8ff",
-    glow: "rgba(116, 168, 255, 0.38)",
-    stats: [
-      { label: "Extensibility", value: "Open" },
-      { label: "Profiles", value: "12 Slots" },
-      { label: "Sandbox", value: "Ready" },
-    ],
-  },
-];
+};
 
-export function EntryExperience({ onComplete }: EntryExperienceProps) {
-  const [phase, setPhase] = useState<EntryPhase>("splash");
-  const [progress, setProgress] = useState(0);
-  const [hoveredModelId, setHoveredModelId] = useState(MODEL_PROFILES[1].id);
+const MODEL_PROFILES: ModelProfile[] = OKAB_MODEL_OPTIONS.map((option) => ({
+  id: option.id,
+  name: option.label,
+  description: option.description,
+  ...MODEL_PROFILE_DECOR[option.id],
+}));
+
+export function EntryExperience({ onComplete, bootstrap }: EntryExperienceProps) {
+  const [phase, setPhase] = useState<EntryPhase>(bootstrap.isReady ? "select" : "splash");
+  const [hoveredModelId, setHoveredModelId] = useState(DEFAULT_OKAB_MODEL_ID);
   const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (phase !== "splash") {
+    if (phase !== "splash" || !bootstrap.isReady) {
       return;
     }
 
-    let frameId = 0;
-    let timeoutId = 0;
-    const startTime = performance.now();
-
-    const tick = (timestamp: number) => {
-      const progressRatio = Math.min((timestamp - startTime) / SPLASH_DURATION_MS, 1);
-      const easedRatio = 1 - Math.pow(1 - progressRatio, 3);
-      setProgress(Math.round(easedRatio * 100));
-
-      if (progressRatio < 1) {
-        frameId = window.requestAnimationFrame(tick);
-        return;
-      }
-
-      timeoutId = window.setTimeout(() => {
-        setPhase("select");
-      }, SPLASH_EXIT_DELAY_MS);
-    };
-
-    frameId = window.requestAnimationFrame(tick);
+    const timeoutId = window.setTimeout(() => {
+      setPhase("select");
+    }, SPLASH_EXIT_DELAY_MS);
 
     return () => {
-      window.cancelAnimationFrame(frameId);
       window.clearTimeout(timeoutId);
     };
-  }, [phase]);
+  }, [bootstrap.isReady, phase]);
 
   useEffect(() => {
     if (phase !== "entering" || !selectedModelId) {
@@ -121,7 +105,9 @@ export function EntryExperience({ onComplete }: EntryExperienceProps) {
   }, [onComplete, phase, selectedModelId]);
 
   const selectedModel =
-    MODEL_PROFILES.find((profile) => profile.id === selectedModelId) ?? MODEL_PROFILES[1];
+    MODEL_PROFILES.find((profile) => profile.id === selectedModelId) ??
+    MODEL_PROFILES.find((profile) => profile.id === DEFAULT_OKAB_MODEL_ID) ??
+    MODEL_PROFILES[0];
 
   const handleSelect = (modelId: string) => {
     if (phase === "entering") {
@@ -157,8 +143,17 @@ export function EntryExperience({ onComplete }: EntryExperienceProps) {
                 animate={{ opacity: [0.45, 1, 0.45] }}
                 transition={{ duration: 2.6, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
               >
-                Initializing AI...
+                Initializing
               </motion.p>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                className="font-sci-display text-[clamp(3.4rem,9vw,6.4rem)] uppercase tracking-[0.24em] text-white"
+              >
+                OKAB
+              </motion.h1>
 
               <div className="sci-holo-core">
                 <div className="sci-holo-ring sci-holo-ring-outer" />
@@ -177,13 +172,13 @@ export function EntryExperience({ onComplete }: EntryExperienceProps) {
 
               <div className="mt-10 w-full max-w-md">
                 <div className="font-sci-mono sci-progress-caption">
-                  <span>Neural lattice sync</span>
-                  <span>{progress}%</span>
+                  <span>{bootstrap.statusLabel}</span>
+                  <span>{bootstrap.progress}%</span>
                 </div>
                 <div className="sci-progress-shell">
                   <motion.div
                     className="sci-progress-fill"
-                    animate={{ width: `${progress}%` }}
+                    animate={{ width: `${bootstrap.progress}%` }}
                     transition={{ duration: 0.24, ease: "easeOut" }}
                   />
                 </div>
@@ -206,13 +201,10 @@ export function EntryExperience({ onComplete }: EntryExperienceProps) {
                 transition={{ delay: 0.08, duration: 0.7 }}
                 className="mx-auto max-w-3xl text-center"
               >
-                <p className="font-sci-mono sci-entry-kicker">Model Selection</p>
-                <h1 className="font-sci-display sci-entry-title">
-                  Choose An Intelligence Core
-                </h1>
+                <p className="font-sci-mono sci-entry-kicker">OKAB Models</p>
+                <h1 className="font-sci-display sci-entry-title">Choose A Detection Profile</h1>
                 <p className="sci-entry-copy">
-                  Step through the command gateway, lock in a cognitive profile, and
-                  enter the system with a cinematic sci-fi prelaunch feel.
+                  Select the monitoring profile you want active by default before entering the live hazard dashboard.
                 </p>
               </motion.div>
 
@@ -262,13 +254,13 @@ export function EntryExperience({ onComplete }: EntryExperienceProps) {
                       <div className="relative z-10 flex h-full flex-col">
                         <div className="flex items-start justify-between gap-4">
                           <div className="text-left">
-                            <p className="font-sci-mono sci-card-label">Core ID</p>
+                            <p className="font-sci-mono sci-card-label">Model ID</p>
                             <h2 className="font-sci-display sci-card-title">{profile.name}</h2>
                             <p className="sci-card-subtitle">{profile.label}</p>
                           </div>
                           <div className="sci-card-status">
                             <span className="sci-card-status-dot" />
-                            Live
+                            Ready
                           </div>
                         </div>
 
@@ -303,7 +295,7 @@ export function EntryExperience({ onComplete }: EntryExperienceProps) {
               >
                 <div className="sci-entry-footer-line" />
                 <p className="font-sci-mono sci-entry-footer-copy">
-                  Hover to inspect telemetry. Select a core to enter the system.
+                  Hover to inspect telemetry. Select a model to enter the system.
                 </p>
               </motion.div>
             </div>
@@ -329,11 +321,10 @@ export function EntryExperience({ onComplete }: EntryExperienceProps) {
             >
               <p className="font-sci-mono sci-entry-kicker">Access Granted</p>
               <h2 className="font-sci-display sci-entry-overlay-title">
-                Syncing {selectedModel.name}
+                Launching {selectedModel.name}
               </h2>
               <p className="sci-entry-overlay-copy">
-                Holographic shell aligned. Routing you from the cinematic prelaunch deck
-                into the live application.
+                Finalizing the OKAB command environment and moving into live hazard monitoring.
               </p>
             </motion.div>
           </motion.div>

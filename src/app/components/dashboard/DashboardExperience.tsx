@@ -2,6 +2,7 @@ import { AnimatePresence, MotionConfig, motion } from "motion/react";
 import { lazy, Suspense, startTransition, useState } from "react";
 
 import { pageVariants, transitionDefaults } from "../../animations/variants";
+import type { AppBootstrapState } from "../../hooks/useAppBootstrap";
 import { AlertPanel } from "./AlertPanel";
 import { AnalyticsChart } from "./AnalyticsChart";
 import { CameraGrid } from "./CameraGrid";
@@ -14,28 +15,35 @@ import { AppShell } from "../layout/AppShell";
 import { EmberBackground } from "../layout/EmberBackground";
 import {
   cameraFeeds,
+  type CameraStatus,
   forestZones,
   type NavigationId,
 } from "../../data/dashboard";
-import { useDashboardBootstrap } from "../../hooks/useDashboardBootstrap";
+import { getDashboardWarmupSnapshot } from "../../lib/dashboardWarmup";
 
 const AIDetection = lazy(() => import("../../../pages/AIDetection.jsx"));
 
 const initialFocusedCamera =
   cameraFeeds.find((camera) => camera.status === "safe")?.id ?? cameraFeeds[0]?.id ?? "";
 
-export function DashboardExperience() {
+interface DashboardExperienceProps {
+  bootstrap: AppBootstrapState;
+  selectedModelId: string;
+}
+
+export function DashboardExperience({ bootstrap, selectedModelId }: DashboardExperienceProps) {
   const [activeNav, setActiveNav] = useState<NavigationId>("overview");
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [focusedCameraId, setFocusedCameraId] = useState(initialFocusedCamera);
   const [alerts, setAlerts] = useState([]);
-  const { isLoading } = useDashboardBootstrap(1100);
+  const dashboardSnapshot = getDashboardWarmupSnapshot();
+  const towerStatusTotals = dashboardSnapshot.towerTopology.statusTotals as Record<CameraStatus, number>;
 
   const focusedCamera =
     cameraFeeds.find((camera) => camera.id === focusedCameraId) ?? cameraFeeds[0];
   const criticalCount = alerts.filter((alert) => alert.severity === "critical").length;
-  const warningCount = cameraFeeds.filter((camera) => camera.status === "warning").length;
-  const safeCount = cameraFeeds.filter((camera) => camera.status === "safe").length;
+  const warningCount = towerStatusTotals.warning;
+  const safeCount = towerStatusTotals.safe;
 
   const focusCamera = (cameraId: string) => {
     setFocusedCameraId(cameraId);
@@ -106,8 +114,8 @@ export function DashboardExperience() {
 
     if (activeNav === "aiDetection") {
       return (
-        <Suspense fallback={<DashboardSkeleton />}>
-          <AIDetection />
+        <Suspense fallback={<DashboardSkeleton progress={bootstrap.progress} statusLabel={bootstrap.statusLabel} />}>
+          <AIDetection defaultModelId={selectedModelId} />
         </Suspense>
       );
     }
@@ -136,7 +144,7 @@ export function DashboardExperience() {
             focusedCamera={focusedCamera}
           >
             <AnimatePresence mode="wait" initial={false}>
-              {isLoading ? (
+              {!bootstrap.isReady ? (
                 <motion.div
                   key="dashboard-loading"
                   initial={{ opacity: 0, y: 16 }}
@@ -144,7 +152,7 @@ export function DashboardExperience() {
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <DashboardSkeleton />
+                  <DashboardSkeleton progress={bootstrap.progress} statusLabel={bootstrap.statusLabel} />
                 </motion.div>
               ) : (
                 <motion.div

@@ -14,15 +14,18 @@ import {
   X,
 } from "lucide-react";
 
+import {
+  DEFAULT_OKAB_MODEL_ID,
+  OKAB_MODEL_OPTIONS,
+  getOkabModelLabel,
+  getOkabModelOption,
+  getOkabModelSessions,
+} from "../app/lib/okabModels";
+
 const SOURCE_TABS = [
   { id: "webcam", label: "Webcam", badge: "Webcam" },
   { id: "ip", label: "IP Camera", badge: "IP" },
   { id: "screen", label: "Screen Share", badge: "Screen" },
-];
-
-const MODEL_OPTIONS = [
-  { path: "/best.onnx", label: "General Model" },
-  { path: "/forest.onnx", label: "Forest Model" },
 ];
 
 const INPUT_SIZE = 640;
@@ -37,8 +40,8 @@ function getSourceBadge(source) {
   return SOURCE_TABS.find((tab) => tab.id === source)?.badge ?? "None";
 }
 
-function getModelLabel(modelPath) {
-  return MODEL_OPTIONS.find((option) => option.path === modelPath)?.label ?? "Unknown Model";
+function getModelLabel(modelId) {
+  return getOkabModelLabel(modelId);
 }
 
 function getDetectionLabel(type) {
@@ -327,19 +330,13 @@ function parseDetections(outputTensor, videoWidth, videoHeight) {
   return applyNms(rawDetections, NMS_THRESHOLD);
 }
 
-async function releaseSession(session) {
-  if (!session || typeof session.release !== "function") {
-    return;
-  }
-
-  try {
-    await session.release();
-  } catch {
-    // Ignore session disposal issues so model switching remains resilient.
-  }
+async function runSessionInference(session, tensor) {
+  const inputName = session.inputNames?.[0] ?? "images";
+  const outputs = await session.run({ [inputName]: tensor });
+  return Object.values(outputs)[0];
 }
 
-function useDetectionEngine(videoRef, canvasRef, isRunning, modelPath) {
+function useDetectionEngine(videoRef, canvasRef, isRunning, modelId) {
   const [detections, setDetections] = useState([]);
   const [detectionsToday, setDetectionsToday] = useState(0);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
@@ -347,7 +344,7 @@ function useDetectionEngine(videoRef, canvasRef, isRunning, modelPath) {
   const [modelError, setModelError] = useState("");
   const [runtimeError, setRuntimeError] = useState("");
 
-  const sessionRef = useRef(null);
+  const sessionRef = useRef([]);
   const processingCanvasRef = useRef(null);
   const processingContextRef = useRef(null);
   const inputBufferRef = useRef(new Float32Array(3 * INPUT_SIZE * INPUT_SIZE));
@@ -364,19 +361,14 @@ function useDetectionEngine(videoRef, canvasRef, isRunning, modelPath) {
       setRuntimeError("");
       clearCanvas(canvasRef.current);
 
-      const previousSession = sessionRef.current;
-      sessionRef.current = null;
-      await releaseSession(previousSession);
-
       try {
-        const nextSession = await ort.InferenceSession.create(modelPath);
+        const nextSessions = await getOkabModelSessions(modelId);
 
         if (cancelled) {
-          await releaseSession(nextSession);
           return;
         }
 
-        sessionRef.current = nextSession;
+        sessionRef.current = nextSessions;
         setIsModelLoaded(true);
         setIsLoadingModel(false);
       } catch (error) {
@@ -395,13 +387,12 @@ function useDetectionEngine(videoRef, canvasRef, isRunning, modelPath) {
     return () => {
       cancelled = true;
     };
-  }, [canvasRef, modelPath]);
+  }, [canvasRef, modelId]);
 
   useEffect(() => {
     return () => {
       window.clearTimeout(loopTimeoutRef.current);
-      releaseSession(sessionRef.current);
-      sessionRef.current = null;
+      sessionRef.current = [];
       clearCanvas(canvasRef.current);
     };
   }, [canvasRef]);
@@ -411,7 +402,7 @@ function useDetectionEngine(videoRef, canvasRef, isRunning, modelPath) {
 
     window.clearTimeout(loopTimeoutRef.current);
 
-    if (!isRunning || !isModelLoaded || !sessionRef.current) {
+    if (!isRunning || !isModelLoaded || sessionRef.current.length === 0) {
       setRuntimeError("");
       clearCanvas(canvasRef.current);
       return () => {
@@ -440,12 +431,14 @@ function useDetectionEngine(videoRef, canvasRef, isRunning, modelPath) {
 
       const video = videoRef.current;
       const canvas = canvasRef.current;
-      const session = sessionRef.current;
+      const sessions = sessionRef.current;
+      const activeModel = getOkabModelOption(modelId);
+      const allowedTypes = new Set(activeModel.allowedTypes);
 
       if (
         !video ||
         !canvas ||
-        !session ||
+        sessions.length === 0 ||
         !processingContext ||
         video.readyState < 2 ||
         !video.videoWidth ||
@@ -460,14 +453,18 @@ function useDetectionEngine(videoRef, canvasRef, isRunning, modelPath) {
         const imageData = processingContext.getImageData(0, 0, INPUT_SIZE, INPUT_SIZE);
         const input = buildInferenceInput(imageData, inputBufferRef.current);
         const tensor = new ort.Tensor("float32", input, [1, 3, INPUT_SIZE, INPUT_SIZE]);
-        const outputs = await session.run({ images: tensor });
+        const outputs = await Promise.all(sessions.map((session) => runSessionInference(session, tensor)));
 
         if (cancelled) {
           return;
         }
 
-        const outputTensor = Object.values(outputs)[0];
-        const nextDetections = parseDetections(outputTensor, video.videoWidth, video.videoHeight);
+        const nextDetections = applyNms(
+          outputs
+            .flatMap((outputTensor) => parseDetections(outputTensor, video.videoWidth, video.videoHeight))
+            .filter((detection) => allowedTypes.has(detection.type)),
+          NMS_THRESHOLD,
+        );
         setRuntimeError("");
         drawDetections(canvas, video, nextDetections);
 
@@ -502,7 +499,7 @@ function useDetectionEngine(videoRef, canvasRef, isRunning, modelPath) {
                 height: detection.height,
               },
               label: getDetectionLabel(detection.type),
-              modelPath,
+              modelId,
             });
           });
 
@@ -537,7 +534,7 @@ function useDetectionEngine(videoRef, canvasRef, isRunning, modelPath) {
       window.clearTimeout(loopTimeoutRef.current);
       clearCanvas(canvasRef.current);
     };
-  }, [canvasRef, isModelLoaded, isRunning, modelPath, videoRef]);
+  }, [canvasRef, isModelLoaded, isRunning, modelId, videoRef]);
 
   const lastTenDetections = detections.slice(0, 10);
   const averageConfidence =
@@ -567,7 +564,7 @@ function StatCard({ label, value }) {
   );
 }
 
-export default function AIDetection() {
+export default function AIDetection({ defaultModelId = DEFAULT_OKAB_MODEL_ID }) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
@@ -582,20 +579,24 @@ export default function AIDetection() {
   const [sourceError, setSourceError] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [modelPath, setModelPath] = useState("/best.onnx");
+  const [modelId, setModelId] = useState(getOkabModelOption(defaultModelId).id);
   const [toasts, setToasts] = useState([]);
   const [isOverlayDismissed, setIsOverlayDismissed] = useState(false);
   const [borderFlash, setBorderFlash] = useState({ visible: false, key: 0 });
   const [now, setNow] = useState(Date.now());
 
+  useEffect(() => {
+    setModelId(getOkabModelOption(defaultModelId).id);
+  }, [defaultModelId]);
+
   const { detections, stats, isModelLoaded, isLoadingModel, modelError, runtimeError } = useDetectionEngine(
     videoRef,
     canvasRef,
     isRunning && isSourceReady,
-    modelPath,
+    modelId,
   );
 
-  const currentModel = getModelLabel(modelPath);
+  const currentModel = getOkabModelOption(modelId);
   const canStartDetection = isSourceReady && isModelLoaded && !isLoadingModel && !modelError;
   const activeSourceStat = isSourceReady ? getSourceBadge(activeSource) : "None";
   const showOverlay = activeSource === "screen" && isRunning && !isOverlayDismissed;
@@ -870,7 +871,7 @@ export default function AIDetection() {
     if (isLoadingModel) {
       return {
         title: "Loading model",
-        description: `Preparing ${currentModel} for live inference.`,
+        description: `Preparing ${currentModel.label} for live inference.`,
         icon: (
           <motion.div
             animate={{ rotate: 360 }}
@@ -979,13 +980,13 @@ export default function AIDetection() {
                 <h1 className="text-2xl font-semibold text-[var(--text-primary)]">AI Detection</h1>
 
                 <span className="rounded-md bg-[rgba(14,165,233,0.1)] px-2 py-0.5 text-xs font-medium text-[var(--accent-glow)]">
-                  {currentModel}
+                  {currentModel.label}
                 </span>
               </div>
 
               <p className="max-w-2xl text-sm text-[var(--text-secondary)]">
-                Run live fire and smoke inference with model switching, annotated snapshots in the log, and alerting
-                tuned for rapid incident review.
+                Run live OKAB detection with model switching, annotated snapshots in the log, and alerting tuned for
+                rapid incident review.
               </p>
             </div>
 
@@ -993,12 +994,12 @@ export default function AIDetection() {
               <p className="command-section-label">Model Selector</p>
               <div className="relative">
                 <select
-                  value={modelPath}
-                  onChange={(event) => setModelPath(event.target.value)}
+                  value={modelId}
+                  onChange={(event) => setModelId(event.target.value)}
                   className="appearance-none rounded-lg border border-[var(--border)] bg-[var(--bg-card)] py-2.5 pl-4 pr-16 text-sm font-medium text-[var(--text-primary)] outline-none transition-colors duration-150 focus:border-[var(--border-hover)]"
                 >
-                  {MODEL_OPTIONS.map((option) => (
-                    <option key={option.path} value={option.path}>
+                  {OKAB_MODEL_OPTIONS.map((option) => (
+                    <option key={option.id} value={option.id}>
                       {option.label}
                     </option>
                   ))}
@@ -1016,6 +1017,9 @@ export default function AIDetection() {
 
                 <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-secondary)]" />
               </div>
+              <p className="mt-2 max-w-xs text-xs leading-5 text-[var(--text-secondary)]">
+                {currentModel.description}
+              </p>
             </div>
           </div>
         </motion.section>
@@ -1189,7 +1193,7 @@ export default function AIDetection() {
                           {getDetectionLabel(detection.type)}
                         </span>
                         <span className="rounded-md border border-[var(--border)] bg-[var(--bg-surface)] px-2.5 py-1 text-[var(--text-secondary)]">
-                          {getModelLabel(detection.modelPath)}
+                          {getModelLabel(detection.modelId)}
                         </span>
                       </div>
                     </div>
