@@ -3,12 +3,14 @@
 :root {
   --font-size: 16px;
   --bg-base: #ffffff;
-  --bg-surface: #ffffff;
-  --bg-card: #ffffff;
+  --bg-surface: rgba(255, 255, 255, 0.86);
+  --bg-card: rgba(255, 255, 255, 0.92);
   --bg-card-hover: #faf7ef;
   --accent-primary: #c9a227;
   --accent-glow: #f0dc86;
   --highlight-gradient: linear-gradient(90deg, #9f6f00 0%, #d5a62b 22%, #fff59b 50%, #d9aa2f 78%, #f4de72 100%);
+  --shadow-sm: 0 8px 24px rgba(18, 18, 18, 0.04);
+  --shadow-md: 0 18px 40px rgba(18, 18, 18, 0.08);
   --fire: #c9a227;
   --fire-dim: #f6edd1;
   --critical: #c9a227;

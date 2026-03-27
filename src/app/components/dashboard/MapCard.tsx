@@ -38,9 +38,9 @@ export function MapCard({ zones, onFocusCamera }: MapCardProps) {
           <div className="relative min-h-[380px] overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-surface)]">
             <div className="command-map-grid pointer-events-none absolute inset-0" />
             <div className="pointer-events-none absolute inset-[8%] rounded-xl border border-[var(--border)]" />
-            <div className="pointer-events-none absolute left-[16%] top-[20%] h-[22%] w-[18%] rounded-xl border border-[var(--border)] bg-[rgba(28,36,51,0.28)]" />
-            <div className="pointer-events-none absolute left-[44%] top-[18%] h-[24%] w-[22%] rounded-xl border border-[var(--border)] bg-[rgba(28,36,51,0.28)]" />
-            <div className="pointer-events-none absolute left-[26%] top-[56%] h-[18%] w-[40%] rounded-xl border border-[var(--border)] bg-[rgba(28,36,51,0.28)]" />
+            <div className="pointer-events-none absolute left-[16%] top-[20%] h-[22%] w-[18%] rounded-xl border border-[var(--border)] bg-[rgba(201,162,39,0.08)]" />
+            <div className="pointer-events-none absolute left-[44%] top-[18%] h-[24%] w-[22%] rounded-xl border border-[var(--border)] bg-[rgba(201,162,39,0.08)]" />
+            <div className="pointer-events-none absolute left-[26%] top-[56%] h-[18%] w-[40%] rounded-xl border border-[var(--border)] bg-[rgba(201,162,39,0.08)]" />
 
             {zones.map((zone, index) => (
               <motion.button
@@ -61,7 +61,7 @@ export function MapCard({ zones, onFocusCamera }: MapCardProps) {
                   />
                 ) : null}
                 <div
-                  className="relative flex h-11 w-11 items-center justify-center rounded-full border bg-[rgba(17,24,39,0.92)] backdrop-blur-sm transition-transform duration-200 hover:scale-105"
+                  className="relative flex h-11 w-11 items-center justify-center rounded-full border bg-[rgba(255,255,255,0.92)] shadow-[var(--shadow-sm)] backdrop-blur-sm transition-transform duration-200 hover:scale-105"
                   style={{
                     borderColor: `${markerGlow[zone.status]}aa`,
                   }}

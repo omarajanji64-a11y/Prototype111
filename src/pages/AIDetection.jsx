@@ -1081,7 +1081,7 @@ export default function AIDetection() {
                 <button
                   type="button"
                   onClick={() => setIsMuted((currentMuted) => !currentMuted)}
-                  className="absolute right-4 top-4 z-20 inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--border)] bg-[rgba(17,24,39,0.82)] text-[var(--text-primary)] backdrop-blur transition-colors duration-150 hover:border-[var(--border-hover)] hover:bg-[rgba(28,36,51,0.92)]"
+                  className="absolute right-4 top-4 z-20 inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--border)] bg-[rgba(255,255,255,0.88)] text-[var(--text-primary)] shadow-[var(--shadow-sm)] backdrop-blur transition-colors duration-150 hover:border-[var(--border-hover)] hover:bg-[var(--bg-card-hover)]"
                   aria-label={isMuted ? "Unmute alert sound" : "Mute alert sound"}
                 >
                   {isMuted ? <VolumeX className="h-4.5 w-4.5" /> : <Volume2 className="h-4.5 w-4.5" />}
@@ -1089,7 +1089,7 @@ export default function AIDetection() {
 
                 {videoMessage ? (
                   <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/70 px-6 text-center backdrop-blur-sm">
-                    <div className="max-w-md space-y-3 rounded-xl border border-[var(--border)] bg-[rgba(28,36,51,0.92)] p-6">
+                    <div className="max-w-md space-y-3 rounded-xl border border-[var(--border)] bg-[rgba(255,255,255,0.94)] p-6 shadow-[var(--shadow-md)]">
                       <div className="mx-auto flex justify-center">{videoMessage.icon}</div>
                       <div>
                         <p className="text-sm font-semibold text-[var(--text-primary)]">{videoMessage.title}</p>
@@ -1218,7 +1218,7 @@ export default function AIDetection() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 24 }}
             transition={{ duration: 0.24, ease: "easeOut" }}
-            className="fixed bottom-4 right-4 z-50 w-72 rounded-xl border border-[var(--border)] bg-[rgba(17,24,39,0.92)] p-4 backdrop-blur"
+            className="fixed bottom-4 right-4 z-50 w-72 rounded-xl border border-[var(--border)] bg-[rgba(255,255,255,0.94)] p-4 shadow-[var(--shadow-md)] backdrop-blur"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2">

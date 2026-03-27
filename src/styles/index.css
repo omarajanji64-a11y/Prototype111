@@ -3,7 +3,7 @@
 @import './theme.css';
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html {
@@ -86,18 +86,21 @@ h3,
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
 }
 
 .command-card-hover {
   transition:
     border-color 200ms ease,
     background-color 200ms ease,
-    transform 150ms ease;
+    transform 150ms ease,
+    box-shadow 200ms ease;
 }
 
 .command-card-hover:hover {
   border-color: var(--border-hover);
   background: var(--bg-card-hover);
+  box-shadow: var(--shadow-md);
 }
 
 .command-section-label {

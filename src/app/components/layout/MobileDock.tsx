@@ -32,7 +32,7 @@ const iconMap: Record<NavigationId, LucideIcon> = {
 export function MobileDock({ activeItem, onActiveChange }: MobileDockProps) {
   return (
     <div className="fixed inset-x-4 bottom-4 z-50 lg:hidden">
-      <div className="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-2">
+      <div className="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-2 shadow-[var(--shadow-md)] backdrop-blur-xl">
         <div className="flex min-w-max items-center gap-1.5">
           {navigationItems.map((item) => {
             const Icon = iconMap[item.id];
