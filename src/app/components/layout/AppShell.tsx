@@ -27,6 +27,7 @@ export function AppShell({
 }: AppShellProps) {
   return (
     <div className="relative min-h-screen text-white">
+      <div className="command-shell-frame" />
       <Sidebar
         activeItem={activeNav}
         isExpanded={isSidebarExpanded}
@@ -47,7 +48,9 @@ export function AppShell({
           isSidebarExpanded ? "lg:pl-[240px]" : "lg:pl-[64px]",
         )}
       >
-        <div className="mx-auto max-w-[1720px] px-4 sm:px-5 lg:px-6">{children}</div>
+        <div className="mx-auto max-w-[1720px] px-4 sm:px-5 lg:px-6">
+          <div className="command-shell-main">{children}</div>
+        </div>
       </main>
     </div>
   );

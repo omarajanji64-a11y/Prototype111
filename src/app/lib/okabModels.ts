@@ -8,6 +8,7 @@ export interface OkabModelOption {
   description: string;
   sessionPaths: string[];
   allowedTypes: DetectionType[];
+  recommended?: boolean;
 }
 
 export const DEFAULT_OKAB_MODEL_ID = "okab-hybrid";
@@ -21,19 +22,20 @@ export const OKAB_MODEL_OPTIONS: OkabModelOption[] = [
     allowedTypes: ["smoke"],
   },
   {
-    id: "okab-fire",
-    label: "OKAB - Fire",
-    description: "Specialized in detecting flames, providing rapid alerts to reduce risk and damage.",
-    sessionPaths: ["/best.onnx"],
-    allowedTypes: ["fire"],
-  },
-  {
     id: "okab-hybrid",
     label: "OKAB - Hybrid",
     description:
       "Combines smoke and fire detection with faster, more accurate alerts for complete hazard awareness.",
     sessionPaths: ["/best.onnx", "/forest.onnx"],
     allowedTypes: ["smoke", "fire"],
+    recommended: true,
+  },
+  {
+    id: "okab-fire",
+    label: "OKAB - Fire",
+    description: "Specialized in detecting flames, providing rapid alerts to reduce risk and damage.",
+    sessionPaths: ["/best.onnx"],
+    allowedTypes: ["fire"],
   },
 ];
 

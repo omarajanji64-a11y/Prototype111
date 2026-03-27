@@ -21,6 +21,7 @@ interface ModelProfile {
   prompt: string;
   accent: string;
   glow: string;
+  recommended?: boolean;
   stats: Array<{ label: string; value: string }>;
 }
 
@@ -70,6 +71,7 @@ const MODEL_PROFILES: ModelProfile[] = OKAB_MODEL_OPTIONS.map((option) => ({
   id: option.id,
   name: option.label,
   description: option.description,
+  recommended: option.recommended,
   ...MODEL_PROFILE_DECOR[option.id],
 }));
 
@@ -225,6 +227,7 @@ export function EntryExperience({ onComplete, bootstrap }: EntryExperienceProps)
                       style={style}
                       data-active={isHighlighted || isSelected}
                       data-entering={isEnteringAnother}
+                      data-recommended={profile.recommended ? "true" : "false"}
                       className="sci-model-card"
                       onMouseEnter={() => setHoveredModelId(profile.id)}
                       onFocus={() => setHoveredModelId(profile.id)}
@@ -258,9 +261,12 @@ export function EntryExperience({ onComplete, bootstrap }: EntryExperienceProps)
                             <h2 className="font-sci-display sci-card-title">{profile.name}</h2>
                             <p className="sci-card-subtitle">{profile.label}</p>
                           </div>
-                          <div className="sci-card-status">
-                            <span className="sci-card-status-dot" />
-                            Ready
+                          <div className="flex flex-col items-end gap-2">
+                            {profile.recommended ? <div className="sci-card-recommended">Recommended</div> : null}
+                            <div className="sci-card-status">
+                              <span className="sci-card-status-dot" />
+                              Ready
+                            </div>
                           </div>
                         </div>
 

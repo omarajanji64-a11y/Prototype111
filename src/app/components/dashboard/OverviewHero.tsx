@@ -50,35 +50,59 @@ export function OverviewHero({
         variants={cardVariants}
         className="relative p-6 sm:p-8"
       >
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-1/2 bg-[radial-gradient(circle_at_right,rgba(56,189,248,0.16),transparent_60%)]" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-1/2 bg-[radial-gradient(circle_at_right,rgba(141,240,255,0.18),transparent_60%)]" />
+        <div className="pointer-events-none absolute -right-18 top-[-20%] h-72 w-72 rounded-full bg-[radial-gradient(circle_at_center,rgba(90,140,255,0.2),transparent_72%)] blur-2xl" />
         <div className="relative">
           <div className="flex flex-wrap items-center gap-3">
-            <div className="rounded-full border border-cyan-300/18 bg-cyan-300/10 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.26em] text-cyan-100">
-              Project summary
+            <div className="command-live-chip inline-flex">
+              <span className="command-live-dot" />
+              Ecosystem intelligence live
             </div>
-            <div className="rounded-full border border-orange-300/16 bg-orange-300/10 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-orange-100">
+            <div className="rounded-full border border-orange-300/16 bg-orange-300/10 px-3 py-1 font-sci-mono text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-orange-100">
               {alertCount} active fire alerts
             </div>
           </div>
 
           <div className="mt-6 max-w-3xl">
-            <h2 className="text-4xl font-semibold leading-[1.02] tracking-[-0.08em] text-white sm:text-5xl">
+            <h2 className="command-holo-title text-4xl font-semibold leading-[1.02] text-white sm:text-5xl">
               OKAB detects forest and rural fires early with AI, IoT towers, and UAV support.
             </h2>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300/82">
+            <p className="mt-4 max-w-2xl text-[1.05rem] leading-7 text-slate-300/82">
               The system continuously monitors temperature, gas, and humidity through a LoRa-connected
               tower network, confirms anomalies with multi-tower logic, and triggers fast intervention.
             </p>
           </div>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <ActionButton icon={Siren} variant="primary">
-              Simulate UAV dispatch
-            </ActionButton>
-            <ActionButton icon={Video} variant="secondary" onClick={onOpenCameraWall}>
-              Open tower feeds
-            </ActionButton>
-            <ActionButton icon={ArrowRight}>Review project scope</ActionButton>
+          <div className="mt-8 grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_280px]">
+            <div>
+              <div className="flex flex-wrap items-center gap-3">
+                <ActionButton icon={Siren} variant="primary">
+                  Simulate UAV dispatch
+                </ActionButton>
+                <ActionButton icon={Video} variant="secondary" onClick={onOpenCameraWall}>
+                  Open tower feeds
+                </ActionButton>
+                <ActionButton icon={ArrowRight}>Review project scope</ActionButton>
+              </div>
+            </div>
+
+            <div className="command-subpanel p-4">
+              <p className="command-section-label font-sci-mono">Command Pulse</p>
+              <div className="mt-4 space-y-3 text-sm text-[var(--text-secondary)]">
+                <div className="flex items-center justify-between">
+                  <span>Autonomous towers</span>
+                  <strong className="font-sci-mono text-[var(--text-primary)]">3 linked</strong>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Sensor heartbeat</span>
+                  <strong className="font-sci-mono text-[var(--accent-glow)]">Stable</strong>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Response posture</span>
+                  <strong className="font-sci-mono text-[var(--warning)]">Armed</strong>
+                </div>
+              </div>
+            </div>
           </div>
 
           <motion.div
@@ -89,12 +113,12 @@ export function OverviewHero({
               <motion.div
                 key={highlight.label}
                 variants={listItemVariants}
-                className="rounded-[24px] border border-white/8 bg-white/[0.04] p-4"
+                className="command-subpanel p-4"
               >
-                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-slate-500">
+                <p className="font-sci-mono text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-slate-500">
                   {highlight.label}
                 </p>
-                <p className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-white">
+                <p className="command-holo-title mt-2 text-2xl font-semibold text-white">
                   {highlight.value}
                 </p>
                 <p className="mt-1 text-sm text-slate-400">{highlight.detail}</p>
@@ -112,10 +136,10 @@ export function OverviewHero({
         <div className="relative">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.26em] text-slate-500">
+              <p className="font-sci-mono text-[0.72rem] font-semibold uppercase tracking-[0.26em] text-slate-500">
                 Focused tower
               </p>
-              <h3 className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-white">
+              <h3 className="command-holo-title mt-2 text-2xl font-semibold text-white">
                 {focusedCamera.name}
               </h3>
               <p className="mt-1 text-sm text-slate-400">
@@ -128,30 +152,30 @@ export function OverviewHero({
           <p className="mt-6 text-sm leading-7 text-slate-300/85">{focusedCamera.summary}</p>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-[22px] border border-white/8 bg-white/[0.045] p-4">
-              <p className="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-slate-500">
+            <div className="command-subpanel p-4">
+              <p className="font-sci-mono text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-slate-500">
                 Thermal reading
               </p>
-              <p className="mt-2 text-3xl font-semibold tracking-[-0.05em] text-white">
+              <p className="command-holo-title mt-2 text-3xl font-semibold text-white">
                 {focusedCamera.temperature}
                 <span className="ml-1 text-lg text-slate-400">°C</span>
               </p>
             </div>
-            <div className="rounded-[22px] border border-white/8 bg-white/[0.045] p-4">
-              <p className="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-slate-500">
+            <div className="command-subpanel p-4">
+              <p className="font-sci-mono text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-slate-500">
                 AI confidence
               </p>
-              <p className="mt-2 text-3xl font-semibold tracking-[-0.05em] text-white">
+              <p className="command-holo-title mt-2 text-3xl font-semibold text-white">
                 {focusedCamera.confidence}
                 <span className="ml-1 text-lg text-slate-400">%</span>
               </p>
             </div>
           </div>
 
-          <div className="mt-6 rounded-[24px] border border-white/8 bg-white/[0.04] p-4">
+          <div className="command-subpanel mt-6 p-4">
             <div className="flex items-center justify-between text-sm">
               <span className="text-slate-400">Fire probability score</span>
-              <span className="font-medium text-white">{accent.value}%</span>
+              <span className="font-sci-mono font-medium text-white">{accent.value}%</span>
             </div>
             <div className="mt-3 h-3 overflow-hidden rounded-full bg-white/[0.06]">
               <motion.div
@@ -164,13 +188,13 @@ export function OverviewHero({
             </div>
 
             <div className="mt-4 flex flex-wrap gap-3">
-              <div className="rounded-full border border-white/8 bg-white/[0.045] px-3 py-2 text-sm text-slate-300">
+              <div className="rounded-full border border-white/8 bg-white/[0.045] px-3 py-2 font-sci-mono text-sm text-slate-300">
                 {criticalCount} critical alerts
               </div>
-              <div className="rounded-full border border-white/8 bg-white/[0.045] px-3 py-2 text-sm text-slate-300">
+              <div className="rounded-full border border-white/8 bg-white/[0.045] px-3 py-2 font-sci-mono text-sm text-slate-300">
                 {warningCount} warnings in watch mode
               </div>
-              <div className="rounded-full border border-white/8 bg-white/[0.045] px-3 py-2 text-sm text-slate-300">
+              <div className="rounded-full border border-white/8 bg-white/[0.045] px-3 py-2 font-sci-mono text-sm text-slate-300">
                 Last sweep {focusedCamera.lastSweep}
               </div>
             </div>

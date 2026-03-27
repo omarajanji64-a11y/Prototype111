@@ -46,23 +46,23 @@ export function HomeQuickActions({
         <div className="space-y-5">
           <SectionTitle
             title="Quick Actions"
-            description="Use the sidebar to open each module. Home now focuses on immediate actions and newest fire events."
+            description="Step into the live command center, launch key modules instantly, and review the latest hazard signals as they arrive."
           />
 
           <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-xl border border-[var(--border)] border-l-2 border-l-[var(--critical)] bg-[var(--bg-card)] p-5">
+            <div className="command-metric-tile p-5" data-tone="critical">
               <p className="command-section-label text-[var(--text-muted)]">Critical Fires</p>
-              <p className="mt-2 text-[36px] font-bold leading-none text-[var(--text-primary)]">{criticalCount}</p>
+              <p className="command-holo-title mt-2 text-[36px] font-bold leading-none text-[var(--text-primary)]">{criticalCount}</p>
               <p className="mt-2 text-xs text-[var(--text-secondary)]">Immediate intervention required</p>
             </div>
-            <div className="rounded-xl border border-[var(--border)] border-l-2 border-l-[var(--warning)] bg-[var(--bg-card)] p-5">
+            <div className="command-metric-tile p-5" data-tone="warning">
               <p className="command-section-label text-[var(--text-muted)]">Warning Towers</p>
-              <p className="mt-2 text-[36px] font-bold leading-none text-[var(--text-primary)]">{warningTowerCount}</p>
+              <p className="command-holo-title mt-2 text-[36px] font-bold leading-none text-[var(--text-primary)]">{warningTowerCount}</p>
               <p className="mt-2 text-xs text-[var(--text-secondary)]">Need verification or watch mode</p>
             </div>
-            <div className="rounded-xl border border-[var(--border)] border-l-2 border-l-[var(--safe)] bg-[var(--bg-card)] p-5">
+            <div className="command-metric-tile p-5" data-tone="safe">
               <p className="command-section-label text-[var(--text-muted)]">Safe Towers</p>
-              <p className="mt-2 text-[36px] font-bold leading-none text-[var(--text-primary)]">{safeTowerCount}</p>
+              <p className="command-holo-title mt-2 text-[36px] font-bold leading-none text-[var(--text-primary)]">{safeTowerCount}</p>
               <p className="mt-2 text-xs text-[var(--text-secondary)]">Nominal environmental readings</p>
             </div>
           </div>
@@ -109,7 +109,7 @@ export function HomeQuickActions({
             title="Latest Alert Stream"
             description="Newest detections requiring immediate review."
             action={
-              <div className="inline-flex items-center gap-2 rounded-md border border-[rgba(249,115,22,0.2)] bg-[var(--fire-dim)] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--fire)]">
+              <div className="inline-flex items-center gap-2 rounded-md border border-[rgba(249,115,22,0.2)] bg-[var(--fire-dim)] px-3 py-1.5 font-sci-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--fire)]">
                 <Flame className="h-4 w-4" />
                 {alerts.length} total
               </div>
@@ -130,7 +130,7 @@ export function HomeQuickActions({
               <motion.div
                 key={alert.id}
                 variants={listItemVariants}
-                className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4 transition-colors duration-200 hover:border-[var(--border-hover)]"
+                className="command-subpanel p-4 transition-colors duration-200 hover:border-[var(--border-hover)]"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="space-y-2">
@@ -142,7 +142,7 @@ export function HomeQuickActions({
                       </p>
                     </div>
                   </div>
-                  <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--fire)]">
+                  <div className="inline-flex h-9 w-9 items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.78)] text-[var(--fire)]">
                     <Shield className="h-4 w-4" />
                   </div>
                 </div>

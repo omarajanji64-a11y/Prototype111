@@ -9,9 +9,9 @@ interface GlassPanelProps extends HTMLMotionProps<"section"> {
 
 const toneClasses = {
   default: "",
-  cyan: "border-l-2 border-l-[var(--accent-primary)]",
-  orange: "border-l-2 border-l-[var(--warning)]",
-  red: "border-l-2 border-l-[var(--critical)]",
+  cyan: "command-panel-tone-cyan border-l-2 border-l-[var(--accent-primary)]",
+  orange: "command-panel-tone-orange border-l-2 border-l-[var(--warning)]",
+  red: "command-panel-tone-red border-l-2 border-l-[var(--critical)]",
 };
 
 export function GlassPanel({
@@ -23,17 +23,20 @@ export function GlassPanel({
 }: GlassPanelProps) {
   return (
     <motion.section
-      whileHover={{ scale: 1.005 }}
-      transition={{ duration: 0.15, ease: "easeOut" }}
+      whileHover={interactive ? { scale: 1.008, y: -3 } : undefined}
+      transition={{ duration: 0.18, ease: "easeOut" }}
       className={cn(
-        "relative overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-card)]",
+        "command-glass-panel relative overflow-hidden rounded-[1.5rem] border border-[var(--border)]",
         interactive && "transition-[transform,border-color,background-color] duration-200 hover:border-[var(--border-hover)] hover:bg-[var(--bg-card-hover)]",
         className,
         toneClasses[tone],
       )}
       {...props}
     >
-      {children}
+      <div className="command-panel-grid" />
+      <div className="command-panel-beam" />
+      <div className="command-panel-glow" />
+      <div className="relative z-10">{children}</div>
     </motion.section>
   );
 }

@@ -16,22 +16,60 @@ html {
 body {
   min-height: 100vh;
   overflow-x: hidden;
+  position: relative;
   background-color: var(--bg-base);
+  background-image:
+    radial-gradient(circle at 18% 14%, rgba(30, 216, 255, 0.16), transparent 20%),
+    radial-gradient(circle at 80% 0%, rgba(90, 140, 255, 0.18), transparent 26%),
+    radial-gradient(circle at 50% 115%, rgba(255, 139, 61, 0.12), transparent 30%),
+    linear-gradient(180deg, #02040b 0%, #050b18 40%, #071124 100%);
   color: var(--text-primary);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.012em;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
 
+body::before,
+body::after {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+body::before {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.95), transparent 90%);
+  opacity: 0.2;
+  animation: commandGridDrift 24s linear infinite;
+}
+
+body::after {
+  background:
+    radial-gradient(circle at 15% 70%, rgba(30, 216, 255, 0.16), transparent 18%),
+    radial-gradient(circle at 82% 24%, rgba(84, 240, 197, 0.1), transparent 18%);
+  filter: blur(60px);
+  opacity: 0.62;
+}
+
 #root {
   min-height: 100vh;
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
 }
 
 h1,
 h2,
 h3,
 .font-display {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.04em;
 }
 
 * {
@@ -67,26 +105,103 @@ h3,
   position: relative;
   overflow: hidden;
   border: 1px solid var(--border);
-  background: linear-gradient(90deg, rgba(28, 36, 51, 0.92) 0%, rgba(33, 45, 64, 1) 50%, rgba(28, 36, 51, 0.92) 100%);
+  background:
+    linear-gradient(90deg, rgba(7, 16, 34, 0.92) 0%, rgba(18, 42, 88, 0.98) 50%, rgba(7, 16, 34, 0.92) 100%);
   background-size: 200% 100%;
+  box-shadow: inset 0 0 24px rgba(141, 240, 255, 0.06);
   animation: shimmer 1.4s linear infinite;
 }
 
 .command-app-bg {
+  position: relative;
+  overflow: hidden;
   background-color: var(--bg-base);
   background-image:
-    radial-gradient(circle at top left, rgba(34, 211, 238, 0.05), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.05), transparent 24%),
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: auto, auto, 28px 28px, 28px 28px;
+    radial-gradient(circle at 16% 18%, rgba(30, 216, 255, 0.13), transparent 22%),
+    radial-gradient(circle at 82% 12%, rgba(90, 140, 255, 0.14), transparent 24%),
+    radial-gradient(circle at 48% 85%, rgba(255, 139, 61, 0.1), transparent 26%),
+    linear-gradient(rgba(130, 220, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(130, 220, 255, 0.035) 1px, transparent 1px);
+  background-size: auto, auto, auto, 32px 32px, 32px 32px;
   background-position: 0 0, 100% 100%, 0 0, 0 0;
+  animation: commandBgShift 22s ease-in-out infinite alternate;
+}
+
+.command-app-bg::before,
+.command-app-bg::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+}
+
+.command-app-bg::before {
+  background:
+    radial-gradient(circle at center, rgba(141, 240, 255, 0.08), transparent 28%),
+    conic-gradient(from 210deg at 50% 50%, transparent, rgba(141, 240, 255, 0.08), transparent, rgba(84, 240, 197, 0.04), transparent);
+  filter: blur(20px);
+  animation: commandHaloPulse 18s ease-in-out infinite;
+}
+
+.command-app-bg::after {
+  background: linear-gradient(120deg, transparent 12%, rgba(255, 255, 255, 0.06) 49%, transparent 82%);
+  transform: translateX(-140%);
+  animation: commandDataSweep 13s linear infinite;
+  opacity: 0.35;
+}
+
+.command-grid-overlay {
+  background:
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.05), transparent 48%),
+    repeating-linear-gradient(0deg, rgba(141, 240, 255, 0.04) 0, rgba(141, 240, 255, 0.04) 1px, transparent 1px, transparent 56px),
+    repeating-linear-gradient(90deg, rgba(141, 240, 255, 0.04) 0, rgba(141, 240, 255, 0.04) 1px, transparent 1px, transparent 56px);
+  opacity: 0.42;
+  mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.96), transparent 92%);
+}
+
+.command-energy-beam {
+  position: absolute;
+  width: 44vw;
+  height: 44vw;
+  border-radius: 999px;
+  filter: blur(90px);
+  opacity: 0.18;
+  animation: commandFloat 18s ease-in-out infinite;
+}
+
+.command-energy-beam-a {
+  top: -12vw;
+  left: -8vw;
+  background: radial-gradient(circle at center, rgba(30, 216, 255, 0.72), transparent 70%);
+}
+
+.command-energy-beam-b {
+  right: -10vw;
+  bottom: -18vw;
+  background: radial-gradient(circle at center, rgba(90, 140, 255, 0.62), transparent 70%);
+  animation-duration: 24s;
+  animation-direction: reverse;
+}
+
+.command-energy-particle {
+  position: absolute;
+  left: var(--particle-left);
+  top: var(--particle-top);
+  width: var(--particle-size);
+  height: var(--particle-size);
+  border-radius: 999px;
+  background: var(--particle-color);
+  box-shadow: 0 0 14px var(--particle-color);
+  opacity: 0.5;
+  animation: commandParticleRise var(--particle-duration) ease-in-out infinite;
+  animation-delay: var(--particle-delay);
 }
 
 .command-card {
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: var(--bg-card);
+  background: var(--panel-gradient);
+  box-shadow: var(--shadow-panel);
 }
 
 .command-card-hover {
@@ -104,9 +219,9 @@ h3,
 .command-section-label {
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: color-mix(in srgb, var(--accent-glow) 58%, var(--text-secondary) 42%);
 }
 
 .command-card-label {
@@ -118,15 +233,18 @@ h3,
 }
 
 .command-page-title {
-  font-size: 24px;
+  font-size: clamp(1.4rem, 1.8vw, 1.9rem);
   font-weight: 600;
   color: var(--text-primary);
-  letter-spacing: -0.03em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 0 24px rgba(141, 240, 255, 0.12);
 }
 
 .command-page-description {
-  font-size: 14px;
-  color: var(--text-secondary);
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--text-secondary) 82%, white 18%);
 }
 
 .command-empty-state {
@@ -136,7 +254,9 @@ h3,
   justify-content: center;
   border: 1px dashed var(--border-hover);
   border-radius: 12px;
-  background: rgba(17, 24, 39, 0.52);
+  background:
+    linear-gradient(180deg, rgba(9, 17, 37, 0.88), rgba(6, 12, 26, 0.74));
+  box-shadow: inset 0 0 0 1px rgba(141, 240, 255, 0.04);
   color: var(--text-secondary);
 }
 
@@ -152,6 +272,7 @@ h3,
   width: 8px;
   border-radius: 999px;
   background: var(--accent-glow);
+  box-shadow: 0 0 18px rgba(141, 240, 255, 0.9);
   animation: commandPulse 1.5s linear infinite;
 }
 
@@ -161,6 +282,7 @@ h3,
   width: 8px;
   border-radius: 999px;
   background: var(--fire);
+  box-shadow: 0 0 18px rgba(255, 139, 61, 0.8);
   animation: commandPulse 1.5s linear infinite;
 }
 
@@ -177,8 +299,168 @@ h3,
   color: var(--text-secondary);
 }
 
+.command-topbar-search {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    rgba(6, 14, 30, 0.84);
+  box-shadow:
+    inset 0 0 0 1px rgba(141, 240, 255, 0.03),
+    0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
 .command-alert-flash {
   animation: alertFlash 1.5s linear infinite;
+}
+
+.command-shell-frame {
+  position: fixed;
+  inset: 12px;
+  border-radius: 30px;
+  border: 1px solid rgba(141, 240, 255, 0.09);
+  box-shadow:
+    inset 0 0 0 1px rgba(141, 240, 255, 0.04),
+    0 0 60px rgba(30, 216, 255, 0.05);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.command-shell-main {
+  position: relative;
+}
+
+.command-shell-main::before {
+  content: "";
+  position: absolute;
+  inset: -12px 0 auto;
+  height: 220px;
+  background: radial-gradient(circle at top center, rgba(141, 240, 255, 0.08), transparent 70%);
+  pointer-events: none;
+}
+
+.command-topbar-shell,
+.command-sidebar-shell,
+.command-dock-shell,
+.command-glass-panel,
+.command-subpanel,
+.command-metric-tile {
+  background:
+    var(--panel-shine),
+    var(--panel-gradient);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px rgba(141, 240, 255, 0.03),
+    var(--shadow-panel);
+  backdrop-filter: blur(26px);
+}
+
+.command-panel-grid,
+.command-panel-beam,
+.command-panel-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.command-panel-grid {
+  background:
+    linear-gradient(rgba(141, 240, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(141, 240, 255, 0.03) 1px, transparent 1px);
+  background-size: 22px 22px;
+  opacity: 0.25;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.6), transparent 88%);
+}
+
+.command-panel-beam {
+  background: linear-gradient(112deg, transparent 18%, rgba(255, 255, 255, 0.06) 48%, transparent 82%);
+  transform: translateX(-140%);
+  animation: commandDataSweep 9s linear infinite;
+  opacity: 0.5;
+}
+
+.command-panel-glow {
+  background:
+    radial-gradient(circle at top right, rgba(141, 240, 255, 0.16), transparent 30%),
+    radial-gradient(circle at bottom left, rgba(90, 140, 255, 0.1), transparent 28%);
+}
+
+.command-panel-tone-cyan {
+  border-color: rgba(141, 240, 255, 0.18);
+}
+
+.command-panel-tone-orange {
+  border-color: rgba(255, 209, 102, 0.18);
+}
+
+.command-panel-tone-red {
+  border-color: rgba(255, 88, 116, 0.22);
+}
+
+.command-subpanel,
+.command-metric-tile {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 1.15rem;
+}
+
+.command-subpanel::before,
+.command-metric-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 32%);
+  pointer-events: none;
+}
+
+.command-metric-tile[data-tone="critical"] {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px rgba(255, 88, 116, 0.06),
+    0 24px 80px rgba(0, 0, 0, 0.34),
+    0 0 32px rgba(255, 88, 116, 0.08);
+}
+
+.command-metric-tile[data-tone="warning"] {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px rgba(255, 209, 102, 0.06),
+    0 24px 80px rgba(0, 0, 0, 0.34),
+    0 0 32px rgba(255, 209, 102, 0.06);
+}
+
+.command-metric-tile[data-tone="safe"] {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px rgba(141, 240, 255, 0.05),
+    0 24px 80px rgba(0, 0, 0, 0.34),
+    0 0 32px rgba(141, 240, 255, 0.08);
+}
+
+.command-live-chip,
+.command-recommended-chip {
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(141, 240, 255, 0.18);
+  background: rgba(8, 18, 40, 0.68);
+  color: var(--accent-glow);
+  font-family: "Space Mono", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  padding: 0.45rem 0.72rem;
+  text-transform: uppercase;
+  box-shadow: inset 0 0 16px rgba(141, 240, 255, 0.06);
+}
+
+.command-recommended-chip {
+  border-color: rgba(84, 240, 197, 0.22);
+  color: var(--accent-secondary);
+}
+
+.command-holo-title {
+  font-family: "Orbitron", sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
 @keyframes shimmer {
@@ -211,5 +493,66 @@ h3,
   }
   100% {
     border-color: rgba(239, 68, 68, 0.12);
+  }
+}
+
+@keyframes commandBgShift {
+  0% {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  100% {
+    transform: scale(1.04) translate3d(0, -1%, 0);
+  }
+}
+
+@keyframes commandGridDrift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 44px, 0);
+  }
+}
+
+@keyframes commandDataSweep {
+  0% {
+    transform: translateX(-140%);
+  }
+  100% {
+    transform: translateX(140%);
+  }
+}
+
+@keyframes commandParticleRise {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(0.9);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translate3d(0, -18px, 0) scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+@keyframes commandHaloPulse {
+  0%,
+  100% {
+    transform: scale(0.94);
+    opacity: 0.26;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.42;
+  }
+}
+
+@keyframes commandFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(3%, -4%, 0);
   }
 }

@@ -43,18 +43,22 @@ export function Sidebar({
     <motion.aside
       animate={{ width: isExpanded ? 240 : 64 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className="fixed inset-y-0 left-0 z-50 hidden overflow-hidden border-r border-[var(--border)] bg-[var(--bg-surface)] lg:flex"
+      className="command-sidebar-shell fixed inset-y-0 left-0 z-50 hidden overflow-hidden border-r border-[var(--border)] lg:flex"
     >
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(141,240,255,0.16),transparent_36%)]" />
       <div className="flex h-full w-full flex-col px-3 py-3">
         <div className="flex h-[56px] items-center gap-3 px-2">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-card)] text-[var(--accent-primary)]">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[1rem] border border-[var(--border-hover)] bg-[rgba(8,18,40,0.82)] text-[var(--accent-primary)] shadow-[0_0_24px_rgba(30,216,255,0.08)]">
             <ShieldCheck className="h-4.5 w-4.5" />
           </div>
           {isExpanded ? (
             <div className="min-w-0">
-              <p className="truncate text-base font-semibold leading-none">
+              <p className="command-holo-title truncate text-base font-semibold leading-none">
                 <span className="text-[var(--accent-primary)]">OKAB</span>{" "}
                 <span className="text-[var(--text-secondary)]">Core</span>
+              </p>
+              <p className="mt-1 font-sci-mono text-[0.62rem] uppercase tracking-[0.24em] text-[var(--text-secondary)]">
+                Autonomous Forest Grid
               </p>
             </div>
           ) : null}
@@ -73,11 +77,11 @@ export function Sidebar({
                 onClick={() => onActiveChange(item.id)}
                 title={!isExpanded ? item.label : undefined}
                 className={cn(
-                  "relative flex h-10 w-full items-center rounded-lg border border-transparent px-3 text-left transition-[background-color,border-color,color] duration-200",
+                  "relative flex h-11 w-full items-center rounded-[1rem] border border-transparent px-3 text-left transition-[background-color,border-color,color,box-shadow] duration-200",
                   isExpanded ? "justify-start gap-3" : "justify-center",
                   isActive
-                    ? "bg-[var(--bg-card)] text-[var(--text-primary)]"
-                    : "text-[var(--text-secondary)] hover:bg-[rgba(28,36,51,0.5)] hover:text-[var(--text-primary)]",
+                    ? "border-[rgba(141,240,255,0.16)] bg-[rgba(9,22,48,0.84)] text-[var(--text-primary)] shadow-[inset_0_0_0_1px_rgba(141,240,255,0.05),0_0_28px_rgba(30,216,255,0.06)]"
+                    : "text-[var(--text-secondary)] hover:border-[rgba(141,240,255,0.12)] hover:bg-[rgba(8,18,40,0.52)] hover:text-[var(--text-primary)]",
                 )}
               >
                 {isActive ? (
@@ -94,7 +98,7 @@ export function Sidebar({
                   )}
                 />
                 {isExpanded ? (
-                  <span className="relative truncate text-[13px] font-medium">{item.label}</span>
+                  <span className="relative truncate text-[13px] font-medium uppercase tracking-[0.08em]">{item.label}</span>
                 ) : null}
               </motion.button>
             );
@@ -106,7 +110,7 @@ export function Sidebar({
             whileHover={buttonHover}
             whileTap={buttonTap}
             onClick={onToggle}
-            className="flex h-10 w-full items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] transition-colors duration-200 hover:border-[var(--border-hover)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)]"
+            className="flex h-11 w-full items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.84)] text-[var(--text-secondary)] transition-colors duration-200 hover:border-[var(--border-hover)] hover:bg-[rgba(10,24,54,0.9)] hover:text-[var(--text-primary)]"
             aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
             title={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
           >

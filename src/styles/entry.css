@@ -1,10 +1,10 @@
 :root {
-  --entry-cyan: #68f5ff;
-  --entry-magenta: #ea5cff;
-  --entry-blue: #74a8ff;
+  --entry-cyan: #8df0ff;
+  --entry-magenta: #5a8cff;
+  --entry-blue: #54f0c5;
   --entry-deep: #030813;
-  --entry-surface: rgba(9, 14, 28, 0.62);
-  --entry-border: rgba(255, 255, 255, 0.09);
+  --entry-surface: rgba(7, 13, 28, 0.72);
+  --entry-border: rgba(141, 240, 255, 0.14);
 }
 
 .font-sci-display {
@@ -20,10 +20,10 @@
   min-height: 100vh;
   overflow: hidden;
   background:
-    radial-gradient(circle at top left, rgba(116, 168, 255, 0.14), transparent 26%),
-    radial-gradient(circle at 80% 18%, rgba(234, 92, 255, 0.16), transparent 28%),
-    radial-gradient(circle at bottom center, rgba(104, 245, 255, 0.14), transparent 34%),
-    linear-gradient(180deg, #02050f 0%, #050a18 52%, #040711 100%);
+    radial-gradient(circle at top left, rgba(141, 240, 255, 0.16), transparent 24%),
+    radial-gradient(circle at 82% 16%, rgba(90, 140, 255, 0.18), transparent 28%),
+    radial-gradient(circle at bottom center, rgba(84, 240, 197, 0.12), transparent 34%),
+    linear-gradient(180deg, #02050f 0%, #040b17 52%, #030711 100%);
   color: #f5f8ff;
 }
 
@@ -38,11 +38,11 @@
 
 .sci-entry-grid {
   background-image:
-    linear-gradient(rgba(104, 245, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(104, 245, 255, 0.08) 1px, transparent 1px);
-  background-size: 72px 72px;
+    linear-gradient(rgba(141, 240, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(141, 240, 255, 0.08) 1px, transparent 1px);
+  background-size: 56px 56px;
   mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.95), transparent 85%);
-  opacity: 0.26;
+  opacity: 0.3;
 }
 
 .sci-entry-scanlines {
@@ -71,13 +71,13 @@
 }
 
 .sci-entry-aurora-left {
-  background: radial-gradient(circle at center, rgba(104, 245, 255, 0.42), transparent 70%);
+  background: radial-gradient(circle at center, rgba(141, 240, 255, 0.42), transparent 70%);
   transform: translate(-18%, -12%);
   animation: sciAuroraFloat 9s ease-in-out infinite;
 }
 
 .sci-entry-aurora-right {
-  background: radial-gradient(circle at center, rgba(234, 92, 255, 0.32), transparent 68%);
+  background: radial-gradient(circle at center, rgba(90, 140, 255, 0.34), transparent 68%);
   transform: translate(24%, 18%);
   animation: sciAuroraFloat 11s ease-in-out infinite reverse;
 }
@@ -264,8 +264,8 @@
   border-radius: 1.8rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 28%),
-    linear-gradient(180deg, rgba(10, 14, 28, 0.74), rgba(6, 10, 22, 0.9));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 24%),
+    linear-gradient(180deg, rgba(8, 14, 30, 0.82), rgba(5, 10, 23, 0.94));
   padding: 1.55rem;
   text-align: left;
   backdrop-filter: blur(20px);
@@ -279,6 +279,14 @@
     background-color 220ms ease,
     transform 220ms ease,
     opacity 220ms ease;
+}
+
+.sci-model-card[data-recommended="true"] {
+  border-color: rgba(84, 240, 197, 0.28);
+  box-shadow:
+    0 0 0 1px rgba(84, 240, 197, 0.18),
+    0 24px 70px rgba(1, 4, 12, 0.56),
+    0 0 56px rgba(84, 240, 197, 0.16);
 }
 
 .sci-model-card:hover,
@@ -393,6 +401,21 @@
   letter-spacing: 0.18em;
   text-transform: uppercase;
   font-family: "Space Mono", monospace;
+}
+
+.sci-card-recommended {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(84, 240, 197, 0.2);
+  background: rgba(9, 29, 32, 0.72);
+  color: rgba(154, 255, 229, 0.9);
+  font-family: "Space Mono", monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.18em;
+  padding: 0.45rem 0.7rem;
+  text-transform: uppercase;
+  box-shadow: 0 0 22px rgba(84, 240, 197, 0.08);
 }
 
 .sci-card-status-dot {

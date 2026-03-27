@@ -954,7 +954,7 @@ export default function AIDetection({ defaultModelId = DEFAULT_OKAB_MODEL_ID }) 
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25, ease: "easeOut" }}
-          className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-5"
+          className="command-subpanel p-5"
         >
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="space-y-3">
@@ -1000,7 +1000,7 @@ export default function AIDetection({ defaultModelId = DEFAULT_OKAB_MODEL_ID }) 
                 >
                   {OKAB_MODEL_OPTIONS.map((option) => (
                     <option key={option.id} value={option.id}>
-                      {option.label}
+                      {option.recommended ? `${option.label} (Recommended)` : option.label}
                     </option>
                   ))}
                 </select>
@@ -1020,6 +1020,9 @@ export default function AIDetection({ defaultModelId = DEFAULT_OKAB_MODEL_ID }) 
               <p className="mt-2 max-w-xs text-xs leading-5 text-[var(--text-secondary)]">
                 {currentModel.description}
               </p>
+              {currentModel.recommended ? (
+                <div className="command-recommended-chip mt-2 inline-flex">Recommended default profile</div>
+              ) : null}
             </div>
           </div>
         </motion.section>
@@ -1029,7 +1032,7 @@ export default function AIDetection({ defaultModelId = DEFAULT_OKAB_MODEL_ID }) 
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, delay: 0.04, ease: "easeOut" }}
-            className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-5"
+            className="command-subpanel p-5"
           >
             <div className="flex flex-wrap items-center gap-2">
               {SOURCE_TABS.map((tab) => (
@@ -1131,7 +1134,7 @@ export default function AIDetection({ defaultModelId = DEFAULT_OKAB_MODEL_ID }) 
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, delay: 0.08, ease: "easeOut" }}
-            className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-5"
+            className="command-subpanel p-5"
           >
             <p className="command-section-label">Detection Log</p>
 
