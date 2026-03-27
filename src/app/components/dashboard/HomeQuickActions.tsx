@@ -109,7 +109,7 @@ export function HomeQuickActions({
             title="Latest Alert Stream"
             description="Newest detections requiring immediate review."
             action={
-              <div className="inline-flex items-center gap-2 rounded-md border border-[rgba(249,115,22,0.2)] bg-[var(--fire-dim)] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--fire)]">
+              <div className="inline-flex items-center gap-2 rounded-md border border-[rgba(201,162,39,0.2)] bg-[var(--fire-dim)] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--fire)]">
                 <Flame className="h-4 w-4" />
                 {alerts.length} total
               </div>

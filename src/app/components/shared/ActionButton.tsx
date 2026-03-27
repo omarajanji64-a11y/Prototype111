@@ -17,7 +17,7 @@ const variantClasses = {
   ghost:
     "border border-[var(--border)] bg-transparent text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:bg-[rgba(255,255,255,0.02)] hover:text-[var(--text-primary)]",
   danger:
-    "border border-[rgba(239,68,68,0.2)] bg-[var(--critical-dim)] text-[var(--critical)] hover:border-[rgba(239,68,68,0.32)]",
+    "border border-[rgba(230,210,143,0.2)] bg-[var(--critical-dim)] text-[var(--critical)] hover:border-[rgba(230,210,143,0.32)]",
 };
 
 export function ActionButton({

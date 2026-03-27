@@ -14,9 +14,9 @@ interface MapCardProps {
 }
 
 const markerGlow = {
-  safe: "#22d3ee",
-  warning: "#fbbf24",
-  fire: "#f97316",
+  safe: "#f8f8f8",
+  warning: "#e6d28f",
+  fire: "#c9a227",
 } as const;
 
 export function MapCard({ zones, onFocusCamera }: MapCardProps) {
@@ -79,7 +79,7 @@ export function MapCard({ zones, onFocusCamera }: MapCardProps) {
             <motion.div
               animate={{ y: ["-12%", "110%"] }}
               transition={{ duration: 4.4, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-              className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[linear-gradient(180deg,rgba(14,165,233,0),rgba(14,165,233,0.12),rgba(14,165,233,0))]"
+              className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[linear-gradient(180deg,rgba(201,162,39,0),rgba(201,162,39,0.12),rgba(201,162,39,0))]"
             />
           </div>
 

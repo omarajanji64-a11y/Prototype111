@@ -75,8 +75,8 @@ function getSeverity(confidence) {
 
 function getSeverityClasses(confidence) {
   return confidence > ALERT_THRESHOLD
-    ? "border-[rgba(239,68,68,0.2)] bg-[var(--critical-dim)] text-[var(--critical)]"
-    : "border-[rgba(251,191,36,0.2)] bg-[var(--warning-dim)] text-[var(--warning)]";
+    ? "border-[rgba(230,210,143,0.2)] bg-[var(--critical-dim)] text-[var(--critical)]"
+    : "border-[rgba(230,210,143,0.2)] bg-[var(--warning-dim)] text-[var(--warning)]";
 }
 
 function clearCanvas(canvas) {
@@ -153,7 +153,7 @@ function drawDetectionShapes(context, detections, scaleX, scaleY) {
   context.textBaseline = "top";
 
   detections.forEach((detection) => {
-    const color = detection.type === "fire" ? "#ef4444" : "#22d3ee";
+    const color = detection.type === "fire" ? "#c9a227" : "#e6d28f";
     const label = `${getDetectionLabel(detection.type)} ${formatConfidence(detection.confidence)}`;
     const x = detection.left * scaleX;
     const y = detection.top * scaleY;
@@ -978,7 +978,7 @@ export default function AIDetection() {
 
                 <h1 className="text-2xl font-semibold text-[var(--text-primary)]">AI Detection</h1>
 
-                <span className="rounded-md bg-[rgba(14,165,233,0.1)] px-2 py-0.5 text-xs font-medium text-[var(--accent-glow)]">
+                <span className="rounded-md bg-[rgba(230,210,143,0.1)] px-2 py-0.5 text-xs font-medium text-[var(--accent-glow)]">
                   {currentModel}
                 </span>
               </div>

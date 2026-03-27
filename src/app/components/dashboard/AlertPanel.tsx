@@ -46,7 +46,7 @@ export function AlertPanel({
           }
         />
 
-        <div className="flex items-start gap-3 rounded-lg border border-[rgba(14,165,233,0.2)] bg-[rgba(14,165,233,0.05)] p-4 text-sm text-[var(--text-secondary)]">
+        <div className="flex items-start gap-3 rounded-lg border border-[rgba(230,210,143,0.2)] bg-[rgba(230,210,143,0.06)] p-4 text-sm text-[var(--text-secondary)]">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent-glow)]" />
           <p>Average sensor-to-alert notification time is currently 11 seconds in prototype tests.</p>
         </div>
