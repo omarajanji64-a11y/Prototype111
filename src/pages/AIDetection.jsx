@@ -575,9 +575,13 @@ const sensorStatusClasses = {
 export default function AIDetection({
   defaultModelId = DEFAULT_OKAB_MODEL_ID,
   embedded = false,
+  configurationLocked = false,
   heading,
   description,
   linkedSensors = [],
+  lockedSource,
+  lockedIpCameraUrl = "",
+  lockedAiEnabled,
   onTelemetryChange,
 }) {
   const videoRef = useRef(null);
@@ -589,9 +593,10 @@ export default function AIDetection({
   const toastTimeoutsRef = useRef({});
   const handledAlertsRef = useRef(new Set());
   const telemetryRef = useRef(null);
+  const autoLoadedIpRef = useRef("");
 
-  const [activeSource, setActiveSource] = useState("webcam");
-  const [ipCameraUrl, setIpCameraUrl] = useState("");
+  const [activeSource, setActiveSource] = useState(lockedSource ?? "webcam");
+  const [ipCameraUrl, setIpCameraUrl] = useState(lockedIpCameraUrl ?? "");
   const [isSourceReady, setIsSourceReady] = useState(false);
   const [sourceError, setSourceError] = useState("");
   const [isRunning, setIsRunning] = useState(false);
@@ -607,6 +612,18 @@ export default function AIDetection({
     setModelId(getOkabModelOption(defaultModelId).id);
   }, [defaultModelId]);
 
+  useEffect(() => {
+    if (lockedSource && lockedSource !== activeSource) {
+      setActiveSource(lockedSource);
+    }
+  }, [activeSource, lockedSource]);
+
+  useEffect(() => {
+    if (typeof lockedIpCameraUrl === "string" && lockedIpCameraUrl !== ipCameraUrl) {
+      setIpCameraUrl(lockedIpCameraUrl);
+    }
+  }, [ipCameraUrl, lockedIpCameraUrl]);
+
   const { detections, stats, isModelLoaded, isLoadingModel, modelError, runtimeError } = useDetectionEngine(
     videoRef,
     canvasRef,
@@ -619,6 +636,7 @@ export default function AIDetection({
   const activeSourceStat = isSourceReady ? getSourceBadge(activeSource) : "None";
   const showOverlay = activeSource === "screen" && isRunning && !isOverlayDismissed;
   const latestOverlayDetections = detections.slice(0, 3);
+  const setupControlLabel = lockedAiEnabled ? "AI controlled by Setup" : "AI disabled in Setup";
   const sectionEyebrow = embedded ? "Main Tower" : "AI Detection";
   const sectionHeading = heading ?? (embedded ? "Main Tower Camera POV" : "AI Detection");
   const sectionDescription =
@@ -701,6 +719,21 @@ export default function AIDetection({
       });
     };
   }, [onTelemetryChange]);
+
+  useEffect(() => {
+    if (typeof lockedAiEnabled !== "boolean") {
+      return;
+    }
+
+    if (!lockedAiEnabled && isRunning) {
+      setIsRunning(false);
+      return;
+    }
+
+    if (lockedAiEnabled && canStartDetection && !isRunning) {
+      setIsRunning(true);
+    }
+  }, [canStartDetection, isRunning, lockedAiEnabled]);
 
   function stopCurrentSource() {
     if (streamRef.current) {
@@ -951,6 +984,29 @@ export default function AIDetection({
     video.load();
   }
 
+  useEffect(() => {
+    if (!configurationLocked || activeSource !== "ip") {
+      return;
+    }
+
+    const trimmedUrl = ipCameraUrl.trim();
+
+    if (!trimmedUrl) {
+      setIsSourceReady(false);
+      setSourceError("Add an IP camera URL in Setup to link the Main Tower feed.");
+      return;
+    }
+
+    const sourceKey = `${activeSource}:${trimmedUrl}`;
+
+    if (autoLoadedIpRef.current === sourceKey) {
+      return;
+    }
+
+    autoLoadedIpRef.current = sourceKey;
+    loadIpCamera();
+  }, [activeSource, configurationLocked, ipCameraUrl]);
+
   function handleSourceChange(nextSource) {
     if (nextSource === activeSource) {
       return;
@@ -1114,32 +1170,41 @@ export default function AIDetection({
             </div>
 
             <div className="space-y-2">
-              <p className="command-section-label">Model Selector</p>
-              <div className="relative">
-                <select
-                  value={modelId}
-                  onChange={(event) => setModelId(event.target.value)}
-                  className="appearance-none rounded-lg border border-[var(--border)] bg-[var(--bg-card)] py-2.5 pl-4 pr-16 text-sm font-medium text-[var(--text-primary)] outline-none transition-colors duration-150 focus:border-[var(--border-hover)]"
-                >
-                  {OKAB_MODEL_OPTIONS.map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {option.recommended ? `${option.label} (Recommended)` : option.label}
-                    </option>
-                  ))}
-                </select>
-
-                {isLoadingModel ? (
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 0.9, ease: "linear", repeat: Number.POSITIVE_INFINITY }}
-                    className="pointer-events-none absolute right-10 top-1/2 -translate-y-1/2 text-[var(--accent-primary)]"
+              <p className="command-section-label">{configurationLocked ? "Setup Control" : "Model Selector"}</p>
+              {configurationLocked ? (
+                <div className="rounded-xl border border-[var(--border)] bg-[rgba(8,18,40,0.82)] p-4 text-sm text-[var(--text-secondary)]">
+                  <p className="font-semibold text-[var(--text-primary)]">{setupControlLabel}</p>
+                  <p className="mt-2">
+                    Source: {getSourceBadge(activeSource)} · Model: {currentModel.label}
+                  </p>
+                </div>
+              ) : (
+                <div className="relative">
+                  <select
+                    value={modelId}
+                    onChange={(event) => setModelId(event.target.value)}
+                    className="appearance-none rounded-lg border border-[var(--border)] bg-[var(--bg-card)] py-2.5 pl-4 pr-16 text-sm font-medium text-[var(--text-primary)] outline-none transition-colors duration-150 focus:border-[var(--border-hover)]"
                   >
-                    <LoaderCircle className="h-4.5 w-4.5" />
-                  </motion.div>
-                ) : null}
+                    {OKAB_MODEL_OPTIONS.map((option) => (
+                      <option key={option.id} value={option.id}>
+                        {option.recommended ? `${option.label} (Recommended)` : option.label}
+                      </option>
+                    ))}
+                  </select>
 
-                <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-secondary)]" />
-              </div>
+                  {isLoadingModel ? (
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 0.9, ease: "linear", repeat: Number.POSITIVE_INFINITY }}
+                      className="pointer-events-none absolute right-10 top-1/2 -translate-y-1/2 text-[var(--accent-primary)]"
+                    >
+                      <LoaderCircle className="h-4.5 w-4.5" />
+                    </motion.div>
+                  ) : null}
+
+                  <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-secondary)]" />
+                </div>
+              )}
               <p className="mt-2 max-w-xs text-xs leading-5 text-[var(--text-secondary)]">
                 {currentModel.description}
               </p>
@@ -1157,45 +1222,53 @@ export default function AIDetection({
             transition={{ duration: 0.25, delay: 0.04, ease: "easeOut" }}
             className="command-subpanel p-5"
           >
-            <div className="flex flex-wrap items-center gap-2">
-              {SOURCE_TABS.map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => handleSourceChange(tab.id)}
-                  className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors duration-150 ${
-                    activeSource === tab.id
-                      ? "border-transparent bg-[var(--accent-primary)] text-white"
-                      : "border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)]"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            {activeSource === "ip" ? (
-              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                <div className="relative flex-1">
-                  <Link2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-secondary)]" />
-                  <input
-                    type="text"
-                    value={ipCameraUrl}
-                    onChange={(event) => setIpCameraUrl(event.target.value)}
-                    placeholder="Enter IP camera stream URL"
-                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-card)] py-2.5 pl-10 pr-4 text-sm text-[var(--text-primary)] outline-none transition-colors duration-150 placeholder:text-[var(--text-secondary)] focus:border-[var(--border-hover)]"
-                  />
+            {configurationLocked ? (
+              <div className="rounded-xl border border-[var(--border)] bg-[rgba(8,18,40,0.72)] p-4 text-sm text-[var(--text-secondary)]">
+                Camera source is configured in Setup and applied automatically here.
+              </div>
+            ) : (
+              <>
+                <div className="flex flex-wrap items-center gap-2">
+                  {SOURCE_TABS.map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => handleSourceChange(tab.id)}
+                      className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors duration-150 ${
+                        activeSource === tab.id
+                          ? "border-transparent bg-[var(--accent-primary)] text-white"
+                          : "border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)]"
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
                 </div>
 
-                <button
-                  type="button"
-                  onClick={loadIpCamera}
-                  className="rounded-lg bg-[var(--accent-primary)] px-4 py-2.5 text-sm font-medium text-white transition duration-150 hover:brightness-110"
-                >
-                  Load Stream
-                </button>
-              </div>
-            ) : null}
+                {activeSource === "ip" ? (
+                  <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                    <div className="relative flex-1">
+                      <Link2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-secondary)]" />
+                      <input
+                        type="text"
+                        value={ipCameraUrl}
+                        onChange={(event) => setIpCameraUrl(event.target.value)}
+                        placeholder="Enter IP camera stream URL"
+                        className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-card)] py-2.5 pl-10 pr-4 text-sm text-[var(--text-primary)] outline-none transition-colors duration-150 placeholder:text-[var(--text-secondary)] focus:border-[var(--border-hover)]"
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={loadIpCamera}
+                      className="rounded-lg bg-[var(--accent-primary)] px-4 py-2.5 text-sm font-medium text-white transition duration-150 hover:brightness-110"
+                    >
+                      Load Stream
+                    </button>
+                  </div>
+                ) : null}
+              </>
+            )}
 
             <div
               ref={videoFrameRef}
@@ -1252,18 +1325,24 @@ export default function AIDetection({
                 <span className="text-[var(--text-primary)]">every 200ms</span>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setIsRunning((currentState) => !currentState)}
-                disabled={!isRunning && !canStartDetection}
-                className={`rounded-lg px-4 py-2.5 text-sm font-medium text-white transition duration-150 ${
-                  isRunning
-                    ? "bg-[var(--critical)] text-white hover:brightness-110"
-                    : "bg-[var(--accent-primary)] text-white hover:brightness-110"
-                } disabled:cursor-not-allowed disabled:opacity-50`}
-              >
-                {isRunning ? "Stop Detection" : "Start Detection"}
-              </button>
+              {configurationLocked ? (
+                <div className="rounded-lg border border-[var(--border)] bg-[rgba(8,18,40,0.72)] px-4 py-2.5 text-sm text-[var(--text-secondary)]">
+                  {lockedAiEnabled ? "AI state is controlled in Setup" : "Enable AI detection in Setup to start inference"}
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setIsRunning((currentState) => !currentState)}
+                  disabled={!isRunning && !canStartDetection}
+                  className={`rounded-lg px-4 py-2.5 text-sm font-medium text-white transition duration-150 ${
+                    isRunning
+                      ? "bg-[var(--critical)] text-white hover:brightness-110"
+                      : "bg-[var(--accent-primary)] text-white hover:brightness-110"
+                  } disabled:cursor-not-allowed disabled:opacity-50`}
+                >
+                  {isRunning ? "Stop Detection" : "Start Detection"}
+                </button>
+              )}
             </div>
           </motion.section>
 

@@ -1,5 +1,5 @@
 import { AnimatePresence, MotionConfig, motion } from "motion/react";
-import { lazy, Suspense, startTransition, useCallback, useMemo, useState } from "react";
+import { startTransition, useCallback, useEffect, useMemo, useState } from "react";
 
 import { pageVariants, transitionDefaults } from "../../animations/variants";
 import type { AppBootstrapState } from "../../hooks/useAppBootstrap";
@@ -9,6 +9,7 @@ import { DashboardSkeleton } from "./DashboardSkeleton";
 import { HomeQuickActions } from "./HomeQuickActions";
 import { MainTowerConsole } from "./MainTowerConsole";
 import { MapCard } from "./MapCard";
+import { SetupConsole } from "./SetupConsole";
 import { SystemStatus } from "./SystemStatus";
 import { UavResponsePanel } from "./UavResponsePanel";
 import { AppShell } from "../layout/AppShell";
@@ -29,8 +30,16 @@ import {
   getTowerTemperature,
   type MainTowerTelemetry,
 } from "../../lib/mainTower";
-
-const AIDetection = lazy(() => import("../../../pages/AIDetection.jsx"));
+import {
+  getCameraSourceLabel,
+  getConfiguredSensors,
+  persistSystemSetup,
+  readStoredSystemSetup,
+  type SensorSetupItem,
+  type SystemSetupState,
+  type TowerSetupConfig,
+  type UavSetupConfig,
+} from "../../lib/systemSetup";
 
 interface DashboardExperienceProps {
   bootstrap: AppBootstrapState;
@@ -44,7 +53,17 @@ export function DashboardExperience({ bootstrap, selectedModelId }: DashboardExp
   const [towerTelemetry, setTowerTelemetry] = useState<MainTowerTelemetry>(EMPTY_MAIN_TOWER_TELEMETRY);
 
   const mainTower = cameraFeeds[0];
-  const mainTowerStatus = getTowerStatusFromTelemetry(towerTelemetry);
+  const [systemSetup, setSystemSetup] = useState<SystemSetupState>(() =>
+    readStoredSystemSetup(mainTower, selectedModelId),
+  );
+
+  useEffect(() => {
+    persistSystemSetup(systemSetup);
+  }, [systemSetup]);
+
+  const configuredSensors = useMemo(() => getConfiguredSensors(systemSetup.sensors), [systemSetup.sensors]);
+  const mainTowerStatus =
+    !systemSetup.tower.cameraConfigured ? "warning" : getTowerStatusFromTelemetry(towerTelemetry);
   const allAlerts = useMemo(() => buildTowerAlerts(mainTower, towerTelemetry), [mainTower, towerTelemetry]);
   const alerts = useMemo(
     () => allAlerts.filter((alert) => !dismissedAlertIds.includes(alert.id)),
@@ -53,20 +72,39 @@ export function DashboardExperience({ bootstrap, selectedModelId }: DashboardExp
   const criticalCount = alerts.filter((alert) => alert.severity === "critical").length;
   const warningCount = mainTowerStatus === "warning" ? 1 : 0;
   const safeCount = mainTowerStatus === "safe" ? 1 : 0;
+  const linkedCamera = useMemo(
+    () => ({
+      ...mainTower.linkedCamera,
+      name: systemSetup.tower.cameraConfigured
+        ? systemSetup.tower.cameraName.trim() || mainTower.linkedCamera.name
+        : "Camera Not Configured",
+      resolution: systemSetup.tower.resolution.trim() || mainTower.linkedCamera.resolution,
+      coverage: systemSetup.tower.coverage.trim() || mainTower.linkedCamera.coverage,
+      streamHint: systemSetup.tower.cameraConfigured
+        ? getCameraSourceLabel(systemSetup.tower.cameraSource)
+        : "Open Setup to link the tower camera",
+    }),
+    [mainTower.linkedCamera, systemSetup.tower],
+  );
 
   const focusedCamera = useMemo(
     () => ({
       ...mainTower,
       status: mainTowerStatus,
-      summary: getTowerSummary(mainTower, towerTelemetry),
+      summary: !systemSetup.tower.cameraConfigured
+        ? "Main Tower does not have a linked camera yet. Open Setup to configure the camera feed, sensors, and AI controls."
+        : systemSetup.tower.aiEnabled
+          ? getTowerSummary(mainTower, towerTelemetry)
+          : "Main Tower camera is linked, but OKAB AI detection is turned off in Setup. Turn it on when you want live hazard analysis.",
       imageUrl: towerTelemetry.latestSnapshot || mainTower.imageUrl,
       detections: towerTelemetry.detectionLogs.length,
       temperature: getTowerTemperature(mainTower.temperature, towerTelemetry),
       confidence: getTowerConfidence(mainTower.confidence, towerTelemetry),
       lastSweep: getTowerLastSweep(towerTelemetry),
-      sensors: getTowerSensors(mainTower.sensors, towerTelemetry),
+      linkedCamera,
+      sensors: getTowerSensors(configuredSensors, towerTelemetry),
     }),
-    [mainTower, mainTowerStatus, towerTelemetry],
+    [configuredSensors, linkedCamera, mainTower, mainTowerStatus, systemSetup.tower.aiEnabled, systemSetup.tower.cameraConfigured, towerTelemetry],
   );
 
   const mapZones = useMemo(
@@ -75,23 +113,50 @@ export function DashboardExperience({ bootstrap, selectedModelId }: DashboardExp
         ...zone,
         status: mainTowerStatus,
         risk:
-          mainTowerStatus === "fire"
+          !systemSetup.tower.cameraConfigured
+            ? "58%"
+            : mainTowerStatus === "fire"
             ? "93%"
             : mainTowerStatus === "warning"
               ? "68%"
               : "32%",
         note:
-          mainTowerStatus === "fire"
+          !systemSetup.tower.cameraConfigured
+            ? "Main Tower camera is not configured yet. Open Setup to link the tower feed."
+            : mainTowerStatus === "fire"
             ? "Main Tower has confirmed a fire signature from the linked camera feed."
             : mainTowerStatus === "warning"
               ? "Main Tower is tracking smoke or runtime anomalies in this corridor."
               : "Main Tower coverage is stable with no active hazard detections.",
       })),
-    [mainTowerStatus],
+    [mainTowerStatus, systemSetup.tower.cameraConfigured],
   );
 
   const handleTelemetryChange = useCallback((nextTelemetry: MainTowerTelemetry) => {
     setTowerTelemetry(nextTelemetry);
+  }, []);
+
+  const handleTowerSetupChange = useCallback((nextTower: TowerSetupConfig) => {
+    setSystemSetup((currentSetup) => ({
+      ...currentSetup,
+      tower: nextTower,
+    }));
+  }, []);
+
+  const handleSensorSetupChange = useCallback((sensorId: string, nextEnabled: boolean) => {
+    setSystemSetup((currentSetup) => ({
+      ...currentSetup,
+      sensors: currentSetup.sensors.map((sensor: SensorSetupItem) =>
+        sensor.id === sensorId ? { ...sensor, enabled: nextEnabled } : sensor,
+      ),
+    }));
+  }, []);
+
+  const handleUavSetupChange = useCallback((nextUav: UavSetupConfig) => {
+    setSystemSetup((currentSetup) => ({
+      ...currentSetup,
+      uav: nextUav,
+    }));
   }, []);
 
   const focusCamera = () => {
@@ -131,8 +196,11 @@ export function DashboardExperience({ bootstrap, selectedModelId }: DashboardExp
           tower={focusedCamera}
           telemetry={towerTelemetry}
           alertCount={alerts.length}
-          defaultModelId={selectedModelId}
+          towerSetup={systemSetup.tower}
+          uavSetup={systemSetup.uav}
+          defaultModelId={systemSetup.tower.modelId || selectedModelId}
           onTelemetryChange={handleTelemetryChange}
+          onOpenSetup={() => handleActiveNavChange("setup")}
         />
       );
     }
@@ -165,11 +233,14 @@ export function DashboardExperience({ bootstrap, selectedModelId }: DashboardExp
       return <MapCard zones={mapZones} onFocusCamera={focusCamera} />;
     }
 
-    if (activeNav === "aiDetection") {
+    if (activeNav === "setup") {
       return (
-        <Suspense fallback={<DashboardSkeleton progress={bootstrap.progress} statusLabel={bootstrap.statusLabel} />}>
-          <AIDetection defaultModelId={selectedModelId} onTelemetryChange={handleTelemetryChange} />
-        </Suspense>
+        <SetupConsole
+          setup={systemSetup}
+          onTowerChange={handleTowerSetupChange}
+          onSensorChange={handleSensorSetupChange}
+          onUavChange={handleUavSetupChange}
+        />
       );
     }
 

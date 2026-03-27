@@ -5,6 +5,7 @@ import {
   Flame,
   MapPinned,
   Plane,
+  Settings2,
   Shield,
 } from "lucide-react";
 import { motion } from "motion/react";
@@ -91,6 +92,11 @@ export function HomeQuickActions({
             <motion.div variants={listItemVariants}>
               <ActionButton icon={MapPinned} variant="secondary" className="w-full" onClick={() => onNavigate("map")}>
                 Open Forest Map
+              </ActionButton>
+            </motion.div>
+            <motion.div variants={listItemVariants}>
+              <ActionButton icon={Settings2} variant="secondary" className="w-full" onClick={() => onNavigate("setup")}>
+                Open Setup
               </ActionButton>
             </motion.div>
             <motion.div variants={listItemVariants} className="sm:col-span-2">

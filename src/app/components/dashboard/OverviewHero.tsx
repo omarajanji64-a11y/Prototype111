@@ -80,7 +80,7 @@ export function OverviewHero({
                   Simulate UAV dispatch
                 </ActionButton>
                 <ActionButton icon={Video} variant="secondary" onClick={onOpenCameraWall}>
-                  Open tower feeds
+                  Open Main Tower
                 </ActionButton>
                 <ActionButton icon={ArrowRight}>Review project scope</ActionButton>
               </div>

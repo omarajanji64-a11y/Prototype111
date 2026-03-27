@@ -4,16 +4,16 @@ import {
   Camera,
   ChevronDown,
   Flame,
-  Radar,
   RadioTower,
-  ScanSearch,
-  ShieldCheck,
+  Settings2,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 import { cardVariants } from "../../animations/variants";
 import type { CameraFeed } from "../../data/dashboard";
 import type { MainTowerTelemetry } from "../../lib/mainTower";
+import { getOkabModelLabel } from "../../lib/okabModels";
+import type { TowerSetupConfig, UavSetupConfig } from "../../lib/systemSetup";
 import { ActionButton } from "../shared/ActionButton";
 import { GlassPanel } from "../shared/GlassPanel";
 import { SectionTitle } from "../shared/SectionTitle";
@@ -25,241 +25,163 @@ interface MainTowerConsoleProps {
   tower: CameraFeed;
   telemetry: MainTowerTelemetry;
   alertCount: number;
+  towerSetup: TowerSetupConfig;
+  uavSetup: UavSetupConfig;
   defaultModelId: string;
   onTelemetryChange: (nextTelemetry: MainTowerTelemetry) => void;
+  onOpenSetup: () => void;
 }
-
-const sensorStatusClassMap = {
-  online: "border-[rgba(34,211,238,0.18)] bg-[rgba(8,18,40,0.78)] text-[var(--safe)]",
-  watch: "border-[rgba(251,191,36,0.2)] bg-[rgba(69,26,3,0.34)] text-[var(--warning)]",
-  alert: "border-[rgba(239,68,68,0.2)] bg-[rgba(69,10,10,0.34)] text-[var(--critical)]",
-} as const;
 
 export function MainTowerConsole({
   tower,
   telemetry,
   alertCount,
+  towerSetup,
+  uavSetup,
   defaultModelId,
   onTelemetryChange,
+  onOpenSetup,
 }: MainTowerConsoleProps) {
   const [isTowerOpen, setIsTowerOpen] = useState(false);
 
   const previewImage = telemetry.latestSnapshot || tower.imageUrl;
-  const aiLabel = telemetry.isAiEnabled
-    ? telemetry.isSourceReady
-      ? "AI online"
-      : "AI initializing"
-    : "AI standby";
+  const aiLabel = !towerSetup.aiEnabled
+    ? "AI off"
+    : telemetry.isAiEnabled
+      ? telemetry.isSourceReady
+        ? "AI active"
+        : "AI arming"
+      : "AI armed";
   const detectionLabel =
     telemetry.detectionLogs.length > 0
-      ? `${telemetry.detectionLogs.length} logged detection${telemetry.detectionLogs.length === 1 ? "" : "s"}`
-      : "No detections logged";
+      ? `${telemetry.detectionLogs.length} detection${telemetry.detectionLogs.length === 1 ? "" : "s"}`
+      : "No detections";
   const latestEventLabel = telemetry.latestDetection
     ? `${telemetry.latestDetection.type === "fire" ? "Fire" : "Smoke"} · ${Math.round(
         telemetry.latestDetection.confidence * 100,
       )}% confidence`
-    : "No hazard event recorded";
-
+    : towerSetup.aiEnabled
+      ? "Waiting for a logged event"
+      : "AI detection disabled";
   const sensorSummary = useMemo(() => {
-    const alertingSensors = tower.sensors.filter((sensor) => sensor.status === "alert").length;
-    const watchSensors = tower.sensors.filter((sensor) => sensor.status === "watch").length;
-
-    if (alertingSensors > 0) {
-      return `${alertingSensors} linked sensor${alertingSensors === 1 ? "" : "s"} in alert mode`;
+    if (tower.sensors.length === 0) {
+      return "No linked sensors";
     }
 
-    if (watchSensors > 0) {
-      return `${watchSensors} linked sensor${watchSensors === 1 ? "" : "s"} in watch mode`;
-    }
-
-    return `${tower.sensors.length} linked sensor modules online`;
-  }, [tower.sensors]);
+    return `${tower.sensors.length} linked sensor${tower.sensors.length === 1 ? "" : "s"}`;
+  }, [tower.sensors.length]);
+  const openButtonLabel = towerSetup.cameraConfigured
+    ? isTowerOpen
+      ? "Close Tower"
+      : "Open Tower"
+    : "Open Setup";
 
   return (
     <GlassPanel variants={cardVariants} className="p-5">
       <div className="space-y-5">
         <SectionTitle
           eyebrow="Main Tower"
-          title="Single-tower command view"
-          description="One tower, one linked camera, one live sensor stack. Open the tower to view the real camera POV, expand it, and inspect detections as they arrive."
+          title="Tower preview"
+          description="The preview card shows the linked camera, whether AI is on, and whether the tower has any detections. Open the tower to inspect full details."
           action={
-            <ActionButton
-              icon={Camera}
-              variant="primary"
-              onClick={() => setIsTowerOpen((currentState) => !currentState)}
-            >
-              {isTowerOpen ? "Close Tower" : "Open Tower"}
+            <ActionButton icon={Settings2} variant="secondary" onClick={onOpenSetup}>
+              Open Setup
             </ActionButton>
           }
         />
 
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_360px]">
-          <div className="relative overflow-hidden rounded-[1.4rem] border border-[var(--border)] bg-black">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(30,216,255,0.18),transparent_42%)]" />
-            <img src={previewImage} alt={tower.linkedCamera.name} className="h-full min-h-[340px] w-full object-cover" />
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,16,0.12),rgba(4,8,16,0.2),rgba(4,8,16,0.88))]" />
-
-            <div className="absolute left-5 right-5 top-5 flex flex-wrap items-center justify-between gap-3">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(30,216,255,0.22)] bg-[rgba(8,18,40,0.78)] px-3 py-1.5 font-sci-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--accent-glow)] backdrop-blur">
-                <RadioTower className="h-4 w-4" />
-                {tower.id}
-              </div>
-
-              <StatusBadge status={tower.status} />
-            </div>
-
-            <div className="absolute left-5 top-20 rounded-xl border border-[var(--border)] bg-[rgba(8,18,40,0.82)] px-4 py-3 text-xs text-[var(--text-secondary)] backdrop-blur">
-              <p className="command-section-label text-[var(--text-muted)]">Linked Camera</p>
-              <p className="mt-1 text-sm font-semibold text-[var(--text-primary)]">{tower.linkedCamera.name}</p>
-              <p className="mt-1">{tower.linkedCamera.resolution}</p>
-            </div>
-
-            <div className="absolute bottom-5 left-5 right-5 space-y-4">
-              <div className="flex flex-wrap gap-2">
-                <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[rgba(8,18,40,0.82)] px-3 py-1.5 text-xs text-[var(--text-primary)] backdrop-blur">
-                  <Bot className="h-4 w-4 text-[var(--accent-primary)]" />
-                  {aiLabel}
+        <div className="relative overflow-hidden rounded-[1.5rem] border border-[var(--border)] bg-black">
+          {towerSetup.cameraConfigured ? (
+            <img src={previewImage} alt={tower.linkedCamera.name} className="h-full min-h-[380px] w-full object-cover" />
+          ) : (
+            <div className="flex min-h-[380px] items-center justify-center bg-[radial-gradient(circle_at_top,rgba(30,216,255,0.16),transparent_46%)] px-6 text-center">
+              <div className="max-w-lg space-y-4">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[1.25rem] border border-[var(--border)] bg-[rgba(8,18,40,0.82)] text-[var(--accent-primary)]">
+                  <Camera className="h-6 w-6" />
                 </div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[rgba(8,18,40,0.82)] px-3 py-1.5 text-xs text-[var(--text-primary)] backdrop-blur">
-                  <ScanSearch className="h-4 w-4 text-[var(--warning)]" />
-                  {detectionLabel}
-                </div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[rgba(8,18,40,0.82)] px-3 py-1.5 text-xs text-[var(--text-primary)] backdrop-blur">
-                  <Radar className="h-4 w-4 text-[var(--safe)]" />
-                  {sensorSummary}
+                <div>
+                  <p className="text-lg font-semibold text-[var(--text-primary)]">No camera linked to Main Tower</p>
+                  <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+                    Open Setup to configure the tower camera, choose the source, and control whether OKAB AI should run.
+                  </p>
                 </div>
               </div>
+            </div>
+          )}
 
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,16,0.12),rgba(4,8,16,0.22),rgba(4,8,16,0.88))]" />
+
+          <div className="absolute left-5 right-5 top-5 flex flex-wrap items-center justify-between gap-3">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(30,216,255,0.22)] bg-[rgba(8,18,40,0.8)] px-3 py-1.5 font-sci-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--accent-glow)] backdrop-blur">
+              <RadioTower className="h-4 w-4" />
+              {tower.id}
+            </div>
+            <StatusBadge status={tower.status} />
+          </div>
+
+          <div className="absolute inset-x-5 bottom-5 space-y-4">
+            <div className="grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
               <div className="rounded-[1.2rem] border border-[var(--border)] bg-[rgba(8,18,40,0.84)] p-4 backdrop-blur">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <p className="command-section-label text-[var(--text-muted)]">Live Preview</p>
-                    <h3 className="mt-2 text-2xl font-semibold text-[var(--text-primary)]">{tower.name}</h3>
-                    <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                      {tower.location} · {tower.zone}
-                    </p>
-                  </div>
+                <p className="command-section-label text-[var(--text-muted)]">Preview</p>
+                <h3 className="mt-2 text-2xl font-semibold text-[var(--text-primary)]">{tower.name}</h3>
+                <p className="mt-1 text-sm text-[var(--text-secondary)]">
+                  {tower.location} · {tower.zone}
+                </p>
 
-                  <div className="rounded-xl border border-[var(--border)] bg-[rgba(2,6,14,0.45)] px-4 py-3 text-right">
-                    <p className="command-section-label text-[var(--text-muted)]">Latest Event</p>
-                    <p className="mt-2 text-sm font-semibold text-[var(--text-primary)]">{latestEventLabel}</p>
+                <div className="mt-4 flex flex-wrap gap-2 text-xs">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[rgba(8,18,40,0.82)] px-3 py-1.5 text-[var(--text-primary)]">
+                    <Camera className="h-4 w-4 text-[var(--accent-primary)]" />
+                    {tower.linkedCamera.name}
+                  </div>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[rgba(8,18,40,0.82)] px-3 py-1.5 text-[var(--text-primary)]">
+                    <Bot className="h-4 w-4 text-[var(--warning)]" />
+                    {aiLabel}
+                  </div>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[rgba(8,18,40,0.82)] px-3 py-1.5 text-[var(--text-primary)]">
+                    <Flame className="h-4 w-4 text-[var(--fire)]" />
+                    {detectionLabel}
                   </div>
                 </div>
 
                 <p className="mt-4 max-w-3xl text-sm leading-6 text-[var(--text-secondary)]">{tower.summary}</p>
               </div>
-            </div>
-          </div>
 
-          <div className="space-y-3">
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-              <div className="command-subpanel p-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.72)] text-[var(--accent-primary)]">
-                    <Camera className="h-5 w-5" />
+              <div className="rounded-[1.2rem] border border-[var(--border)] bg-[rgba(8,18,40,0.84)] p-4 backdrop-blur">
+                <div className="space-y-3 text-sm text-[var(--text-secondary)]">
+                  <div className="flex items-center justify-between gap-3">
+                    <span>Linked camera</span>
+                    <strong className="font-sci-mono text-[var(--text-primary)]">{towerSetup.cameraConfigured ? "Ready" : "Not set"}</strong>
                   </div>
-                  <div>
-                    <p className="command-section-label text-[var(--text-muted)]">Camera Link</p>
-                    <p className="mt-1 text-lg font-semibold text-[var(--text-primary)]">{tower.linkedCamera.name}</p>
+                  <div className="flex items-center justify-between gap-3">
+                    <span>AI detection</span>
+                    <strong className="font-sci-mono text-[var(--text-primary)]">{towerSetup.aiEnabled ? "On" : "Off"}</strong>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span>Last event</span>
+                    <strong className="font-sci-mono text-[var(--text-primary)]">{latestEventLabel}</strong>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span>Linked sensors</span>
+                    <strong className="font-sci-mono text-[var(--text-primary)]">{sensorSummary}</strong>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span>UAV status</span>
+                    <strong className="font-sci-mono text-[var(--text-primary)]">{uavSetup.enabled ? "Armed" : "Standby"}</strong>
                   </div>
                 </div>
-                <p className="mt-4 text-sm text-[var(--text-secondary)]">{tower.linkedCamera.coverage}</p>
-              </div>
 
-              <div className="command-subpanel p-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.72)] text-[var(--warning)]">
-                    <Bot className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="command-section-label text-[var(--text-muted)]">AI Runtime</p>
-                    <p className="mt-1 text-lg font-semibold text-[var(--text-primary)]">{aiLabel}</p>
-                  </div>
-                </div>
-                <p className="mt-4 text-sm text-[var(--text-secondary)]">
-                  {telemetry.modelLabel ? `Running ${telemetry.modelLabel}` : "Waiting for OKAB runtime"}
-                </p>
-              </div>
-
-              <div className="command-subpanel p-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.72)] text-[var(--fire)]">
-                    <Flame className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="command-section-label text-[var(--text-muted)]">Detection State</p>
-                    <p className="mt-1 text-lg font-semibold text-[var(--text-primary)]">
-                      {telemetry.detectionLogs.length > 0 ? "Detections present" : "All clear"}
-                    </p>
-                  </div>
-                </div>
-                <p className="mt-4 text-sm text-[var(--text-secondary)]">
-                  {alertCount > 0 ? `${alertCount} active alert${alertCount === 1 ? "" : "s"} pending review` : "No active tower alerts"}
-                </p>
-              </div>
-
-              <div className="command-subpanel p-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.72)] text-[var(--safe)]">
-                    <ShieldCheck className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="command-section-label text-[var(--text-muted)]">Linked Sensors</p>
-                    <p className="mt-1 text-lg font-semibold text-[var(--text-primary)]">{tower.sensors.length}</p>
-                  </div>
-                </div>
-                <p className="mt-4 text-sm text-[var(--text-secondary)]">{sensorSummary}</p>
-              </div>
-            </div>
-
-            <div className="command-subpanel p-4">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="command-section-label text-[var(--text-muted)]">Tower Sensors</p>
-                  <p className="mt-1 text-sm text-[var(--text-secondary)]">Modules currently linked to Main Tower.</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsTowerOpen((currentState) => !currentState)}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--border)] bg-[rgba(8,18,40,0.72)] text-[var(--text-secondary)] transition-colors duration-150 hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]"
-                  aria-label={isTowerOpen ? "Collapse tower panel" : "Expand tower panel"}
-                >
-                  <motion.div
-                    animate={{ rotate: isTowerOpen ? 180 : 0 }}
-                    transition={{ duration: 0.2, ease: "easeOut" }}
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <ActionButton
+                    icon={Camera}
+                    variant="primary"
+                    onClick={() => (towerSetup.cameraConfigured ? setIsTowerOpen((currentState) => !currentState) : onOpenSetup())}
                   >
-                    <ChevronDown className="h-4 w-4" />
-                  </motion.div>
-                </button>
-              </div>
-
-              <div className="mt-4 space-y-3">
-                {tower.sensors.map((sensor) => (
-                  <div
-                    key={sensor.id}
-                    className="rounded-xl border border-[var(--border)] bg-[rgba(8,18,40,0.62)] p-3"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-semibold text-[var(--text-primary)]">{sensor.name}</p>
-                        <p className="mt-1 text-xs text-[var(--text-secondary)]">
-                          {sensor.type} · {sensor.location}
-                        </p>
-                      </div>
-                      <div
-                        className={`rounded-md border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.22em] ${
-                          sensorStatusClassMap[sensor.status]
-                        }`}
-                      >
-                        {sensor.status}
-                      </div>
-                    </div>
-
-                    <div className="mt-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-3 py-2 text-xs text-[var(--text-secondary)]">
-                      {sensor.reading}
-                    </div>
-                  </div>
-                ))}
+                    {openButtonLabel}
+                  </ActionButton>
+                  <ActionButton icon={Settings2} variant="secondary" onClick={onOpenSetup}>
+                    Configure
+                  </ActionButton>
+                </div>
               </div>
             </div>
           </div>
@@ -268,29 +190,75 @@ export function MainTowerConsole({
         <AnimatePresence initial={false}>
           {isTowerOpen ? (
             <motion.div
-              key="tower-console"
+              key="tower-details"
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.24, ease: "easeOut" }}
-              className="command-subpanel overflow-hidden p-4 sm:p-5"
+              className="space-y-3"
             >
-              <Suspense
-                fallback={
-                  <div className="command-empty-state min-h-[240px] rounded-xl p-6 text-sm">
-                    Initializing Main Tower camera console...
+              <div className="grid gap-3 xl:grid-cols-4">
+                <div className="command-subpanel p-4">
+                  <p className="command-section-label text-[var(--text-muted)]">Camera Source</p>
+                  <p className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{tower.linkedCamera.streamHint}</p>
+                </div>
+                <div className="command-subpanel p-4">
+                  <p className="command-section-label text-[var(--text-muted)]">AI Model</p>
+                  <p className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{getOkabModelLabel(towerSetup.modelId)}</p>
+                </div>
+                <div className="command-subpanel p-4">
+                  <p className="command-section-label text-[var(--text-muted)]">Alerts</p>
+                  <p className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{alertCount}</p>
+                </div>
+                <div className="command-subpanel p-4">
+                  <p className="command-section-label text-[var(--text-muted)]">UAV</p>
+                  <p className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{uavSetup.callsign}</p>
+                </div>
+              </div>
+
+              {towerSetup.cameraConfigured ? (
+                <GlassPanel variants={cardVariants} className="overflow-hidden p-4 sm:p-5">
+                  <Suspense
+                    fallback={
+                      <div className="command-empty-state min-h-[240px] rounded-xl p-6 text-sm">
+                        Initializing Main Tower details...
+                      </div>
+                    }
+                  >
+                    <AIDetection
+                      defaultModelId={towerSetup.modelId || defaultModelId}
+                      embedded
+                      configurationLocked
+                      lockedSource={towerSetup.cameraSource}
+                      lockedIpCameraUrl={towerSetup.ipCameraUrl}
+                      lockedAiEnabled={towerSetup.aiEnabled}
+                      heading={`${tower.name} Details`}
+                      description="Camera POV, fullscreen expansion, detection logs, and linked sensors are all driven by the Setup configuration."
+                      linkedSensors={tower.sensors}
+                      onTelemetryChange={onTelemetryChange}
+                    />
+                  </Suspense>
+                </GlassPanel>
+              ) : (
+                <GlassPanel variants={cardVariants} className="p-5">
+                  <div className="command-empty-state min-h-[220px] rounded-xl px-6 text-center">
+                    Set up the tower camera in Setup before opening the full tower details view.
                   </div>
-                }
-              >
-                <AIDetection
-                  defaultModelId={defaultModelId}
-                  embedded
-                  heading={`${tower.name} Camera POV`}
-                  description="Use the linked camera feed for live OKAB analysis. Expand the POV for a full-screen inspection and review the tower logs and linked sensors in one place."
-                  linkedSensors={tower.sensors}
-                  onTelemetryChange={onTelemetryChange}
-                />
-              </Suspense>
+                </GlassPanel>
+              )}
+
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsTowerOpen(false)}
+                  className="inline-flex items-center gap-2 rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.82)] px-4 py-2 font-sci-mono text-[12px] uppercase tracking-[0.16em] text-[var(--text-secondary)] transition-colors duration-150 hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]"
+                >
+                  Close Tower
+                  <motion.div animate={{ rotate: 180 }} transition={{ duration: 0.2, ease: "easeOut" }}>
+                    <ChevronDown className="h-4 w-4" />
+                  </motion.div>
+                </button>
+              </div>
             </motion.div>
           ) : null}
         </AnimatePresence>

@@ -5,8 +5,8 @@ import {
   Camera,
   LayoutDashboard,
   MapPinned,
+  Settings2,
   Sparkles,
-  Video,
 } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -26,7 +26,7 @@ const iconMap: Record<NavigationId, LucideIcon> = {
   analytics: BarChart3,
   map: MapPinned,
   automation: Sparkles,
-  aiDetection: Video,
+  setup: Settings2,
 };
 
 export function MobileDock({ activeItem, onActiveChange }: MobileDockProps) {

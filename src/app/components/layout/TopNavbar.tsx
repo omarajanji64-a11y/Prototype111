@@ -8,8 +8,8 @@ import {
   LayoutDashboard,
   MapPinned,
   Search,
+  Settings2,
   Sparkles,
-  Video,
 } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -32,7 +32,7 @@ const pageIcons: Record<NavigationId, LucideIcon> = {
   analytics: BarChart3,
   map: MapPinned,
   automation: Sparkles,
-  aiDetection: Video,
+  setup: Settings2,
 };
 
 const pageNames: Record<NavigationId, string> = {
@@ -42,7 +42,7 @@ const pageNames: Record<NavigationId, string> = {
   analytics: "Analytics",
   map: "Forest Map",
   automation: "UAV Response",
-  aiDetection: "AI Detection",
+  setup: "Setup",
 };
 
 export function TopNavbar({

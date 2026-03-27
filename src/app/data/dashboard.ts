@@ -5,7 +5,7 @@ export type NavigationId =
   | "analytics"
   | "map"
   | "automation"
-  | "aiDetection";
+  | "setup";
 
 export type CameraStatus = "safe" | "warning" | "fire";
 export type AlertSeverity = "critical" | "high" | "medium";
@@ -128,7 +128,7 @@ export const navigationItems: NavigationItem[] = [
   { id: "analytics", label: "Analytics", shortLabel: "Data" },
   { id: "map", label: "Forest Map", shortLabel: "Map" },
   { id: "automation", label: "UAV Response", shortLabel: "UAV" },
-  { id: "aiDetection", label: "AI Detection", shortLabel: "AI" },
+  { id: "setup", label: "Setup", shortLabel: "Setup" },
 ];
 
 export const heroHighlights: HeroHighlight[] = [
