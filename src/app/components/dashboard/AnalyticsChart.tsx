@@ -46,7 +46,7 @@ export function AnalyticsChart() {
           title="Fire probability trend"
           description="Temperature, gas, and humidity anomalies tracked over the last 24 hours."
           action={
-            <div className="inline-flex items-center gap-2 rounded-md border border-[rgba(230,210,143,0.2)] bg-[rgba(230,210,143,0.08)] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--accent-glow)]">
+            <div className="inline-flex items-center gap-2 rounded-md border border-[rgba(14,165,233,0.2)] bg-[rgba(14,165,233,0.1)] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--accent-glow)]">
               <Activity className="h-4 w-4" />
               24h prototype log
             </div>
@@ -58,12 +58,12 @@ export function AnalyticsChart() {
               <AreaChart data={activitySeries} margin={{ top: 10, right: 8, left: -18, bottom: 0 }}>
                 <defs>
                   <linearGradient id="detectionsGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#c9a227" stopOpacity={0.28} />
-                    <stop offset="95%" stopColor="#c9a227" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.28} />
+                    <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="confidenceGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#e6d28f" stopOpacity={0.16} />
-                    <stop offset="95%" stopColor="#e6d28f" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.16} />
+                    <stop offset="95%" stopColor="#22d3ee" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
@@ -83,7 +83,7 @@ export function AnalyticsChart() {
                   type="monotone"
                   dataKey="detections"
                   name="Detections"
-                  stroke="#c9a227"
+                  stroke="#0ea5e9"
                   strokeWidth={2}
                   fill="url(#detectionsGradient)"
                   isAnimationActive
@@ -94,7 +94,7 @@ export function AnalyticsChart() {
                   type="monotone"
                   dataKey="confidence"
                   name="Confidence"
-                  stroke="#e6d28f"
+                  stroke="#22d3ee"
                   strokeWidth={2}
                   fill="url(#confidenceGradient)"
                   isAnimationActive
@@ -114,7 +114,7 @@ export function AnalyticsChart() {
           title="Alert distribution"
           description="Severity distribution helps teams evaluate intervention load and risk patterns."
           action={
-            <div className="inline-flex items-center gap-2 rounded-md border border-[rgba(201,162,39,0.2)] bg-[var(--fire-dim)] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--fire)]">
+            <div className="inline-flex items-center gap-2 rounded-md border border-[rgba(249,115,22,0.2)] bg-[var(--fire-dim)] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--fire)]">
               <Flame className="h-4 w-4" />
               7-day review
             </div>
@@ -141,7 +141,7 @@ export function AnalyticsChart() {
                   dataKey="critical"
                   name="Critical"
                   stackId="severity"
-                  fill="#c9a227"
+                  fill="#ef4444"
                   radius={[6, 6, 0, 0]}
                   isAnimationActive
                   animationDuration={350}
@@ -150,7 +150,7 @@ export function AnalyticsChart() {
                   dataKey="high"
                   name="High"
                   stackId="severity"
-                  fill="#e6d28f"
+                  fill="#fbbf24"
                   radius={[6, 6, 0, 0]}
                   isAnimationActive
                   animationDuration={400}
@@ -160,7 +160,7 @@ export function AnalyticsChart() {
                   dataKey="medium"
                   name="Medium"
                   stackId="severity"
-                  fill="#f8f8f8"
+                  fill="#0ea5e9"
                   radius={[6, 6, 0, 0]}
                   isAnimationActive
                   animationDuration={450}

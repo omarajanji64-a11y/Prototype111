@@ -11,13 +11,13 @@ interface ActionButtonProps extends HTMLMotionProps<"button"> {
 
 const variantClasses = {
   primary:
-    "border border-[rgba(201,162,39,0.26)] bg-[image:var(--highlight-gradient)] text-[var(--text-primary)] shadow-[0_10px_24px_rgba(201,162,39,0.18)] hover:brightness-105",
+    "border border-transparent bg-[var(--accent-primary)] text-white hover:brightness-110",
   secondary:
-    "border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-primary)] shadow-[var(--shadow-sm)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-card-hover)]",
+    "border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-card-hover)]",
   ghost:
-    "border border-[var(--border)] bg-transparent text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:bg-[rgba(201,162,39,0.06)] hover:text-[var(--text-primary)]",
+    "border border-[var(--border)] bg-transparent text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:bg-[rgba(255,255,255,0.02)] hover:text-[var(--text-primary)]",
   danger:
-    "border border-[rgba(230,210,143,0.2)] bg-[var(--critical-dim)] text-[var(--critical)] hover:border-[rgba(230,210,143,0.32)]",
+    "border border-[rgba(239,68,68,0.2)] bg-[var(--critical-dim)] text-[var(--critical)] hover:border-[rgba(239,68,68,0.32)]",
 };
 
 export function ActionButton({

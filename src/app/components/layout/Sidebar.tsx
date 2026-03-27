@@ -43,7 +43,7 @@ export function Sidebar({
     <motion.aside
       animate={{ width: isExpanded ? 240 : 64 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className="fixed inset-y-0 left-0 z-50 hidden overflow-hidden border-r border-[var(--border)] bg-[var(--bg-surface)] shadow-[0_16px_40px_rgba(18,18,18,0.05)] backdrop-blur-xl lg:flex"
+      className="fixed inset-y-0 left-0 z-50 hidden overflow-hidden border-r border-[var(--border)] bg-[var(--bg-surface)] lg:flex"
     >
       <div className="flex h-full w-full flex-col px-3 py-3">
         <div className="flex h-[56px] items-center gap-3 px-2">
@@ -77,7 +77,7 @@ export function Sidebar({
                   isExpanded ? "justify-start gap-3" : "justify-center",
                   isActive
                     ? "bg-[var(--bg-card)] text-[var(--text-primary)]"
-                    : "text-[var(--text-secondary)] hover:bg-[rgba(201,162,39,0.08)] hover:text-[var(--text-primary)]",
+                    : "text-[var(--text-secondary)] hover:bg-[rgba(28,36,51,0.5)] hover:text-[var(--text-primary)]",
                 )}
               >
                 {isActive ? (

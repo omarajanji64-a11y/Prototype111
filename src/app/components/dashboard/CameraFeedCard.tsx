@@ -16,21 +16,21 @@ interface CameraFeedCardProps {
 const statusFrame = {
   safe: {
     border: "border-[var(--border)]",
-    overlay: "from-[rgba(248,248,248,0.06)] via-transparent to-transparent",
-    scan: "from-transparent via-[rgba(248,248,248,0.18)] to-transparent",
-    box: "border-[rgba(248,248,248,0.45)] bg-[rgba(50,50,50,0.4)] text-[var(--text-primary)]",
+    overlay: "from-[rgba(34,211,238,0.08)] via-transparent to-transparent",
+    scan: "from-transparent via-[rgba(34,211,238,0.24)] to-transparent",
+    box: "border-[rgba(34,211,238,0.55)] bg-[rgba(10,42,51,0.4)] text-[var(--text-primary)]",
   },
   warning: {
-    border: "border-[rgba(230,210,143,0.2)]",
-    overlay: "from-[rgba(230,210,143,0.08)] via-transparent to-transparent",
-    scan: "from-transparent via-[rgba(230,210,143,0.22)] to-transparent",
-    box: "border-[rgba(230,210,143,0.55)] bg-[rgba(81,66,26,0.4)] text-[var(--text-primary)]",
+    border: "border-[rgba(251,191,36,0.2)]",
+    overlay: "from-[rgba(251,191,36,0.08)] via-transparent to-transparent",
+    scan: "from-transparent via-[rgba(251,191,36,0.24)] to-transparent",
+    box: "border-[rgba(251,191,36,0.55)] bg-[rgba(69,26,3,0.4)] text-[var(--text-primary)]",
   },
   fire: {
-    border: "border-[rgba(201,162,39,0.2)]",
-    overlay: "from-[rgba(201,162,39,0.12)] via-transparent to-transparent",
-    scan: "from-transparent via-[rgba(201,162,39,0.24)] to-transparent",
-    box: "border-[rgba(201,162,39,0.7)] bg-[rgba(63,53,24,0.4)] text-[var(--text-primary)]",
+    border: "border-[rgba(249,115,22,0.2)]",
+    overlay: "from-[rgba(249,115,22,0.12)] via-transparent to-transparent",
+    scan: "from-transparent via-[rgba(249,115,22,0.24)] to-transparent",
+    box: "border-[rgba(249,115,22,0.7)] bg-[rgba(124,58,14,0.4)] text-[var(--text-primary)]",
   },
 } as const;
 
@@ -60,13 +60,13 @@ export function CameraFeedCard({ camera, isFocused, onFocus }: CameraFeedCardPro
         <div className={cn("absolute inset-0 bg-gradient-to-br opacity-90", theme.overlay)} />
 
         <div className="absolute left-4 right-4 top-4 flex items-start justify-between gap-3">
-          <div className="rounded-md border border-[var(--border)] bg-[rgba(255,255,255,0.88)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--text-primary)] backdrop-blur-sm">
+          <div className="rounded-md border border-[var(--border)] bg-[rgba(17,24,39,0.88)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--text-primary)] backdrop-blur-sm">
             {camera.id}
           </div>
           <StatusBadge status={camera.status} />
         </div>
 
-        <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-md border border-[rgba(230,210,143,0.24)] bg-[rgba(42,42,42,0.88)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--accent-glow)] backdrop-blur-sm">
+        <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-md border border-[rgba(14,165,233,0.24)] bg-[rgba(17,24,39,0.88)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--accent-glow)] backdrop-blur-sm">
           <motion.span
             animate={{
               opacity: [1, 0.4, 1],
@@ -109,7 +109,7 @@ export function CameraFeedCard({ camera, isFocused, onFocus }: CameraFeedCardPro
               transition={{ duration: 2.4, repeat: Number.POSITIVE_INFINITY }}
               className="absolute inset-0 rounded-[10px] border border-white/12"
             />
-            <div className="absolute -top-3 left-3 rounded-md border border-[var(--border)] bg-[rgba(255,255,255,0.92)] px-2 py-1 text-[10px] font-medium tracking-[0.02em] text-[var(--text-primary)] backdrop-blur-sm">
+            <div className="absolute -top-3 left-3 rounded-md border border-[var(--border)] bg-[rgba(17,24,39,0.92)] px-2 py-1 text-[10px] font-medium tracking-[0.02em] text-[var(--text-primary)] backdrop-blur-sm">
               {box.label} · {box.confidence}%
             </div>
           </motion.div>

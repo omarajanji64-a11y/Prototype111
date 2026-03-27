@@ -75,8 +75,8 @@ function getSeverity(confidence) {
 
 function getSeverityClasses(confidence) {
   return confidence > ALERT_THRESHOLD
-    ? "border-[rgba(230,210,143,0.2)] bg-[var(--critical-dim)] text-[var(--critical)]"
-    : "border-[rgba(230,210,143,0.2)] bg-[var(--warning-dim)] text-[var(--warning)]";
+    ? "border-[rgba(239,68,68,0.2)] bg-[var(--critical-dim)] text-[var(--critical)]"
+    : "border-[rgba(251,191,36,0.2)] bg-[var(--warning-dim)] text-[var(--warning)]";
 }
 
 function clearCanvas(canvas) {
@@ -978,7 +978,7 @@ export default function AIDetection() {
 
                 <h1 className="text-2xl font-semibold text-[var(--text-primary)]">AI Detection</h1>
 
-                <span className="rounded-md bg-[rgba(230,210,143,0.1)] px-2 py-0.5 text-xs font-medium text-[var(--accent-glow)]">
+                <span className="rounded-md bg-[rgba(14,165,233,0.1)] px-2 py-0.5 text-xs font-medium text-[var(--accent-glow)]">
                   {currentModel}
                 </span>
               </div>
@@ -1035,7 +1035,7 @@ export default function AIDetection() {
                   onClick={() => handleSourceChange(tab.id)}
                   className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors duration-150 ${
                     activeSource === tab.id
-                      ? "border-transparent bg-[var(--accent-primary)] text-[var(--text-primary)]"
+                      ? "border-transparent bg-[var(--accent-primary)] text-white"
                       : "border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)]"
                   }`}
                 >
@@ -1060,7 +1060,7 @@ export default function AIDetection() {
                 <button
                   type="button"
                   onClick={loadIpCamera}
-                  className="rounded-lg bg-[var(--accent-primary)] px-4 py-2.5 text-sm font-medium text-[var(--text-primary)] transition duration-150 hover:brightness-105"
+                  className="rounded-lg bg-[var(--accent-primary)] px-4 py-2.5 text-sm font-medium text-white transition duration-150 hover:brightness-110"
                 >
                   Load Stream
                 </button>
@@ -1081,7 +1081,7 @@ export default function AIDetection() {
                 <button
                   type="button"
                   onClick={() => setIsMuted((currentMuted) => !currentMuted)}
-                  className="absolute right-4 top-4 z-20 inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--border)] bg-[rgba(255,255,255,0.88)] text-[var(--text-primary)] shadow-[var(--shadow-sm)] backdrop-blur transition-colors duration-150 hover:border-[var(--border-hover)] hover:bg-[var(--bg-card-hover)]"
+                  className="absolute right-4 top-4 z-20 inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--border)] bg-[rgba(17,24,39,0.82)] text-[var(--text-primary)] backdrop-blur transition-colors duration-150 hover:border-[var(--border-hover)] hover:bg-[rgba(28,36,51,0.92)]"
                   aria-label={isMuted ? "Unmute alert sound" : "Mute alert sound"}
                 >
                   {isMuted ? <VolumeX className="h-4.5 w-4.5" /> : <Volume2 className="h-4.5 w-4.5" />}
@@ -1089,7 +1089,7 @@ export default function AIDetection() {
 
                 {videoMessage ? (
                   <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/70 px-6 text-center backdrop-blur-sm">
-                    <div className="max-w-md space-y-3 rounded-xl border border-[var(--border)] bg-[rgba(255,255,255,0.94)] p-6 shadow-[var(--shadow-md)]">
+                    <div className="max-w-md space-y-3 rounded-xl border border-[var(--border)] bg-[rgba(28,36,51,0.92)] p-6">
                       <div className="mx-auto flex justify-center">{videoMessage.icon}</div>
                       <div>
                         <p className="text-sm font-semibold text-[var(--text-primary)]">{videoMessage.title}</p>
@@ -1114,8 +1114,8 @@ export default function AIDetection() {
                 disabled={!isRunning && !canStartDetection}
                 className={`rounded-lg px-4 py-2.5 text-sm font-medium text-white transition duration-150 ${
                   isRunning
-                    ? "bg-[var(--critical)] text-[var(--text-primary)] hover:brightness-105"
-                    : "bg-[var(--accent-primary)] text-[var(--text-primary)] hover:brightness-105"
+                    ? "bg-[var(--critical)] text-white hover:brightness-110"
+                    : "bg-[var(--accent-primary)] text-white hover:brightness-110"
                 } disabled:cursor-not-allowed disabled:opacity-50`}
               >
                 {isRunning ? "Stop Detection" : "Start Detection"}
@@ -1218,7 +1218,7 @@ export default function AIDetection() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 24 }}
             transition={{ duration: 0.24, ease: "easeOut" }}
-            className="fixed bottom-4 right-4 z-50 w-72 rounded-xl border border-[var(--border)] bg-[rgba(255,255,255,0.94)] p-4 shadow-[var(--shadow-md)] backdrop-blur"
+            className="fixed bottom-4 right-4 z-50 w-72 rounded-xl border border-[var(--border)] bg-[rgba(17,24,39,0.92)] p-4 backdrop-blur"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2">
@@ -1279,7 +1279,7 @@ export default function AIDetection() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 40 }}
               transition={{ duration: 0.22, ease: "easeOut" }}
-              className="pointer-events-auto rounded-xl border border-[rgba(230,210,143,0.2)] bg-[var(--bg-card)] p-4"
+              className="pointer-events-auto rounded-xl border border-[rgba(239,68,68,0.2)] bg-[var(--bg-card)] p-4"
             >
               <p className="text-sm font-semibold text-[var(--text-primary)]">{toast.message}</p>
             </motion.div>

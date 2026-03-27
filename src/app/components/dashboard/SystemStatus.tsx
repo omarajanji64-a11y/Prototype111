@@ -62,7 +62,7 @@ export function SystemStatus() {
               <h3 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">Feasibility and sustainability indicators</h3>
             </div>
 
-            <div className="inline-flex items-center gap-2 rounded-md border border-[rgba(230,210,143,0.2)] bg-[rgba(230,210,143,0.08)] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--accent-glow)]">
+            <div className="inline-flex items-center gap-2 rounded-md border border-[rgba(14,165,233,0.2)] bg-[rgba(14,165,233,0.1)] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--accent-glow)]">
               <motion.span
                 animate={{ opacity: [1, 0.4, 1] }}
                 transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
@@ -91,7 +91,7 @@ export function SystemStatus() {
                       className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${
                         metric.trend === "up"
                           ? "bg-[var(--safe-dim)] text-[var(--safe)]"
-                          : "bg-[rgba(230,210,143,0.08)] text-[var(--accent-glow)]"
+                          : "bg-[rgba(14,165,233,0.1)] text-[var(--accent-glow)]"
                       }`}
                     >
                       <TrendIcon className="h-3.5 w-3.5" />

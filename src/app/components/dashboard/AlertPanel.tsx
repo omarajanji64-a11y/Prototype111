@@ -16,9 +16,9 @@ interface AlertPanelProps {
 }
 
 const severityBorder = {
-  critical: "border-[rgba(230,210,143,0.2)]",
-  high: "border-[rgba(230,210,143,0.2)]",
-  medium: "border-[rgba(248,248,248,0.16)]",
+  critical: "border-[rgba(239,68,68,0.2)]",
+  high: "border-[rgba(251,191,36,0.2)]",
+  medium: "border-[rgba(34,211,238,0.18)]",
 } as const;
 
 export function AlertPanel({
@@ -46,7 +46,7 @@ export function AlertPanel({
           }
         />
 
-        <div className="flex items-start gap-3 rounded-lg border border-[rgba(230,210,143,0.2)] bg-[rgba(230,210,143,0.06)] p-4 text-sm text-[var(--text-secondary)]">
+        <div className="flex items-start gap-3 rounded-lg border border-[rgba(14,165,233,0.2)] bg-[rgba(14,165,233,0.05)] p-4 text-sm text-[var(--text-secondary)]">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent-glow)]" />
           <p>Average sensor-to-alert notification time is currently 11 seconds in prototype tests.</p>
         </div>

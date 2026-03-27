@@ -26,14 +26,13 @@ export function GlassPanel({
       whileHover={{ scale: 1.005 }}
       transition={{ duration: 0.15, ease: "easeOut" }}
       className={cn(
-        "relative overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-card)] shadow-[var(--shadow-sm)] backdrop-blur-xl",
+        "relative overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-card)]",
         interactive && "transition-[transform,border-color,background-color] duration-200 hover:border-[var(--border-hover)] hover:bg-[var(--bg-card-hover)]",
         className,
         toneClasses[tone],
       )}
       {...props}
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[linear-gradient(180deg,rgba(240,220,134,0.12),transparent)]" />
       {children}
     </motion.section>
   );

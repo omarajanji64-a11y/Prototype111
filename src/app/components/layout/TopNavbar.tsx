@@ -88,7 +88,7 @@ export function TopNavbar({
   return (
     <header
       className={cn(
-        "fixed left-0 right-0 top-0 z-40 border-b border-[var(--border)] bg-[var(--bg-surface)] shadow-[0_8px_24px_rgba(18,18,18,0.04)] backdrop-blur-xl transition-[left] duration-300 ease-out",
+        "fixed left-0 right-0 top-0 z-40 border-b border-[var(--border)] bg-[var(--bg-surface)] transition-[left] duration-300 ease-out",
         isSidebarExpanded ? "lg:left-[240px]" : "lg:left-[64px]",
       )}
     >
@@ -106,7 +106,7 @@ export function TopNavbar({
             <input
               type="text"
               placeholder="Search..."
-              className="command-topbar-search h-10 w-full rounded-lg border border-[var(--border)] bg-[var(--bg-card)] py-2 pl-9 pr-3 text-sm text-[var(--text-primary)] shadow-[var(--shadow-sm)] outline-none transition-colors duration-150 placeholder:text-[var(--text-secondary)] focus:border-[rgba(201,162,39,0.34)]"
+              className="command-topbar-search h-10 w-full rounded-lg border border-[var(--border)] bg-[var(--bg-card)] py-2 pl-9 pr-3 text-sm text-[var(--text-primary)] outline-none transition-colors duration-150 placeholder:text-[var(--text-secondary)] focus:border-[var(--border-hover)]"
             />
           </div>
         </div>
