@@ -16,9 +16,9 @@ interface AlertPanelProps {
 }
 
 const severityBorder = {
-  critical: "border-[rgba(239,68,68,0.2)]",
-  high: "border-[rgba(251,191,36,0.2)]",
-  medium: "border-[rgba(34,211,238,0.18)]",
+  critical: "border-[rgba(230,210,143,0.2)]",
+  high: "border-[rgba(230,210,143,0.2)]",
+  medium: "border-[rgba(248,248,248,0.16)]",
 } as const;
 
 export function AlertPanel({

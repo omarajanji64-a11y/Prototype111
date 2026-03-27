@@ -1279,7 +1279,7 @@ export default function AIDetection() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 40 }}
               transition={{ duration: 0.22, ease: "easeOut" }}
-              className="pointer-events-auto rounded-xl border border-[rgba(239,68,68,0.2)] bg-[var(--bg-card)] p-4"
+              className="pointer-events-auto rounded-xl border border-[rgba(230,210,143,0.2)] bg-[var(--bg-card)] p-4"
             >
               <p className="text-sm font-semibold text-[var(--text-primary)]">{toast.message}</p>
             </motion.div>
