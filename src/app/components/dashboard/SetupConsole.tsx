@@ -20,6 +20,8 @@ import { SectionTitle } from "../shared/SectionTitle";
 interface SetupConsoleProps {
   setup: SystemSetupState;
   onTowerChange: (nextTower: TowerSetupConfig) => void;
+  onLinkCamera: (source: CameraSourceId, ipCameraUrl: string) => Promise<void>;
+  onUnlinkCamera: () => void;
   onSensorChange: (sensorId: string, nextEnabled: boolean) => void;
   onUavChange: (nextUav: UavSetupConfig) => void;
   onOpenModelSwitcher: () => void;
@@ -81,6 +83,8 @@ function SetupInput({
 export function SetupConsole({
   setup,
   onTowerChange,
+  onLinkCamera,
+  onUnlinkCamera,
   onSensorChange,
   onUavChange,
   onOpenModelSwitcher,
@@ -88,6 +92,8 @@ export function SetupConsole({
   const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
   const [draftSource, setDraftSource] = useState<CameraSourceId>(setup.tower.cameraSource);
   const [draftIpUrl, setDraftIpUrl] = useState(setup.tower.ipCameraUrl);
+  const [isLinkingCamera, setIsLinkingCamera] = useState(false);
+  const [cameraLinkError, setCameraLinkError] = useState("");
 
   useEffect(() => {
     setDraftSource(setup.tower.cameraSource);
@@ -96,14 +102,18 @@ export function SetupConsole({
 
   const currentModelLabel = getOkabModelLabel(setup.tower.modelId);
 
-  const handleSaveCameraLink = () => {
-    onTowerChange({
-      ...setup.tower,
-      cameraConfigured: true,
-      cameraSource: draftSource,
-      ipCameraUrl: draftSource === "ip" ? draftIpUrl : "",
-    });
-    setIsCameraModalOpen(false);
+  const handleSaveCameraLink = async () => {
+    setIsLinkingCamera(true);
+    setCameraLinkError("");
+
+    try {
+      await onLinkCamera(draftSource, draftSource === "ip" ? draftIpUrl.trim() : "");
+      setIsCameraModalOpen(false);
+    } catch (error) {
+      setCameraLinkError(error instanceof Error ? error.message : "Camera linking failed. Try again.");
+    } finally {
+      setIsLinkingCamera(false);
+    }
   };
 
   return (
@@ -187,12 +197,7 @@ export function SetupConsole({
                         label="Unlink"
                         active={false}
                         onClick={() =>
-                          onTowerChange({
-                            ...setup.tower,
-                            cameraConfigured: false,
-                            aiEnabled: false,
-                            ipCameraUrl: "",
-                          })
+                          onUnlinkCamera()
                         }
                       />
                     ) : null}
@@ -472,6 +477,12 @@ export function SetupConsole({
                 </div>
               )}
 
+              {cameraLinkError ? (
+                <div className="mt-4 rounded-[1rem] border border-[rgba(239,68,68,0.22)] bg-[rgba(40,10,14,0.78)] p-4 text-sm text-[var(--text-primary)]">
+                  {cameraLinkError}
+                </div>
+              ) : null}
+
               <div className="mt-6 flex flex-wrap justify-end gap-3">
                 <button
                   type="button"
@@ -482,11 +493,13 @@ export function SetupConsole({
                 </button>
                 <button
                   type="button"
-                  onClick={handleSaveCameraLink}
-                  disabled={draftSource === "ip" && !draftIpUrl.trim()}
+                  onClick={() => {
+                    void handleSaveCameraLink();
+                  }}
+                  disabled={isLinkingCamera || (draftSource === "ip" && !draftIpUrl.trim())}
                   className="inline-flex h-11 items-center justify-center rounded-[1rem] border border-[rgba(141,240,255,0.24)] bg-[linear-gradient(135deg,rgba(30,216,255,0.2),rgba(90,140,255,0.34))] px-4 font-sci-mono text-[12px] uppercase tracking-[0.16em] text-white transition duration-150 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Link Camera
+                  {isLinkingCamera ? "Linking..." : "Link Camera"}
                 </button>
               </div>
             </motion.div>

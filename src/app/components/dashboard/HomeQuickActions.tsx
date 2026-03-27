@@ -3,14 +3,22 @@ import { motion } from "motion/react";
 
 import { cardVariants, createStagger, listItemVariants } from "../../animations/variants";
 import type { AlertItem, CameraFeed } from "../../data/dashboard";
+import type { CameraSourceId } from "../../lib/systemSetup";
 import { ActionButton } from "../shared/ActionButton";
 import { GlassPanel } from "../shared/GlassPanel";
+import { LinkedCameraPreview } from "../shared/LinkedCameraPreview";
 import { SectionTitle } from "../shared/SectionTitle";
 import { StatusBadge } from "../shared/StatusBadge";
 
 interface HomeQuickActionsProps {
   alerts: AlertItem[];
   tower: CameraFeed;
+  cameraConfigured: boolean;
+  cameraSource: CameraSourceId;
+  ipCameraUrl?: string;
+  linkedStream?: MediaStream | null;
+  linkedSnapshot?: string | null;
+  linkError?: string;
   onOpenTower: () => void;
   onOpenSetup: () => void;
   onDismissAlert: (alertId: string) => void;
@@ -19,6 +27,12 @@ interface HomeQuickActionsProps {
 export function HomeQuickActions({
   alerts,
   tower,
+  cameraConfigured,
+  cameraSource,
+  ipCameraUrl,
+  linkedStream,
+  linkedSnapshot,
+  linkError,
   onOpenTower,
   onOpenSetup,
   onDismissAlert,
@@ -33,10 +47,18 @@ export function HomeQuickActions({
       <GlassPanel variants={cardVariants} className="overflow-hidden p-0">
         <div className="relative">
           <div className="relative min-h-[440px] overflow-hidden">
-            <img
-              src={tower.imageUrl}
+            <LinkedCameraPreview
+              cameraConfigured={cameraConfigured}
+              cameraSource={cameraSource}
+              ipCameraUrl={ipCameraUrl}
+              stream={linkedStream}
+              snapshot={linkedSnapshot}
+              fallbackImageUrl={tower.imageUrl}
               alt={tower.linkedCamera.name}
-              className="h-full min-h-[440px] w-full object-cover"
+              className="min-h-[440px]"
+              placeholderTitle="Main Tower camera is not linked yet"
+              placeholderDescription="Use Setup to link the camera source, then the live preview will appear here."
+              errorMessage={linkError}
             />
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,16,0.16),rgba(4,8,16,0.26),rgba(4,8,16,0.92))]" />
 

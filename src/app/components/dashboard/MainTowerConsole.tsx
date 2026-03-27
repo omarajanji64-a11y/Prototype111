@@ -6,9 +6,10 @@ import { cardVariants } from "../../animations/variants";
 import type { CameraFeed } from "../../data/dashboard";
 import type { MainTowerTelemetry } from "../../lib/mainTower";
 import { getOkabModelLabel } from "../../lib/okabModels";
-import type { TowerSetupConfig, UavSetupConfig } from "../../lib/systemSetup";
+import type { CameraSourceId, TowerSetupConfig, UavSetupConfig } from "../../lib/systemSetup";
 import { ActionButton } from "../shared/ActionButton";
 import { GlassPanel } from "../shared/GlassPanel";
+import { LinkedCameraPreview } from "../shared/LinkedCameraPreview";
 import { SectionTitle } from "../shared/SectionTitle";
 import { StatusBadge } from "../shared/StatusBadge";
 
@@ -21,6 +22,9 @@ interface MainTowerConsoleProps {
   towerSetup: TowerSetupConfig;
   uavSetup: UavSetupConfig;
   defaultModelId: string;
+  previewStream?: MediaStream | null;
+  previewSnapshot?: string | null;
+  previewError?: string;
   onTelemetryChange: (nextTelemetry: MainTowerTelemetry) => void;
   onOpenSetup: () => void;
   onOpenModelSwitcher: () => void;
@@ -33,6 +37,9 @@ export function MainTowerConsole({
   towerSetup,
   uavSetup,
   defaultModelId,
+  previewStream,
+  previewSnapshot,
+  previewError,
   onTelemetryChange,
   onOpenSetup,
   onOpenModelSwitcher,
@@ -77,27 +84,19 @@ export function MainTowerConsole({
 
         <div className="grid gap-3 xl:grid-cols-[minmax(0,1.25fr)_380px]">
           <div className="overflow-hidden rounded-[1.5rem] border border-[var(--border)] bg-black">
-            {towerSetup.cameraConfigured ? (
-              <img
-                src={previewImage}
-                alt={tower.linkedCamera.name}
-                className="h-full min-h-[420px] w-full object-cover"
-              />
-            ) : (
-              <div className="flex min-h-[420px] items-center justify-center bg-[radial-gradient(circle_at_top,rgba(30,216,255,0.16),transparent_46%)] px-6 text-center">
-                <div className="max-w-lg space-y-4">
-                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[1.25rem] border border-[var(--border)] bg-[rgba(8,18,40,0.82)] text-[var(--accent-primary)]">
-                    <Camera className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="text-lg font-semibold text-[var(--text-primary)]">No camera linked to Main Tower</p>
-                    <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-                      Configure the camera in Setup before opening the expanded tower view.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
+            <LinkedCameraPreview
+              cameraConfigured={towerSetup.cameraConfigured}
+              cameraSource={towerSetup.cameraSource as CameraSourceId}
+              ipCameraUrl={towerSetup.ipCameraUrl}
+              stream={previewStream}
+              snapshot={previewSnapshot || previewImage}
+              fallbackImageUrl={tower.imageUrl}
+              alt={tower.linkedCamera.name}
+              className="min-h-[420px]"
+              placeholderTitle="No camera linked to Main Tower"
+              placeholderDescription="Configure the camera in Setup before opening the expanded tower view."
+              errorMessage={previewError}
+            />
           </div>
 
           <div className="space-y-3">
@@ -219,6 +218,7 @@ export function MainTowerConsole({
                       configurationLocked
                       lockedSource={towerSetup.cameraSource}
                       lockedIpCameraUrl={towerSetup.ipCameraUrl}
+                      lockedStream={previewStream}
                       lockedAiEnabled={towerSetup.aiEnabled}
                       heading={`${tower.name} Details`}
                       description="Camera POV, fullscreen expansion, detection logs, and linked sensors are all driven by the Setup configuration."

@@ -24,6 +24,7 @@ interface TopNavbarProps {
   alertCount: number;
   focusedCamera: CameraFeed;
   isSidebarExpanded: boolean;
+  onOpenModelSwitcher: () => void;
 }
 
 const pageIcons: Record<NavigationId, LucideIcon> = {
@@ -53,6 +54,7 @@ export function TopNavbar({
   alertCount,
   focusedCamera,
   isSidebarExpanded,
+  onOpenModelSwitcher,
 }: TopNavbarProps) {
   const now = useClock();
   const dateLabel = new Intl.DateTimeFormat("en-US", {
@@ -123,6 +125,16 @@ export function TopNavbar({
           <div className="hidden text-[13px] uppercase tracking-[0.12em] text-[var(--text-secondary)] md:block">
             {dateLabel} · {timeLabel}
           </div>
+
+          <motion.button
+            whileHover={buttonHover}
+            whileTap={buttonTap}
+            onClick={onOpenModelSwitcher}
+            className="hidden h-9 items-center gap-2 rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.82)] px-3 text-[13px] text-[var(--text-primary)] transition-colors duration-150 hover:border-[var(--border-hover)] hover:bg-[rgba(10,24,54,0.9)] md:inline-flex"
+          >
+            <Cpu className="h-4 w-4 text-[var(--accent-primary)]" />
+            <span>Switch Model</span>
+          </motion.button>
 
           <div
             className="command-live-chip hidden md:inline-flex"

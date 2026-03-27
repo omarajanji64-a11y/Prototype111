@@ -581,6 +581,7 @@ export default function AIDetection({
   linkedSensors = [],
   lockedSource,
   lockedIpCameraUrl = "",
+  lockedStream,
   lockedAiEnabled,
   onTelemetryChange,
 }) {
@@ -594,6 +595,7 @@ export default function AIDetection({
   const handledAlertsRef = useRef(new Set());
   const telemetryRef = useRef(null);
   const autoLoadedIpRef = useRef("");
+  const streamOwnershipRef = useRef("owned");
 
   const [activeSource, setActiveSource] = useState(lockedSource ?? "webcam");
   const [ipCameraUrl, setIpCameraUrl] = useState(lockedIpCameraUrl ?? "");
@@ -737,9 +739,13 @@ export default function AIDetection({
 
   function stopCurrentSource() {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
+      if (streamOwnershipRef.current === "owned") {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
       streamRef.current = null;
     }
+
+    streamOwnershipRef.current = "owned";
 
     const video = videoRef.current;
     if (!video) {
@@ -764,14 +770,17 @@ export default function AIDetection({
     }
   }
 
-  function attachStream(stream, source) {
+  function attachStream(stream, source, ownership = "owned") {
     const video = videoRef.current;
 
     if (!video) {
-      stream.getTracks().forEach((track) => track.stop());
+      if (ownership === "owned") {
+        stream.getTracks().forEach((track) => track.stop());
+      }
       return;
     }
 
+    streamOwnershipRef.current = ownership;
     streamRef.current = stream;
     video.srcObject = stream;
     video.dataset.source = source;
@@ -810,6 +819,11 @@ export default function AIDetection({
 
     async function prepareSource() {
       if (activeSource === "ip") {
+        return;
+      }
+
+      if (lockedStream && configurationLocked) {
+        attachStream(lockedStream, activeSource, "shared");
         return;
       }
 
@@ -854,7 +868,7 @@ export default function AIDetection({
       cancelled = true;
       stopCurrentSource();
     };
-  }, [activeSource]);
+  }, [activeSource, configurationLocked, lockedStream]);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {

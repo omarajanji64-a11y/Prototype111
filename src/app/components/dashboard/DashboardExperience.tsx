@@ -33,6 +33,7 @@ import {
 } from "../../lib/mainTower";
 import {
   getCameraSourceLabel,
+  type CameraSourceId,
   getConfiguredSensors,
   persistSystemSetup,
   readStoredSystemSetup,
@@ -53,6 +54,9 @@ export function DashboardExperience({
   selectedModelId,
   onSelectedModelChange,
 }: DashboardExperienceProps) {
+  const [linkedCameraStream, setLinkedCameraStream] = useState<MediaStream | null>(null);
+  const [linkedCameraSnapshot, setLinkedCameraSnapshot] = useState<string | null>(null);
+  const [cameraLinkError, setCameraLinkError] = useState("");
   const [activeNav, setActiveNav] = useState<NavigationId>("overview");
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [dismissedAlertIds, setDismissedAlertIds] = useState<string[]>([]);
@@ -67,6 +71,12 @@ export function DashboardExperience({
   useEffect(() => {
     persistSystemSetup(systemSetup);
   }, [systemSetup]);
+
+  useEffect(() => {
+    return () => {
+      linkedCameraStream?.getTracks().forEach((track) => track.stop());
+    };
+  }, [linkedCameraStream]);
 
   const configuredSensors = useMemo(() => getConfiguredSensors(systemSetup.sensors), [systemSetup.sensors]);
   const mainTowerStatus =
@@ -119,7 +129,7 @@ export function DashboardExperience({
         : systemSetup.tower.aiEnabled
           ? getTowerSummary(mainTower, towerTelemetry)
           : "Main Tower camera is linked, but OKAB AI detection is turned off in Setup. Turn it on when you want live hazard analysis.",
-      imageUrl: towerTelemetry.latestSnapshot || mainTower.imageUrl,
+      imageUrl: towerTelemetry.latestSnapshot || linkedCameraSnapshot || mainTower.imageUrl,
       detections: towerTelemetry.detectionLogs.length,
       temperature: getTowerTemperature(mainTower.temperature, towerTelemetry),
       confidence: getTowerConfidence(mainTower.confidence, towerTelemetry),
@@ -127,7 +137,7 @@ export function DashboardExperience({
       linkedCamera,
       sensors: getTowerSensors(configuredSensors, towerTelemetry),
     }),
-    [configuredSensors, linkedCamera, mainTower, mainTowerStatus, systemSetup.tower.aiEnabled, systemSetup.tower.cameraConfigured, towerTelemetry],
+    [configuredSensors, linkedCamera, linkedCameraSnapshot, mainTower, mainTowerStatus, systemSetup.tower.aiEnabled, systemSetup.tower.cameraConfigured, towerTelemetry],
   );
 
   const mapZones = useMemo(
@@ -165,6 +175,136 @@ export function DashboardExperience({
       tower: nextTower,
     }));
   }, []);
+
+  const stopLinkedCameraStream = useCallback((stream?: MediaStream | null) => {
+    stream?.getTracks().forEach((track) => track.stop());
+  }, []);
+
+  const captureLinkedSnapshot = useCallback(async (stream: MediaStream) => {
+    const video = document.createElement("video");
+    video.muted = true;
+    video.playsInline = true;
+    video.srcObject = stream;
+
+    await video.play().catch(() => undefined);
+
+    await new Promise<void>((resolve) => {
+      if (video.readyState >= 2) {
+        resolve();
+        return;
+      }
+
+      video.onloadeddata = () => resolve();
+    });
+
+    const width = video.videoWidth || 1280;
+    const height = video.videoHeight || 720;
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+      video.pause();
+      video.srcObject = null;
+      return null;
+    }
+
+    context.drawImage(video, 0, 0, width, height);
+    video.pause();
+    video.srcObject = null;
+    return canvas.toDataURL("image/jpeg", 0.86);
+  }, []);
+
+  const handleLinkCamera = useCallback(
+    async (cameraSource: CameraSourceId, ipCameraUrl: string) => {
+      setCameraLinkError("");
+
+      if (cameraSource === "ip") {
+        stopLinkedCameraStream(linkedCameraStream);
+        setLinkedCameraStream(null);
+        setLinkedCameraSnapshot(null);
+        setSystemSetup((currentSetup) => ({
+          ...currentSetup,
+          tower: {
+            ...currentSetup.tower,
+            cameraConfigured: true,
+            cameraSource,
+            ipCameraUrl,
+          },
+        }));
+        return;
+      }
+
+      const mediaDevices = navigator.mediaDevices;
+
+      if (!mediaDevices) {
+        throw new Error("This browser does not support live camera linking.");
+      }
+
+      try {
+        const nextStream =
+          cameraSource === "webcam"
+            ? await mediaDevices.getUserMedia({ video: true, audio: false })
+            : typeof mediaDevices.getDisplayMedia === "function"
+              ? await mediaDevices.getDisplayMedia({ video: true, audio: false })
+              : null;
+
+        if (!nextStream) {
+          throw new Error("Screen sharing is not available in this browser.");
+        }
+
+        const snapshot = await captureLinkedSnapshot(nextStream);
+
+        nextStream.getVideoTracks()[0]?.addEventListener("ended", () => {
+          setLinkedCameraStream((currentStream) => (currentStream === nextStream ? null : currentStream));
+          setCameraLinkError(
+            cameraSource === "screen"
+              ? "Screen sharing ended. Relink the camera in Setup to resume the live preview."
+              : "The linked webcam disconnected. Relink the camera in Setup to resume the live preview.",
+          );
+        });
+
+        stopLinkedCameraStream(linkedCameraStream);
+        setLinkedCameraStream(nextStream);
+        setLinkedCameraSnapshot(snapshot);
+        setSystemSetup((currentSetup) => ({
+          ...currentSetup,
+          tower: {
+            ...currentSetup.tower,
+            cameraConfigured: true,
+            cameraSource,
+            ipCameraUrl: "",
+          },
+        }));
+      } catch (error) {
+        const fallbackMessage =
+          cameraSource === "screen"
+            ? "Screen sharing was canceled or blocked."
+            : "Camera permission was denied or the source could not start.";
+        const nextMessage = error instanceof Error && error.message ? error.message : fallbackMessage;
+        setCameraLinkError(nextMessage);
+        throw new Error(nextMessage);
+      }
+    },
+    [captureLinkedSnapshot, linkedCameraStream, stopLinkedCameraStream],
+  );
+
+  const handleUnlinkCamera = useCallback(() => {
+    stopLinkedCameraStream(linkedCameraStream);
+    setLinkedCameraStream(null);
+    setLinkedCameraSnapshot(null);
+    setCameraLinkError("");
+    setSystemSetup((currentSetup) => ({
+      ...currentSetup,
+      tower: {
+        ...currentSetup.tower,
+        cameraConfigured: false,
+        aiEnabled: false,
+        ipCameraUrl: "",
+      },
+    }));
+  }, [linkedCameraStream, stopLinkedCameraStream]);
 
   const handleSensorSetupChange = useCallback((sensorId: string, nextEnabled: boolean) => {
     setSystemSetup((currentSetup) => ({
@@ -224,6 +364,12 @@ export function DashboardExperience({
         <HomeQuickActions
           alerts={alerts}
           tower={focusedCamera}
+          cameraConfigured={systemSetup.tower.cameraConfigured}
+          cameraSource={systemSetup.tower.cameraSource}
+          ipCameraUrl={systemSetup.tower.ipCameraUrl}
+          linkedStream={linkedCameraStream}
+          linkedSnapshot={linkedCameraSnapshot}
+          linkError={cameraLinkError}
           onOpenTower={focusCamera}
           onOpenSetup={() => handleActiveNavChange("setup")}
           onDismissAlert={(alertId) =>
@@ -244,6 +390,9 @@ export function DashboardExperience({
           towerSetup={systemSetup.tower}
           uavSetup={systemSetup.uav}
           defaultModelId={systemSetup.tower.modelId || selectedModelId}
+          previewStream={linkedCameraStream}
+          previewSnapshot={linkedCameraSnapshot}
+          previewError={cameraLinkError}
           onTelemetryChange={handleTelemetryChange}
           onOpenSetup={() => handleActiveNavChange("setup")}
           onOpenModelSwitcher={() => handleOpenModelSwitcher("cameras")}
@@ -284,6 +433,8 @@ export function DashboardExperience({
         <SetupConsole
           setup={systemSetup}
           onTowerChange={handleTowerSetupChange}
+          onLinkCamera={handleLinkCamera}
+          onUnlinkCamera={handleUnlinkCamera}
           onSensorChange={handleSensorSetupChange}
           onUavChange={handleUavSetupChange}
           onOpenModelSwitcher={() => handleOpenModelSwitcher("setup")}
@@ -321,6 +472,9 @@ export function DashboardExperience({
             onActiveChange={handleActiveNavChange}
             isSidebarExpanded={isSidebarExpanded}
             onSidebarToggle={() => setIsSidebarExpanded((current) => !current)}
+            onOpenModelSwitcher={() =>
+              handleOpenModelSwitcher(activeNav === "models" ? modelReturnNav : activeNav)
+            }
             alertCount={alerts.length}
             focusedCamera={focusedCamera}
           >

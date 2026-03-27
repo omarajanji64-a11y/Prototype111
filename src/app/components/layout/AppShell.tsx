@@ -12,6 +12,7 @@ interface AppShellProps {
   onActiveChange: (item: NavigationId) => void;
   isSidebarExpanded: boolean;
   onSidebarToggle: () => void;
+  onOpenModelSwitcher: () => void;
   alertCount: number;
   focusedCamera: CameraFeed;
 }
@@ -22,6 +23,7 @@ export function AppShell({
   onActiveChange,
   isSidebarExpanded,
   onSidebarToggle,
+  onOpenModelSwitcher,
   alertCount,
   focusedCamera,
 }: AppShellProps) {
@@ -39,6 +41,7 @@ export function AppShell({
         alertCount={alertCount}
         focusedCamera={focusedCamera}
         isSidebarExpanded={isSidebarExpanded}
+        onOpenModelSwitcher={onOpenModelSwitcher}
       />
       <MobileDock activeItem={activeNav} onActiveChange={onActiveChange} />
 
