@@ -38,7 +38,7 @@ export function AlertPanel({
         <SectionTitle
           eyebrow="Emergency queue"
           title="Real-time alert rail"
-          description="Multi-tower confirmation and fast notification support early intervention in risk zones."
+          description="Main Tower detections are converted into operator alerts for fast hazard review."
           action={
             <div className="rounded-lg bg-[var(--critical-dim)] px-4 py-2 text-lg font-bold text-[var(--critical)]">
               {criticalCount}
@@ -48,7 +48,7 @@ export function AlertPanel({
 
         <div className="flex items-start gap-3 rounded-lg border border-[rgba(14,165,233,0.2)] bg-[rgba(14,165,233,0.05)] p-4 text-sm text-[var(--text-secondary)]">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent-glow)]" />
-          <p>Average sensor-to-alert notification time is currently 11 seconds in prototype tests.</p>
+          <p>Main Tower alerts are generated directly from the live detection log and linked camera analysis.</p>
         </div>
 
         <div className="space-y-3">
@@ -117,7 +117,7 @@ export function AlertPanel({
                       variant="secondary"
                       onClick={() => onFocusCamera(alert.cameraId)}
                     >
-                      Focus tower
+                      Open Main Tower
                     </ActionButton>
                     <ActionButton icon={Siren} variant="primary">
                       Launch UAV task

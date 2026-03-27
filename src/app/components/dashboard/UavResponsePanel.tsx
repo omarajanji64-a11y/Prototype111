@@ -25,7 +25,7 @@ export function UavResponsePanel({
         <SectionTitle
           eyebrow="UAV Response"
           title="Autonomous Mission Tasks"
-          description="Mission queue for rapid intervention after multi-tower fire confirmation."
+          description="Mission queue for rapid intervention after Main Tower confirms a hazard on the linked camera."
           action={
             <ActionButton icon={Plane} variant="primary">
               Start UAV Simulation

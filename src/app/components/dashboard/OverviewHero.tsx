@@ -68,8 +68,8 @@ export function OverviewHero({
               OKAB detects forest and rural fires early with AI, IoT towers, and UAV support.
             </h2>
             <p className="mt-4 max-w-2xl text-[1.05rem] leading-7 text-slate-300/82">
-              The system continuously monitors temperature, gas, and humidity through a LoRa-connected
-              tower network, confirms anomalies with multi-tower logic, and triggers fast intervention.
+              The system continuously monitors temperature, gas, and humidity through Main Tower, verifies the
+              linked camera feed with OKAB, and triggers fast intervention when a hazard appears.
             </p>
           </div>
 
@@ -91,7 +91,7 @@ export function OverviewHero({
               <div className="mt-4 space-y-3 text-sm text-[var(--text-secondary)]">
                 <div className="flex items-center justify-between">
                   <span>Autonomous towers</span>
-                  <strong className="font-sci-mono text-[var(--text-primary)]">3 linked</strong>
+                  <strong className="font-sci-mono text-[var(--text-primary)]">1 linked</strong>
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Sensor heartbeat</span>

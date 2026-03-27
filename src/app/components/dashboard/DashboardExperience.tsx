@@ -1,13 +1,13 @@
 import { AnimatePresence, MotionConfig, motion } from "motion/react";
-import { lazy, Suspense, startTransition, useState } from "react";
+import { lazy, Suspense, startTransition, useCallback, useMemo, useState } from "react";
 
 import { pageVariants, transitionDefaults } from "../../animations/variants";
 import type { AppBootstrapState } from "../../hooks/useAppBootstrap";
 import { AlertPanel } from "./AlertPanel";
 import { AnalyticsChart } from "./AnalyticsChart";
-import { CameraGrid } from "./CameraGrid";
 import { DashboardSkeleton } from "./DashboardSkeleton";
 import { HomeQuickActions } from "./HomeQuickActions";
+import { MainTowerConsole } from "./MainTowerConsole";
 import { MapCard } from "./MapCard";
 import { SystemStatus } from "./SystemStatus";
 import { UavResponsePanel } from "./UavResponsePanel";
@@ -15,16 +15,22 @@ import { AppShell } from "../layout/AppShell";
 import { EmberBackground } from "../layout/EmberBackground";
 import {
   cameraFeeds,
-  type CameraStatus,
   forestZones,
   type NavigationId,
 } from "../../data/dashboard";
-import { getDashboardWarmupSnapshot } from "../../lib/dashboardWarmup";
+import {
+  buildTowerAlerts,
+  EMPTY_MAIN_TOWER_TELEMETRY,
+  getTowerConfidence,
+  getTowerLastSweep,
+  getTowerSensors,
+  getTowerStatusFromTelemetry,
+  getTowerSummary,
+  getTowerTemperature,
+  type MainTowerTelemetry,
+} from "../../lib/mainTower";
 
 const AIDetection = lazy(() => import("../../../pages/AIDetection.jsx"));
-
-const initialFocusedCamera =
-  cameraFeeds.find((camera) => camera.status === "safe")?.id ?? cameraFeeds[0]?.id ?? "";
 
 interface DashboardExperienceProps {
   bootstrap: AppBootstrapState;
@@ -34,19 +40,61 @@ interface DashboardExperienceProps {
 export function DashboardExperience({ bootstrap, selectedModelId }: DashboardExperienceProps) {
   const [activeNav, setActiveNav] = useState<NavigationId>("overview");
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
-  const [focusedCameraId, setFocusedCameraId] = useState(initialFocusedCamera);
-  const [alerts, setAlerts] = useState([]);
-  const dashboardSnapshot = getDashboardWarmupSnapshot();
-  const towerStatusTotals = dashboardSnapshot.towerTopology.statusTotals as Record<CameraStatus, number>;
+  const [dismissedAlertIds, setDismissedAlertIds] = useState<string[]>([]);
+  const [towerTelemetry, setTowerTelemetry] = useState<MainTowerTelemetry>(EMPTY_MAIN_TOWER_TELEMETRY);
 
-  const focusedCamera =
-    cameraFeeds.find((camera) => camera.id === focusedCameraId) ?? cameraFeeds[0];
+  const mainTower = cameraFeeds[0];
+  const mainTowerStatus = getTowerStatusFromTelemetry(towerTelemetry);
+  const allAlerts = useMemo(() => buildTowerAlerts(mainTower, towerTelemetry), [mainTower, towerTelemetry]);
+  const alerts = useMemo(
+    () => allAlerts.filter((alert) => !dismissedAlertIds.includes(alert.id)),
+    [allAlerts, dismissedAlertIds],
+  );
   const criticalCount = alerts.filter((alert) => alert.severity === "critical").length;
-  const warningCount = towerStatusTotals.warning;
-  const safeCount = towerStatusTotals.safe;
+  const warningCount = mainTowerStatus === "warning" ? 1 : 0;
+  const safeCount = mainTowerStatus === "safe" ? 1 : 0;
 
-  const focusCamera = (cameraId: string) => {
-    setFocusedCameraId(cameraId);
+  const focusedCamera = useMemo(
+    () => ({
+      ...mainTower,
+      status: mainTowerStatus,
+      summary: getTowerSummary(mainTower, towerTelemetry),
+      imageUrl: towerTelemetry.latestSnapshot || mainTower.imageUrl,
+      detections: towerTelemetry.detectionLogs.length,
+      temperature: getTowerTemperature(mainTower.temperature, towerTelemetry),
+      confidence: getTowerConfidence(mainTower.confidence, towerTelemetry),
+      lastSweep: getTowerLastSweep(towerTelemetry),
+      sensors: getTowerSensors(mainTower.sensors, towerTelemetry),
+    }),
+    [mainTower, mainTowerStatus, towerTelemetry],
+  );
+
+  const mapZones = useMemo(
+    () =>
+      forestZones.map((zone) => ({
+        ...zone,
+        status: mainTowerStatus,
+        risk:
+          mainTowerStatus === "fire"
+            ? "93%"
+            : mainTowerStatus === "warning"
+              ? "68%"
+              : "32%",
+        note:
+          mainTowerStatus === "fire"
+            ? "Main Tower has confirmed a fire signature from the linked camera feed."
+            : mainTowerStatus === "warning"
+              ? "Main Tower is tracking smoke or runtime anomalies in this corridor."
+              : "Main Tower coverage is stable with no active hazard detections.",
+      })),
+    [mainTowerStatus],
+  );
+
+  const handleTelemetryChange = useCallback((nextTelemetry: MainTowerTelemetry) => {
+    setTowerTelemetry(nextTelemetry);
+  }, []);
+
+  const focusCamera = () => {
     startTransition(() => {
       setActiveNav("cameras");
     });
@@ -69,7 +117,9 @@ export function DashboardExperience({ bootstrap, selectedModelId }: DashboardExp
           onNavigate={handleActiveNavChange}
           onFocusTower={focusCamera}
           onDismissAlert={(alertId) =>
-            setAlerts((currentAlerts) => currentAlerts.filter((alert) => alert.id !== alertId))
+            setDismissedAlertIds((currentIds) =>
+              currentIds.includes(alertId) ? currentIds : [...currentIds, alertId],
+            )
           }
         />
       );
@@ -77,11 +127,12 @@ export function DashboardExperience({ bootstrap, selectedModelId }: DashboardExp
 
     if (activeNav === "cameras") {
       return (
-        <CameraGrid
-          cameras={cameraFeeds}
-          focusedCameraId={focusedCameraId}
+        <MainTowerConsole
+          tower={focusedCamera}
+          telemetry={towerTelemetry}
           alertCount={alerts.length}
-          onFocusCamera={focusCamera}
+          defaultModelId={selectedModelId}
+          onTelemetryChange={handleTelemetryChange}
         />
       );
     }
@@ -92,7 +143,9 @@ export function DashboardExperience({ bootstrap, selectedModelId }: DashboardExp
           alerts={alerts}
           sticky={false}
           onDismiss={(alertId) =>
-            setAlerts((currentAlerts) => currentAlerts.filter((alert) => alert.id !== alertId))
+            setDismissedAlertIds((currentIds) =>
+              currentIds.includes(alertId) ? currentIds : [...currentIds, alertId],
+            )
           }
           onFocusCamera={focusCamera}
         />
@@ -109,13 +162,13 @@ export function DashboardExperience({ bootstrap, selectedModelId }: DashboardExp
     }
 
     if (activeNav === "map") {
-      return <MapCard zones={forestZones} onFocusCamera={focusCamera} />;
+      return <MapCard zones={mapZones} onFocusCamera={focusCamera} />;
     }
 
     if (activeNav === "aiDetection") {
       return (
         <Suspense fallback={<DashboardSkeleton progress={bootstrap.progress} statusLabel={bootstrap.statusLabel} />}>
-          <AIDetection defaultModelId={selectedModelId} />
+          <AIDetection defaultModelId={selectedModelId} onTelemetryChange={handleTelemetryChange} />
         </Suspense>
       );
     }

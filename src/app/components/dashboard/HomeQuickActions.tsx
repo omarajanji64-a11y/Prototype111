@@ -46,7 +46,7 @@ export function HomeQuickActions({
         <div className="space-y-5">
           <SectionTitle
             title="Quick Actions"
-            description="Step into the live command center, launch key modules instantly, and review the latest hazard signals as they arrive."
+            description="Jump into the Main Tower console, review live hazard signals, and move between the core OKAB control modules."
           />
 
           <div className="grid gap-3 sm:grid-cols-3">
@@ -56,14 +56,14 @@ export function HomeQuickActions({
               <p className="mt-2 text-xs text-[var(--text-secondary)]">Immediate intervention required</p>
             </div>
             <div className="command-metric-tile p-5" data-tone="warning">
-              <p className="command-section-label text-[var(--text-muted)]">Warning Towers</p>
+              <p className="command-section-label text-[var(--text-muted)]">Watch State</p>
               <p className="command-holo-title mt-2 text-[36px] font-bold leading-none text-[var(--text-primary)]">{warningTowerCount}</p>
-              <p className="mt-2 text-xs text-[var(--text-secondary)]">Need verification or watch mode</p>
+              <p className="mt-2 text-xs text-[var(--text-secondary)]">Main Tower needs operator attention</p>
             </div>
             <div className="command-metric-tile p-5" data-tone="safe">
-              <p className="command-section-label text-[var(--text-muted)]">Safe Towers</p>
+              <p className="command-section-label text-[var(--text-muted)]">Tower Safe State</p>
               <p className="command-holo-title mt-2 text-[36px] font-bold leading-none text-[var(--text-primary)]">{safeTowerCount}</p>
-              <p className="mt-2 text-xs text-[var(--text-secondary)]">Nominal environmental readings</p>
+              <p className="mt-2 text-xs text-[var(--text-secondary)]">Main Tower is reading nominal conditions</p>
             </div>
           </div>
 
@@ -75,7 +75,7 @@ export function HomeQuickActions({
           >
             <motion.div variants={listItemVariants}>
               <ActionButton icon={Camera} variant="secondary" className="w-full" onClick={() => onNavigate("cameras")}>
-                Open Tower Network
+                Open Main Tower
               </ActionButton>
             </motion.div>
             <motion.div variants={listItemVariants}>
@@ -107,7 +107,7 @@ export function HomeQuickActions({
           <SectionTitle
             eyebrow="New Fires"
             title="Latest Alert Stream"
-            description="Newest detections requiring immediate review."
+            description="The newest Main Tower detections that need review."
             action={
               <div className="inline-flex items-center gap-2 rounded-md border border-[rgba(249,115,22,0.2)] bg-[var(--fire-dim)] px-3 py-1.5 font-sci-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--fire)]">
                 <Flame className="h-4 w-4" />
@@ -148,7 +148,7 @@ export function HomeQuickActions({
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <ActionButton variant="secondary" className="px-3 py-2 text-xs" onClick={() => onFocusTower(alert.cameraId)}>
-                    Focus Tower
+                    Open Main Tower
                   </ActionButton>
                   <ActionButton
                     className="px-3 py-2 text-xs"

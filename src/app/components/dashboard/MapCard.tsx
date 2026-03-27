@@ -25,11 +25,11 @@ export function MapCard({ zones, onFocusCamera }: MapCardProps) {
       <div className="space-y-5">
         <SectionTitle
           eyebrow="Forest coverage"
-          title="Rural risk map"
-          description="Forest, agricultural, and village-edge zones are monitored for early fire intervention."
+          title="Main Tower coverage map"
+          description="The map centers on the single zone currently watched by Main Tower and its linked sensor stack."
           action={
             <ActionButton icon={Radar} variant="secondary">
-              LoRa positioning
+              Main Tower uplink
             </ActionButton>
           }
         />
@@ -111,7 +111,7 @@ export function MapCard({ zones, onFocusCamera }: MapCardProps) {
 
                 <div className="mt-4 flex flex-wrap gap-2">
                   <div className="rounded-md border border-[var(--border)] bg-[var(--bg-surface)] px-3 py-2 text-sm text-[var(--text-secondary)]">
-                    Tower {zone.cameraId}
+                    {zone.cameraId}
                   </div>
                   <div className="rounded-md border border-[var(--border)] bg-[var(--bg-surface)] px-3 py-2 text-sm text-[var(--text-secondary)]">
                     Risk {zone.risk}
@@ -120,7 +120,7 @@ export function MapCard({ zones, onFocusCamera }: MapCardProps) {
 
                 <div className="mt-4">
                   <ActionButton icon={LocateFixed} variant="secondary" onClick={() => onFocusCamera(zone.cameraId)}>
-                    Focus tower
+                    Open Main Tower
                   </ActionButton>
                 </div>
               </motion.div>

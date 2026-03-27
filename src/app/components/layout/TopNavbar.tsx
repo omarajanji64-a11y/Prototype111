@@ -37,7 +37,7 @@ const pageIcons: Record<NavigationId, LucideIcon> = {
 
 const pageNames: Record<NavigationId, string> = {
   overview: "Overview",
-  cameras: "Tower Network",
+  cameras: "Main Tower",
   alerts: "Alerts",
   analytics: "Analytics",
   map: "Forest Map",
@@ -110,7 +110,7 @@ export function TopNavbar({
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-secondary)]" />
             <input
               type="text"
-              placeholder="Search tower streams, anomalies, and modules..."
+              placeholder="Search main tower, detections, and modules..."
               className="command-topbar-search h-11 w-full rounded-[1rem] border border-[var(--border)] py-2 pl-9 pr-3 text-sm text-[var(--text-primary)] outline-none transition-colors duration-150 placeholder:text-[var(--text-secondary)] focus:border-[var(--border-hover)]"
             />
           </div>

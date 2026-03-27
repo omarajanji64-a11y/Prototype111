@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import * as ort from "onnxruntime-web";
 import { AnimatePresence, motion } from "motion/react";
 import {
+  Maximize2,
+  Minimize2,
   Camera,
   ChevronDown,
   Link2,
@@ -564,14 +566,29 @@ function StatCard({ label, value }) {
   );
 }
 
-export default function AIDetection({ defaultModelId = DEFAULT_OKAB_MODEL_ID }) {
+const sensorStatusClasses = {
+  online: "border-[rgba(34,211,238,0.18)] bg-[rgba(8,18,40,0.72)] text-[var(--safe)]",
+  watch: "border-[rgba(251,191,36,0.2)] bg-[rgba(69,26,3,0.34)] text-[var(--warning)]",
+  alert: "border-[rgba(239,68,68,0.2)] bg-[rgba(69,10,10,0.34)] text-[var(--critical)]",
+};
+
+export default function AIDetection({
+  defaultModelId = DEFAULT_OKAB_MODEL_ID,
+  embedded = false,
+  heading,
+  description,
+  linkedSensors = [],
+  onTelemetryChange,
+}) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  const videoFrameRef = useRef(null);
   const streamRef = useRef(null);
   const audioContextRef = useRef(null);
   const flashTimeoutRef = useRef(null);
   const toastTimeoutsRef = useRef({});
   const handledAlertsRef = useRef(new Set());
+  const telemetryRef = useRef(null);
 
   const [activeSource, setActiveSource] = useState("webcam");
   const [ipCameraUrl, setIpCameraUrl] = useState("");
@@ -583,6 +600,7 @@ export default function AIDetection({ defaultModelId = DEFAULT_OKAB_MODEL_ID }) 
   const [toasts, setToasts] = useState([]);
   const [isOverlayDismissed, setIsOverlayDismissed] = useState(false);
   const [borderFlash, setBorderFlash] = useState({ visible: false, key: 0 });
+  const [isPovExpanded, setIsPovExpanded] = useState(false);
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
@@ -601,6 +619,88 @@ export default function AIDetection({ defaultModelId = DEFAULT_OKAB_MODEL_ID }) 
   const activeSourceStat = isSourceReady ? getSourceBadge(activeSource) : "None";
   const showOverlay = activeSource === "screen" && isRunning && !isOverlayDismissed;
   const latestOverlayDetections = detections.slice(0, 3);
+  const sectionEyebrow = embedded ? "Main Tower" : "AI Detection";
+  const sectionHeading = heading ?? (embedded ? "Main Tower Camera POV" : "AI Detection");
+  const sectionDescription =
+    description ??
+    (embedded
+      ? "Open the linked tower camera, run OKAB live inference, expand the POV, and review detection logs alongside the sensor stack."
+      : "Run live OKAB detection with model switching, annotated snapshots in the log, and alerting tuned for rapid incident review.");
+
+  useEffect(() => {
+    function handleFullscreenChange() {
+      const frame = videoFrameRef.current;
+      const fullscreenTarget = document.fullscreenElement;
+
+      setIsPovExpanded(Boolean(frame && fullscreenTarget && (frame === fullscreenTarget || frame.contains(fullscreenTarget))));
+    }
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!onTelemetryChange) {
+      return;
+    }
+
+    const payload = {
+      activeSource,
+      sourceBadge: activeSourceStat,
+      isSourceReady,
+      isAiEnabled: isRunning,
+      isModelLoaded,
+      detectionsCount: detections.length,
+      detectionsToday: stats.detectionsToday,
+      avgConfidence: stats.avgConfidence,
+      latestSnapshot: detections[0]?.snapshot ?? null,
+      latestDetection: detections[0] ?? null,
+      detectionLogs: detections,
+      modelId,
+      modelLabel: currentModel.label,
+      runtimeError,
+      modelError,
+    };
+
+    telemetryRef.current = payload;
+    onTelemetryChange(payload);
+  }, [
+    activeSource,
+    activeSourceStat,
+    currentModel.label,
+    detections,
+    isModelLoaded,
+    isRunning,
+    isSourceReady,
+    modelError,
+    modelId,
+    onTelemetryChange,
+    runtimeError,
+    stats.avgConfidence,
+    stats.detectionsToday,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      if (!onTelemetryChange) {
+        return;
+      }
+
+      const latestTelemetry = telemetryRef.current;
+
+      if (!latestTelemetry) {
+        return;
+      }
+
+      onTelemetryChange({
+        ...latestTelemetry,
+        isAiEnabled: false,
+        isSourceReady: false,
+      });
+    };
+  }, [onTelemetryChange]);
 
   function stopCurrentSource() {
     if (streamRef.current) {
@@ -859,6 +959,30 @@ export default function AIDetection({ defaultModelId = DEFAULT_OKAB_MODEL_ID }) 
     setActiveSource(nextSource);
   }
 
+  async function toggleExpandedPov() {
+    const frame = videoFrameRef.current;
+
+    if (!frame) {
+      return;
+    }
+
+    try {
+      if (document.fullscreenElement) {
+        if (document.fullscreenElement === frame || frame.contains(document.fullscreenElement)) {
+          await document.exitFullscreen();
+        }
+
+        return;
+      }
+
+      if (typeof frame.requestFullscreen === "function") {
+        await frame.requestFullscreen();
+      }
+    } catch {
+      setIsPovExpanded(false);
+    }
+  }
+
   const videoMessage = (() => {
     if (modelError) {
       return {
@@ -949,7 +1073,7 @@ export default function AIDetection({ defaultModelId = DEFAULT_OKAB_MODEL_ID }) 
         ) : null}
       </AnimatePresence>
 
-      <div className="space-y-3 pb-6">
+      <div className={`${embedded ? "space-y-4" : "space-y-3 pb-6"}`}>
         <motion.section
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
@@ -958,7 +1082,7 @@ export default function AIDetection({ defaultModelId = DEFAULT_OKAB_MODEL_ID }) 
         >
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="space-y-3">
-              <p className="command-section-label">AI Detection</p>
+              <p className="command-section-label">{sectionEyebrow}</p>
               <div className="flex flex-wrap items-center gap-3">
                 <div className="relative flex h-2 w-2 items-center justify-center">
                   <motion.span
@@ -977,7 +1101,7 @@ export default function AIDetection({ defaultModelId = DEFAULT_OKAB_MODEL_ID }) 
                   <span className="relative h-2 w-2 rounded-full bg-[var(--critical)]" />
                 </div>
 
-                <h1 className="text-2xl font-semibold text-[var(--text-primary)]">AI Detection</h1>
+                <h1 className="text-2xl font-semibold text-[var(--text-primary)]">{sectionHeading}</h1>
 
                 <span className="rounded-md bg-[rgba(14,165,233,0.1)] px-2 py-0.5 text-xs font-medium text-[var(--accent-glow)]">
                   {currentModel.label}
@@ -985,8 +1109,7 @@ export default function AIDetection({ defaultModelId = DEFAULT_OKAB_MODEL_ID }) 
               </div>
 
               <p className="max-w-2xl text-sm text-[var(--text-secondary)]">
-                Run live OKAB detection with model switching, annotated snapshots in the log, and alerting tuned for
-                rapid incident review.
+                {sectionDescription}
               </p>
             </div>
 
@@ -1074,7 +1197,10 @@ export default function AIDetection({ defaultModelId = DEFAULT_OKAB_MODEL_ID }) 
               </div>
             ) : null}
 
-            <div className="relative mt-4 overflow-hidden rounded-xl border border-[var(--border)] bg-black">
+            <div
+              ref={videoFrameRef}
+              className="relative mt-4 overflow-hidden rounded-xl border border-[var(--border)] bg-black"
+            >
               <div className="relative aspect-video min-h-[240px] w-full">
                 <video
                   ref={videoRef}
@@ -1085,14 +1211,25 @@ export default function AIDetection({ defaultModelId = DEFAULT_OKAB_MODEL_ID }) 
                 />
                 <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 h-full w-full" />
 
-                <button
-                  type="button"
-                  onClick={() => setIsMuted((currentMuted) => !currentMuted)}
-                  className="absolute right-4 top-4 z-20 inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--border)] bg-[rgba(17,24,39,0.82)] text-[var(--text-primary)] backdrop-blur transition-colors duration-150 hover:border-[var(--border-hover)] hover:bg-[rgba(28,36,51,0.92)]"
-                  aria-label={isMuted ? "Unmute alert sound" : "Mute alert sound"}
-                >
-                  {isMuted ? <VolumeX className="h-4.5 w-4.5" /> : <Volume2 className="h-4.5 w-4.5" />}
-                </button>
+                <div className="absolute right-4 top-4 z-20 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={toggleExpandedPov}
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--border)] bg-[rgba(17,24,39,0.82)] text-[var(--text-primary)] backdrop-blur transition-colors duration-150 hover:border-[var(--border-hover)] hover:bg-[rgba(28,36,51,0.92)]"
+                    aria-label={isPovExpanded ? "Collapse camera POV" : "Expand camera POV"}
+                  >
+                    {isPovExpanded ? <Minimize2 className="h-4.5 w-4.5" /> : <Maximize2 className="h-4.5 w-4.5" />}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsMuted((currentMuted) => !currentMuted)}
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--border)] bg-[rgba(17,24,39,0.82)] text-[var(--text-primary)] backdrop-blur transition-colors duration-150 hover:border-[var(--border-hover)] hover:bg-[rgba(28,36,51,0.92)]"
+                    aria-label={isMuted ? "Unmute alert sound" : "Mute alert sound"}
+                  >
+                    {isMuted ? <VolumeX className="h-4.5 w-4.5" /> : <Volume2 className="h-4.5 w-4.5" />}
+                  </button>
+                </div>
 
                 {videoMessage ? (
                   <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/70 px-6 text-center backdrop-blur-sm">
@@ -1214,6 +1351,48 @@ export default function AIDetection({ defaultModelId = DEFAULT_OKAB_MODEL_ID }) 
               <StatCard label="Active Source" value={activeSourceStat} />
               <StatCard label="Avg Confidence" value={formatConfidence(stats.avgConfidence)} />
             </div>
+
+            {linkedSensors.length > 0 ? (
+              <>
+                <div className="my-6 h-px bg-[var(--border)]" />
+
+                <div className="flex items-center justify-between gap-3">
+                  <p className="command-section-label">Linked Sensors</p>
+                  <div className="rounded-md border border-[var(--border)] bg-[var(--bg-surface)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--text-secondary)]">
+                    {linkedSensors.length} modules
+                  </div>
+                </div>
+
+                <div className="mt-4 space-y-3">
+                  {linkedSensors.map((sensor) => (
+                    <div
+                      key={sensor.id}
+                      className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-semibold text-[var(--text-primary)]">{sensor.name}</p>
+                          <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                            {sensor.type} · {sensor.location}
+                          </p>
+                        </div>
+                        <div
+                          className={`rounded-md border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.22em] ${
+                            sensorStatusClasses[sensor.status] ?? sensorStatusClasses.online
+                          }`}
+                        >
+                          {sensor.status}
+                        </div>
+                      </div>
+
+                      <div className="mt-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-3 py-2 text-xs text-[var(--text-secondary)]">
+                        {sensor.reading}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : null}
           </motion.section>
         </div>
       </div>
