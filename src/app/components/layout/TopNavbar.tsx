@@ -109,7 +109,7 @@ export function TopNavbar({
     >
       <div className="mx-auto flex h-14 max-w-[1720px] items-center justify-between gap-4 px-4 sm:px-5 lg:px-6">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-[1rem] border border-[var(--border-hover)] bg-[rgba(8,18,40,0.88)] text-[var(--accent-primary)] shadow-[0_0_22px_rgba(30,216,255,0.08)]">
+          <div className="flex h-9 w-9 items-center justify-center rounded-[1rem] border border-[var(--border-hover)] bg-[var(--chrome-strong)] text-[var(--accent-primary)] shadow-[var(--theme-glow-shadow)]">
             <PageIcon className="h-4 w-4" />
           </div>
           <div className="min-w-0">

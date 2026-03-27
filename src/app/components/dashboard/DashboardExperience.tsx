@@ -3,6 +3,7 @@ import { startTransition, useCallback, useEffect, useMemo, useState } from "reac
 
 import { pageVariants, transitionDefaults } from "../../animations/variants";
 import type { AppBootstrapState } from "../../hooks/useAppBootstrap";
+import type { DashboardThemeId } from "../../lib/dashboardThemes";
 import { AlertPanel } from "./AlertPanel";
 import { AnalyticsChart } from "./AnalyticsChart";
 import { DashboardSkeleton } from "./DashboardSkeleton";
@@ -47,8 +48,8 @@ interface DashboardExperienceProps {
   bootstrap: AppBootstrapState;
   selectedModelId: string;
   onSelectedModelChange: (modelId: string) => void;
-  selectedThemeId: string;
-  onSelectedThemeChange: (themeId: string) => void;
+  selectedThemeId: DashboardThemeId;
+  onSelectedThemeChange: (themeId: DashboardThemeId) => void;
 }
 
 export function DashboardExperience({
