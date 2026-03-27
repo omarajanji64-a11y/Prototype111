@@ -3,6 +3,7 @@ import {
   BarChart3,
   BellRing,
   Camera,
+  Cpu,
   LayoutDashboard,
   MapPinned,
   Settings2,
@@ -27,6 +28,7 @@ const iconMap: Record<NavigationId, LucideIcon> = {
   map: MapPinned,
   automation: Sparkles,
   setup: Settings2,
+  models: Cpu,
 };
 
 export function MobileDock({ activeItem, onActiveChange }: MobileDockProps) {

@@ -4,6 +4,7 @@ import {
   Bell,
   BellRing,
   Camera,
+  Cpu,
   Flame,
   LayoutDashboard,
   MapPinned,
@@ -33,6 +34,7 @@ const pageIcons: Record<NavigationId, LucideIcon> = {
   map: MapPinned,
   automation: Sparkles,
   setup: Settings2,
+  models: Cpu,
 };
 
 const pageNames: Record<NavigationId, string> = {
@@ -43,6 +45,7 @@ const pageNames: Record<NavigationId, string> = {
   map: "Forest Map",
   automation: "UAV Response",
   setup: "Setup",
+  models: "Model Switcher",
 };
 
 export function TopNavbar({

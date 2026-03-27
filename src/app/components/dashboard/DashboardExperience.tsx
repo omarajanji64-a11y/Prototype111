@@ -9,6 +9,7 @@ import { DashboardSkeleton } from "./DashboardSkeleton";
 import { HomeQuickActions } from "./HomeQuickActions";
 import { MainTowerConsole } from "./MainTowerConsole";
 import { MapCard } from "./MapCard";
+import { ModelSwitcherPanel } from "./ModelSwitcherPanel";
 import { SetupConsole } from "./SetupConsole";
 import { SystemStatus } from "./SystemStatus";
 import { UavResponsePanel } from "./UavResponsePanel";
@@ -44,13 +45,19 @@ import {
 interface DashboardExperienceProps {
   bootstrap: AppBootstrapState;
   selectedModelId: string;
+  onSelectedModelChange: (modelId: string) => void;
 }
 
-export function DashboardExperience({ bootstrap, selectedModelId }: DashboardExperienceProps) {
+export function DashboardExperience({
+  bootstrap,
+  selectedModelId,
+  onSelectedModelChange,
+}: DashboardExperienceProps) {
   const [activeNav, setActiveNav] = useState<NavigationId>("overview");
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [dismissedAlertIds, setDismissedAlertIds] = useState<string[]>([]);
   const [towerTelemetry, setTowerTelemetry] = useState<MainTowerTelemetry>(EMPTY_MAIN_TOWER_TELEMETRY);
+  const [modelReturnNav, setModelReturnNav] = useState<NavigationId>("setup");
 
   const mainTower = cameraFeeds[0];
   const [systemSetup, setSystemSetup] = useState<SystemSetupState>(() =>
@@ -75,16 +82,32 @@ export function DashboardExperience({ bootstrap, selectedModelId }: DashboardExp
   const linkedCamera = useMemo(
     () => ({
       ...mainTower.linkedCamera,
-      name: systemSetup.tower.cameraConfigured
-        ? systemSetup.tower.cameraName.trim() || mainTower.linkedCamera.name
-        : "Camera Not Configured",
-      resolution: systemSetup.tower.resolution.trim() || mainTower.linkedCamera.resolution,
-      coverage: systemSetup.tower.coverage.trim() || mainTower.linkedCamera.coverage,
+      name: !systemSetup.tower.cameraConfigured
+        ? "Camera Not Configured"
+        : systemSetup.tower.cameraSource === "ip"
+          ? "Main Tower IP Camera"
+          : systemSetup.tower.cameraSource === "screen"
+            ? "Main Tower Screen Share"
+            : "Main Tower Webcam",
+      resolution: !systemSetup.tower.cameraConfigured
+        ? "Not linked"
+        : systemSetup.tower.cameraSource === "ip"
+          ? "Network stream"
+          : systemSetup.tower.cameraSource === "screen"
+            ? "Display dependent"
+            : "1920 x 1080",
+      coverage: !systemSetup.tower.cameraConfigured
+        ? "Configure a source in Setup"
+        : systemSetup.tower.cameraSource === "ip"
+          ? "Remote camera feed"
+          : systemSetup.tower.cameraSource === "screen"
+            ? "Shared operator view"
+            : "Direct local camera feed",
       streamHint: systemSetup.tower.cameraConfigured
         ? getCameraSourceLabel(systemSetup.tower.cameraSource)
         : "Open Setup to link the tower camera",
     }),
-    [mainTower.linkedCamera, systemSetup.tower],
+    [mainTower.linkedCamera, systemSetup.tower.cameraConfigured, systemSetup.tower.cameraSource],
   );
 
   const focusedCamera = useMemo(
@@ -159,6 +182,30 @@ export function DashboardExperience({ bootstrap, selectedModelId }: DashboardExp
     }));
   }, []);
 
+  const handleOpenModelSwitcher = useCallback((returnNav: NavigationId) => {
+    setModelReturnNav(returnNav);
+    startTransition(() => {
+      setActiveNav("models");
+    });
+  }, []);
+
+  const handleModelSelection = useCallback(
+    (modelId: string) => {
+      onSelectedModelChange(modelId);
+      setSystemSetup((currentSetup) => ({
+        ...currentSetup,
+        tower: {
+          ...currentSetup.tower,
+          modelId,
+        },
+      }));
+      startTransition(() => {
+        setActiveNav(modelReturnNav);
+      });
+    },
+    [modelReturnNav, onSelectedModelChange],
+  );
+
   const focusCamera = () => {
     startTransition(() => {
       setActiveNav("cameras");
@@ -176,11 +223,9 @@ export function DashboardExperience({ bootstrap, selectedModelId }: DashboardExp
       return (
         <HomeQuickActions
           alerts={alerts}
-          criticalCount={criticalCount}
-          warningTowerCount={warningCount}
-          safeTowerCount={safeCount}
-          onNavigate={handleActiveNavChange}
-          onFocusTower={focusCamera}
+          tower={focusedCamera}
+          onOpenTower={focusCamera}
+          onOpenSetup={() => handleActiveNavChange("setup")}
           onDismissAlert={(alertId) =>
             setDismissedAlertIds((currentIds) =>
               currentIds.includes(alertId) ? currentIds : [...currentIds, alertId],
@@ -201,6 +246,7 @@ export function DashboardExperience({ bootstrap, selectedModelId }: DashboardExp
           defaultModelId={systemSetup.tower.modelId || selectedModelId}
           onTelemetryChange={handleTelemetryChange}
           onOpenSetup={() => handleActiveNavChange("setup")}
+          onOpenModelSwitcher={() => handleOpenModelSwitcher("cameras")}
         />
       );
     }
@@ -240,6 +286,17 @@ export function DashboardExperience({ bootstrap, selectedModelId }: DashboardExp
           onTowerChange={handleTowerSetupChange}
           onSensorChange={handleSensorSetupChange}
           onUavChange={handleUavSetupChange}
+          onOpenModelSwitcher={() => handleOpenModelSwitcher("setup")}
+        />
+      );
+    }
+
+    if (activeNav === "models") {
+      return (
+        <ModelSwitcherPanel
+          selectedModelId={systemSetup.tower.modelId || selectedModelId}
+          onSelectModel={handleModelSelection}
+          onBack={() => handleActiveNavChange(modelReturnNav)}
         />
       );
     }

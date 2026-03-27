@@ -49,7 +49,11 @@ export function isOkabModelId(value: string | null | undefined): value is string
 }
 
 export function getOkabModelOption(modelId?: string | null) {
-  return OKAB_MODEL_OPTIONS.find((option) => option.id === modelId) ?? OKAB_MODEL_OPTIONS[2];
+  return (
+    OKAB_MODEL_OPTIONS.find((option) => option.id === modelId) ??
+    OKAB_MODEL_OPTIONS.find((option) => option.id === DEFAULT_OKAB_MODEL_ID) ??
+    OKAB_MODEL_OPTIONS[0]
+  );
 }
 
 export function getOkabModelLabel(modelId?: string | null) {

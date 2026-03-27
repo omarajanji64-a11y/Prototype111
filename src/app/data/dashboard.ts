@@ -5,7 +5,8 @@ export type NavigationId =
   | "analytics"
   | "map"
   | "automation"
-  | "setup";
+  | "setup"
+  | "models";
 
 export type CameraStatus = "safe" | "warning" | "fire";
 export type AlertSeverity = "critical" | "high" | "medium";
@@ -123,7 +124,6 @@ export interface ForestZone {
 
 export const navigationItems: NavigationItem[] = [
   { id: "overview", label: "Overview", shortLabel: "Home" },
-  { id: "cameras", label: "Main Tower", shortLabel: "Tower" },
   { id: "alerts", label: "Alerts", shortLabel: "Alerts" },
   { id: "analytics", label: "Analytics", shortLabel: "Data" },
   { id: "map", label: "Forest Map", shortLabel: "Map" },

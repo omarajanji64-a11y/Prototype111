@@ -1,17 +1,8 @@
-import {
-  BarChart3,
-  BellRing,
-  Camera,
-  Flame,
-  MapPinned,
-  Plane,
-  Settings2,
-  Shield,
-} from "lucide-react";
+import { Camera, Settings2, Shield } from "lucide-react";
 import { motion } from "motion/react";
 
 import { cardVariants, createStagger, listItemVariants } from "../../animations/variants";
-import type { AlertItem, NavigationId } from "../../data/dashboard";
+import type { AlertItem, CameraFeed } from "../../data/dashboard";
 import { ActionButton } from "../shared/ActionButton";
 import { GlassPanel } from "../shared/GlassPanel";
 import { SectionTitle } from "../shared/SectionTitle";
@@ -19,21 +10,17 @@ import { StatusBadge } from "../shared/StatusBadge";
 
 interface HomeQuickActionsProps {
   alerts: AlertItem[];
-  criticalCount: number;
-  warningTowerCount: number;
-  safeTowerCount: number;
-  onNavigate: (target: NavigationId) => void;
-  onFocusTower: (cameraId: string) => void;
+  tower: CameraFeed;
+  onOpenTower: () => void;
+  onOpenSetup: () => void;
   onDismissAlert: (alertId: string) => void;
 }
 
 export function HomeQuickActions({
   alerts,
-  criticalCount,
-  warningTowerCount,
-  safeTowerCount,
-  onNavigate,
-  onFocusTower,
+  tower,
+  onOpenTower,
+  onOpenSetup,
   onDismissAlert,
 }: HomeQuickActionsProps) {
   return (
@@ -43,68 +30,54 @@ export function HomeQuickActions({
       animate="visible"
       className="grid gap-3 xl:grid-cols-[minmax(0,1.1fr)_minmax(420px,0.9fr)]"
     >
-      <GlassPanel variants={cardVariants} className="p-5">
-        <div className="space-y-5">
-          <SectionTitle
-            title="Quick Actions"
-            description="Jump into the Main Tower console, review live hazard signals, and move between the core OKAB control modules."
-          />
+      <GlassPanel variants={cardVariants} className="overflow-hidden p-0">
+        <div className="relative">
+          <div className="relative min-h-[440px] overflow-hidden">
+            <img
+              src={tower.imageUrl}
+              alt={tower.linkedCamera.name}
+              className="h-full min-h-[440px] w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,16,0.16),rgba(4,8,16,0.26),rgba(4,8,16,0.92))]" />
 
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="command-metric-tile p-5" data-tone="critical">
-              <p className="command-section-label text-[var(--text-muted)]">Critical Fires</p>
-              <p className="command-holo-title mt-2 text-[36px] font-bold leading-none text-[var(--text-primary)]">{criticalCount}</p>
-              <p className="mt-2 text-xs text-[var(--text-secondary)]">Immediate intervention required</p>
+            <div className="absolute left-5 right-5 top-5 flex items-start justify-between gap-3">
+              <div className="rounded-full border border-[rgba(141,240,255,0.2)] bg-[rgba(8,18,40,0.8)] px-3 py-1.5 font-sci-mono text-[10px] uppercase tracking-[0.22em] text-[var(--accent-glow)]">
+                Tower Preview
+              </div>
+              <StatusBadge status={tower.status} />
             </div>
-            <div className="command-metric-tile p-5" data-tone="warning">
-              <p className="command-section-label text-[var(--text-muted)]">Watch State</p>
-              <p className="command-holo-title mt-2 text-[36px] font-bold leading-none text-[var(--text-primary)]">{warningTowerCount}</p>
-              <p className="mt-2 text-xs text-[var(--text-secondary)]">Main Tower needs operator attention</p>
-            </div>
-            <div className="command-metric-tile p-5" data-tone="safe">
-              <p className="command-section-label text-[var(--text-muted)]">Tower Safe State</p>
-              <p className="command-holo-title mt-2 text-[36px] font-bold leading-none text-[var(--text-primary)]">{safeTowerCount}</p>
-              <p className="mt-2 text-xs text-[var(--text-secondary)]">Main Tower is reading nominal conditions</p>
+
+            <div className="absolute inset-x-5 bottom-5 space-y-4">
+              <div className="rounded-[1.2rem] border border-[var(--border)] bg-[rgba(8,18,40,0.84)] p-5 backdrop-blur">
+                <SectionTitle
+                  eyebrow="Overview"
+                  title={tower.name}
+                  description={tower.summary}
+                />
+
+                <div className="mt-5 flex flex-wrap gap-2 text-xs">
+                  <div className="rounded-full border border-[var(--border)] bg-[rgba(8,18,40,0.82)] px-3 py-1.5 text-[var(--text-primary)]">
+                    {tower.linkedCamera.name}
+                  </div>
+                  <div className="rounded-full border border-[var(--border)] bg-[rgba(8,18,40,0.82)] px-3 py-1.5 text-[var(--text-primary)]">
+                    {tower.detections > 0 ? `${tower.detections} detections` : "No detections"}
+                  </div>
+                  <div className="rounded-full border border-[var(--border)] bg-[rgba(8,18,40,0.82)] px-3 py-1.5 text-[var(--text-primary)]">
+                    {tower.sensors.length} linked sensors
+                  </div>
+                </div>
+
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <ActionButton icon={Camera} variant="primary" onClick={onOpenTower}>
+                    Open Tower
+                  </ActionButton>
+                  <ActionButton icon={Settings2} variant="secondary" onClick={onOpenSetup}>
+                    Configure
+                  </ActionButton>
+                </div>
+              </div>
             </div>
           </div>
-
-          <motion.div
-            variants={createStagger(0.06, 0.04)}
-            initial="hidden"
-            animate="visible"
-            className="grid gap-3 sm:grid-cols-2"
-          >
-            <motion.div variants={listItemVariants}>
-              <ActionButton icon={Camera} variant="secondary" className="w-full" onClick={() => onNavigate("cameras")}>
-                Open Main Tower
-              </ActionButton>
-            </motion.div>
-            <motion.div variants={listItemVariants}>
-              <ActionButton icon={BellRing} variant="secondary" className="w-full" onClick={() => onNavigate("alerts")}>
-                Review Fire Alerts
-              </ActionButton>
-            </motion.div>
-            <motion.div variants={listItemVariants}>
-              <ActionButton icon={BarChart3} variant="secondary" className="w-full" onClick={() => onNavigate("analytics")}>
-                Open Analytics
-              </ActionButton>
-            </motion.div>
-            <motion.div variants={listItemVariants}>
-              <ActionButton icon={MapPinned} variant="secondary" className="w-full" onClick={() => onNavigate("map")}>
-                Open Forest Map
-              </ActionButton>
-            </motion.div>
-            <motion.div variants={listItemVariants}>
-              <ActionButton icon={Settings2} variant="secondary" className="w-full" onClick={() => onNavigate("setup")}>
-                Open Setup
-              </ActionButton>
-            </motion.div>
-            <motion.div variants={listItemVariants} className="sm:col-span-2">
-              <ActionButton icon={Plane} variant="primary" className="w-full" onClick={() => onNavigate("automation")}>
-                Open UAV Response Tasks
-              </ActionButton>
-            </motion.div>
-          </motion.div>
         </div>
       </GlassPanel>
 
@@ -114,12 +87,6 @@ export function HomeQuickActions({
             eyebrow="New Fires"
             title="Latest Alert Stream"
             description="The newest Main Tower detections that need review."
-            action={
-              <div className="inline-flex items-center gap-2 rounded-md border border-[rgba(249,115,22,0.2)] bg-[var(--fire-dim)] px-3 py-1.5 font-sci-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--fire)]">
-                <Flame className="h-4 w-4" />
-                {alerts.length} total
-              </div>
-            }
           />
 
           <motion.div variants={createStagger(0.06, 0.05)} className="space-y-3">
@@ -153,8 +120,8 @@ export function HomeQuickActions({
                   </div>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <ActionButton variant="secondary" className="px-3 py-2 text-xs" onClick={() => onFocusTower(alert.cameraId)}>
-                    Open Main Tower
+                  <ActionButton variant="secondary" className="px-3 py-2 text-xs" onClick={onOpenTower}>
+                    Open Tower
                   </ActionButton>
                   <ActionButton
                     className="px-3 py-2 text-xs"

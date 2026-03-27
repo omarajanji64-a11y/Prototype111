@@ -39,17 +39,28 @@ export default function App() {
   const [selectedModelId, setSelectedModelId] = useState(getStoredModelId);
   const bootstrap = useAppBootstrap();
 
-  const handleEntryComplete = (modelId: string) => {
+  const persistSelectedModel = (modelId: string) => {
     const nextModelId = isOkabModelId(modelId) ? modelId : DEFAULT_OKAB_MODEL_ID;
 
     try {
-      window.localStorage.setItem(ENTRY_COMPLETE_KEY, "true");
       window.localStorage.setItem(ENTRY_MODEL_KEY, nextModelId);
+    } catch {
+      // Storage access can fail in private contexts; the selected model still works in memory.
+    }
+
+    setSelectedModelId(nextModelId);
+    return nextModelId;
+  };
+
+  const handleEntryComplete = (modelId: string) => {
+    persistSelectedModel(modelId);
+
+    try {
+      window.localStorage.setItem(ENTRY_COMPLETE_KEY, "true");
     } catch {
       // Storage access can fail in private contexts; the intro still works without persistence.
     }
 
-    setSelectedModelId(nextModelId);
     setHasEntered(true);
   };
 
@@ -63,7 +74,11 @@ export default function App() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
-          <DashboardExperience bootstrap={bootstrap} selectedModelId={selectedModelId} />
+          <DashboardExperience
+            bootstrap={bootstrap}
+            selectedModelId={selectedModelId}
+            onSelectedModelChange={persistSelectedModel}
+          />
         </motion.div>
       ) : (
         <motion.div

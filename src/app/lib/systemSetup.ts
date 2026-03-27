@@ -5,13 +5,10 @@ export type UavResponseMode = "assessment" | "suppression" | "escort";
 
 export interface TowerSetupConfig {
   cameraConfigured: boolean;
-  cameraName: string;
   cameraSource: CameraSourceId;
   ipCameraUrl: string;
   aiEnabled: boolean;
   modelId: string;
-  resolution: string;
-  coverage: string;
 }
 
 export interface SensorSetupItem extends TowerSensor {
@@ -33,7 +30,7 @@ export interface SystemSetupState {
   uav: UavSetupConfig;
 }
 
-const STORAGE_KEY = "okab-system-setup-v1";
+const STORAGE_KEY = "okab-system-setup-v2";
 
 export function getCameraSourceLabel(source: CameraSourceId) {
   if (source === "ip") {
@@ -50,22 +47,19 @@ export function getCameraSourceLabel(source: CameraSourceId) {
 export function createDefaultSystemSetup(tower: CameraFeed, defaultModelId: string): SystemSetupState {
   return {
     tower: {
-      cameraConfigured: true,
-      cameraName: tower.linkedCamera.name,
+      cameraConfigured: false,
       cameraSource: "webcam",
       ipCameraUrl: "",
-      aiEnabled: true,
+      aiEnabled: false,
       modelId: defaultModelId,
-      resolution: tower.linkedCamera.resolution,
-      coverage: tower.linkedCamera.coverage,
     },
     sensors: tower.sensors.map((sensor) => ({
       ...sensor,
-      enabled: true,
+      enabled: false,
     })),
     uav: {
-      enabled: true,
-      autoDispatch: true,
+      enabled: false,
+      autoDispatch: false,
       callsign: "OKAB-UAV-01",
       launchPad: "Main Tower Deck",
       responseMode: "assessment",
@@ -120,10 +114,6 @@ export function readStoredSystemSetup(tower: CameraFeed, defaultModelId: string)
           typeof towerConfig.cameraConfigured === "boolean"
             ? towerConfig.cameraConfigured
             : fallback.tower.cameraConfigured,
-        cameraName:
-          typeof towerConfig.cameraName === "string" && towerConfig.cameraName.trim()
-            ? towerConfig.cameraName
-            : fallback.tower.cameraName,
         cameraSource:
           towerConfig.cameraSource === "ip" || towerConfig.cameraSource === "screen" || towerConfig.cameraSource === "webcam"
             ? towerConfig.cameraSource
@@ -136,14 +126,6 @@ export function readStoredSystemSetup(tower: CameraFeed, defaultModelId: string)
           typeof towerConfig.modelId === "string" && towerConfig.modelId.trim()
             ? towerConfig.modelId
             : fallback.tower.modelId,
-        resolution:
-          typeof towerConfig.resolution === "string" && towerConfig.resolution.trim()
-            ? towerConfig.resolution
-            : fallback.tower.resolution,
-        coverage:
-          typeof towerConfig.coverage === "string" && towerConfig.coverage.trim()
-            ? towerConfig.coverage
-            : fallback.tower.coverage,
       },
       sensors: nextSensors,
       uav: {
