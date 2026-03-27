@@ -4,10 +4,12 @@ import {
   Bell,
   BellRing,
   Camera,
+  ChevronDown,
   Cpu,
   Flame,
   LayoutDashboard,
   MapPinned,
+  Palette,
   Search,
   Settings2,
   Sparkles,
@@ -17,6 +19,10 @@ import { motion } from "motion/react";
 import type { CameraFeed, NavigationId } from "../../data/dashboard";
 import { buttonHover, buttonTap } from "../../animations/variants";
 import { useClock } from "../../hooks/useClock";
+import {
+  DASHBOARD_THEME_OPTIONS,
+  type DashboardThemeId,
+} from "../../lib/dashboardThemes";
 import { cn } from "../ui/utils";
 
 interface TopNavbarProps {
@@ -25,6 +31,8 @@ interface TopNavbarProps {
   focusedCamera: CameraFeed;
   isSidebarExpanded: boolean;
   onOpenModelSwitcher: () => void;
+  selectedThemeId: DashboardThemeId;
+  onThemeChange: (themeId: DashboardThemeId) => void;
 }
 
 const pageIcons: Record<NavigationId, LucideIcon> = {
@@ -55,6 +63,8 @@ export function TopNavbar({
   focusedCamera,
   isSidebarExpanded,
   onOpenModelSwitcher,
+  selectedThemeId,
+  onThemeChange,
 }: TopNavbarProps) {
   const now = useClock();
   const dateLabel = new Intl.DateTimeFormat("en-US", {
@@ -126,11 +136,28 @@ export function TopNavbar({
             {dateLabel} · {timeLabel}
           </div>
 
+          <label className="command-theme-select-shell relative flex h-9 min-w-[132px] items-center sm:min-w-[156px]">
+            <Palette className="pointer-events-none absolute left-3 h-4 w-4 text-[var(--accent-primary)]" />
+            <select
+              aria-label="Dashboard theme"
+              value={selectedThemeId}
+              onChange={(event) => onThemeChange(event.target.value as DashboardThemeId)}
+              className="command-theme-select h-full w-full appearance-none rounded-[1rem] border border-[var(--border)] pl-9 pr-8 text-[11px] font-medium uppercase tracking-[0.12em] text-[var(--text-primary)] outline-none sm:text-[12px]"
+            >
+              {DASHBOARD_THEME_OPTIONS.map((theme) => (
+                <option key={theme.id} value={theme.id}>
+                  {theme.label}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-3 h-4 w-4 text-[var(--text-secondary)]" />
+          </label>
+
           <motion.button
             whileHover={buttonHover}
             whileTap={buttonTap}
             onClick={onOpenModelSwitcher}
-            className="hidden h-9 items-center gap-2 rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.82)] px-3 text-[13px] text-[var(--text-primary)] transition-colors duration-150 hover:border-[var(--border-hover)] hover:bg-[rgba(10,24,54,0.9)] md:inline-flex"
+            className="hidden h-9 items-center gap-2 rounded-[1rem] border border-[var(--border)] bg-[var(--chrome-surface)] px-3 text-[13px] text-[var(--text-primary)] transition-colors duration-150 hover:border-[var(--border-hover)] hover:bg-[var(--chrome-surface-hover)] lg:inline-flex"
           >
             <Cpu className="h-4 w-4 text-[var(--accent-primary)]" />
             <span>Switch Model</span>
@@ -144,7 +171,7 @@ export function TopNavbar({
             <span className="text-[10px] font-semibold uppercase tracking-[0.22em]">{status.label}</span>
           </div>
 
-          <div className="hidden h-9 items-center gap-2 rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.82)] px-3 shadow-[0_0_20px_rgba(255,139,61,0.06)] sm:inline-flex">
+          <div className="hidden h-9 items-center gap-2 rounded-[1rem] border border-[var(--border)] bg-[var(--chrome-surface)] px-3 shadow-[var(--theme-chip-shadow)] sm:inline-flex">
             <Flame className="h-4 w-4 text-[var(--fire)]" />
             <span className="text-[13px] text-[var(--text-primary)]">{alertCount}</span>
             <span className="text-[13px] text-[var(--text-secondary)]">alerts</span>
@@ -153,7 +180,7 @@ export function TopNavbar({
           <motion.button
             whileHover={buttonHover}
             whileTap={buttonTap}
-            className="relative inline-flex h-9 w-9 items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.82)] text-[var(--text-secondary)] transition-colors duration-150 hover:border-[var(--border-hover)] hover:bg-[rgba(10,24,54,0.9)] hover:text-[var(--text-primary)]"
+            className="relative inline-flex h-9 w-9 items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[var(--chrome-surface)] text-[var(--text-secondary)] transition-colors duration-150 hover:border-[var(--border-hover)] hover:bg-[var(--chrome-surface-hover)] hover:text-[var(--text-primary)]"
             aria-label="Notifications"
           >
             <Bell className="h-4 w-4" />

@@ -11,11 +11,11 @@ interface ActionButtonProps extends HTMLMotionProps<"button"> {
 
 const variantClasses = {
   primary:
-    "border border-[rgba(141,240,255,0.24)] bg-[linear-gradient(135deg,rgba(30,216,255,0.2),rgba(90,140,255,0.34))] text-white shadow-[0_0_28px_rgba(30,216,255,0.12)] hover:brightness-110",
+    "border border-[var(--theme-primary-button-border)] bg-[var(--theme-primary-button-bg)] text-white shadow-[var(--theme-primary-button-shadow)] hover:brightness-110",
   secondary:
-    "border border-[var(--border)] bg-[rgba(8,18,40,0.84)] text-[var(--text-primary)] hover:border-[var(--border-hover)] hover:bg-[rgba(10,24,54,0.9)]",
+    "border border-[var(--border)] bg-[var(--chrome-surface)] text-[var(--text-primary)] hover:border-[var(--border-hover)] hover:bg-[var(--chrome-surface-hover)]",
   ghost:
-    "border border-[var(--border)] bg-transparent text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:bg-[rgba(141,240,255,0.04)] hover:text-[var(--text-primary)]",
+    "border border-[var(--border)] bg-transparent text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:bg-[var(--theme-ghost-hover)] hover:text-[var(--text-primary)]",
   danger:
     "border border-[rgba(255,88,116,0.2)] bg-[var(--critical-dim)] text-[var(--critical)] hover:border-[rgba(255,88,116,0.32)]",
 };

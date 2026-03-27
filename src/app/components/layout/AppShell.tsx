@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import type { CameraFeed, NavigationId } from "../../data/dashboard";
+import type { DashboardThemeId } from "../../lib/dashboardThemes";
 import { MobileDock } from "./MobileDock";
 import { Sidebar } from "./Sidebar";
 import { TopNavbar } from "./TopNavbar";
@@ -15,6 +16,8 @@ interface AppShellProps {
   onOpenModelSwitcher: () => void;
   alertCount: number;
   focusedCamera: CameraFeed;
+  selectedThemeId: DashboardThemeId;
+  onThemeChange: (themeId: DashboardThemeId) => void;
 }
 
 export function AppShell({
@@ -26,6 +29,8 @@ export function AppShell({
   onOpenModelSwitcher,
   alertCount,
   focusedCamera,
+  selectedThemeId,
+  onThemeChange,
 }: AppShellProps) {
   return (
     <div className="relative min-h-screen text-white">
@@ -42,6 +47,8 @@ export function AppShell({
         focusedCamera={focusedCamera}
         isSidebarExpanded={isSidebarExpanded}
         onOpenModelSwitcher={onOpenModelSwitcher}
+        selectedThemeId={selectedThemeId}
+        onThemeChange={onThemeChange}
       />
       <MobileDock activeItem={activeNav} onActiveChange={onActiveChange} />
 

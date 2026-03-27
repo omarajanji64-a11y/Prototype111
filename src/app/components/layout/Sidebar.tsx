@@ -47,10 +47,10 @@ export function Sidebar({
       transition={{ duration: 0.25, ease: "easeOut" }}
       className="command-sidebar-shell fixed inset-y-0 left-0 z-50 hidden overflow-hidden border-r border-[var(--border)] lg:flex"
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(141,240,255,0.16),transparent_36%)]" />
+      <div className="command-sidebar-aura pointer-events-none absolute inset-0" />
       <div className="flex h-full w-full flex-col px-3 py-3">
         <div className="flex h-[56px] items-center gap-3 px-2">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[1rem] border border-[var(--border-hover)] bg-[rgba(8,18,40,0.82)] text-[var(--accent-primary)] shadow-[0_0_24px_rgba(30,216,255,0.08)]">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[1rem] border border-[var(--border-hover)] bg-[var(--chrome-surface)] text-[var(--accent-primary)] shadow-[var(--theme-glow-shadow)]">
             <ShieldCheck className="h-4.5 w-4.5" />
           </div>
           {isExpanded ? (
@@ -82,8 +82,8 @@ export function Sidebar({
                   "relative flex h-11 w-full items-center rounded-[1rem] border border-transparent px-3 text-left transition-[background-color,border-color,color,box-shadow] duration-200",
                   isExpanded ? "justify-start gap-3" : "justify-center",
                   isActive
-                    ? "border-[rgba(141,240,255,0.16)] bg-[rgba(9,22,48,0.84)] text-[var(--text-primary)] shadow-[inset_0_0_0_1px_rgba(141,240,255,0.05),0_0_28px_rgba(30,216,255,0.06)]"
-                    : "text-[var(--text-secondary)] hover:border-[rgba(141,240,255,0.12)] hover:bg-[rgba(8,18,40,0.52)] hover:text-[var(--text-primary)]",
+                    ? "border-[var(--nav-active-border)] bg-[var(--nav-active-bg)] text-[var(--text-primary)] shadow-[var(--nav-active-shadow)]"
+                    : "text-[var(--text-secondary)] hover:border-[var(--nav-hover-border)] hover:bg-[var(--nav-hover-bg)] hover:text-[var(--text-primary)]",
                 )}
               >
                 {isActive ? (
@@ -112,7 +112,7 @@ export function Sidebar({
             whileHover={buttonHover}
             whileTap={buttonTap}
             onClick={onToggle}
-            className="flex h-11 w-full items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.84)] text-[var(--text-secondary)] transition-colors duration-200 hover:border-[var(--border-hover)] hover:bg-[rgba(10,24,54,0.9)] hover:text-[var(--text-primary)]"
+            className="flex h-11 w-full items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[var(--chrome-surface)] text-[var(--text-secondary)] transition-colors duration-200 hover:border-[var(--border-hover)] hover:bg-[var(--chrome-surface-hover)] hover:text-[var(--text-primary)]"
             aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
             title={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
           >

@@ -49,7 +49,7 @@ export function MobileDock({ activeItem, onActiveChange }: MobileDockProps) {
                 className={cn(
                   "relative flex min-w-[84px] flex-col items-center gap-1.5 rounded-[1rem] border border-transparent px-3 py-2 text-[11px] font-medium uppercase tracking-[0.08em] transition-colors duration-200",
                   isActive
-                    ? "border-[rgba(141,240,255,0.16)] bg-[rgba(9,22,48,0.84)] text-[var(--text-primary)]"
+                    ? "border-[var(--nav-active-border)] bg-[var(--nav-active-bg)] text-[var(--text-primary)]"
                     : "text-[var(--text-secondary)]",
                 )}
               >

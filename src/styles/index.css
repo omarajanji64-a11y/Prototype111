@@ -19,10 +19,15 @@ body {
   position: relative;
   background-color: var(--bg-base);
   background-image:
-    radial-gradient(circle at 18% 14%, rgba(30, 216, 255, 0.16), transparent 20%),
-    radial-gradient(circle at 80% 0%, rgba(90, 140, 255, 0.18), transparent 26%),
-    radial-gradient(circle at 50% 115%, rgba(255, 139, 61, 0.12), transparent 30%),
-    linear-gradient(180deg, #02040b 0%, #050b18 40%, #071124 100%);
+    radial-gradient(circle at 18% 14%, var(--theme-body-radial-a), transparent 20%),
+    radial-gradient(circle at 80% 0%, var(--theme-body-radial-b), transparent 26%),
+    radial-gradient(circle at 50% 115%, var(--theme-body-radial-c), transparent 30%),
+    linear-gradient(
+      180deg,
+      var(--theme-body-linear-start) 0%,
+      var(--theme-body-linear-mid) 40%,
+      var(--theme-body-linear-end) 100%
+    );
   color: var(--text-primary);
   font-family: 'Rajdhani', sans-serif;
   letter-spacing: 0.012em;
@@ -41,8 +46,8 @@ body::after {
 
 body::before {
   background:
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(var(--theme-body-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--theme-body-grid) 1px, transparent 1px);
   background-size: 44px 44px;
   mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.95), transparent 90%);
   opacity: 0.2;
@@ -51,8 +56,8 @@ body::before {
 
 body::after {
   background:
-    radial-gradient(circle at 15% 70%, rgba(30, 216, 255, 0.16), transparent 18%),
-    radial-gradient(circle at 82% 24%, rgba(84, 240, 197, 0.1), transparent 18%);
+    radial-gradient(circle at 15% 70%, var(--theme-body-aura-a), transparent 18%),
+    radial-gradient(circle at 82% 24%, var(--theme-body-aura-b), transparent 18%);
   filter: blur(60px);
   opacity: 0.62;
 }
@@ -117,11 +122,11 @@ h3,
   overflow: hidden;
   background-color: var(--bg-base);
   background-image:
-    radial-gradient(circle at 16% 18%, rgba(30, 216, 255, 0.13), transparent 22%),
-    radial-gradient(circle at 82% 12%, rgba(90, 140, 255, 0.14), transparent 24%),
-    radial-gradient(circle at 48% 85%, rgba(255, 139, 61, 0.1), transparent 26%),
-    linear-gradient(rgba(130, 220, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(130, 220, 255, 0.035) 1px, transparent 1px);
+    radial-gradient(circle at 16% 18%, var(--theme-app-radial-a), transparent 22%),
+    radial-gradient(circle at 82% 12%, var(--theme-app-radial-b), transparent 24%),
+    radial-gradient(circle at 48% 85%, var(--theme-app-radial-c), transparent 26%),
+    linear-gradient(var(--theme-app-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--theme-app-grid) 1px, transparent 1px);
   background-size: auto, auto, auto, 32px 32px, 32px 32px;
   background-position: 0 0, 100% 100%, 0 0, 0 0;
   animation: commandBgShift 22s ease-in-out infinite alternate;
@@ -137,14 +142,21 @@ h3,
 
 .command-app-bg::before {
   background:
-    radial-gradient(circle at center, rgba(141, 240, 255, 0.08), transparent 28%),
-    conic-gradient(from 210deg at 50% 50%, transparent, rgba(141, 240, 255, 0.08), transparent, rgba(84, 240, 197, 0.04), transparent);
+    radial-gradient(circle at center, var(--theme-app-halo-a), transparent 28%),
+    conic-gradient(
+      from 210deg at 50% 50%,
+      transparent,
+      var(--theme-app-halo-b),
+      transparent,
+      var(--theme-app-halo-c),
+      transparent
+    );
   filter: blur(20px);
   animation: commandHaloPulse 18s ease-in-out infinite;
 }
 
 .command-app-bg::after {
-  background: linear-gradient(120deg, transparent 12%, rgba(255, 255, 255, 0.06) 49%, transparent 82%);
+  background: linear-gradient(120deg, transparent 12%, var(--theme-app-sweep) 49%, transparent 82%);
   transform: translateX(-140%);
   animation: commandDataSweep 13s linear infinite;
   opacity: 0.35;
@@ -172,13 +184,13 @@ h3,
 .command-energy-beam-a {
   top: -12vw;
   left: -8vw;
-  background: radial-gradient(circle at center, rgba(30, 216, 255, 0.72), transparent 70%);
+  background: radial-gradient(circle at center, var(--theme-energy-beam-a), transparent 70%);
 }
 
 .command-energy-beam-b {
   right: -10vw;
   bottom: -18vw;
-  background: radial-gradient(circle at center, rgba(90, 140, 255, 0.62), transparent 70%);
+  background: radial-gradient(circle at center, var(--theme-energy-beam-b), transparent 70%);
   animation-duration: 24s;
   animation-direction: reverse;
 }
@@ -301,10 +313,9 @@ h3,
 
 .command-topbar-search {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
-    rgba(6, 14, 30, 0.84);
+    var(--theme-select-bg);
   box-shadow:
-    inset 0 0 0 1px rgba(141, 240, 255, 0.03),
+    inset 0 0 0 1px var(--theme-search-highlight),
     0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
@@ -316,10 +327,10 @@ h3,
   position: fixed;
   inset: 12px;
   border-radius: 30px;
-  border: 1px solid rgba(141, 240, 255, 0.09);
+  border: 1px solid var(--theme-frame-border);
   box-shadow:
-    inset 0 0 0 1px rgba(141, 240, 255, 0.04),
-    0 0 60px rgba(30, 216, 255, 0.05);
+    inset 0 0 0 1px var(--theme-frame-inset),
+    0 0 60px var(--theme-frame-glow);
   opacity: 0.6;
   pointer-events: none;
 }
@@ -333,7 +344,7 @@ h3,
   position: absolute;
   inset: -12px 0 auto;
   height: 220px;
-  background: radial-gradient(circle at top center, rgba(141, 240, 255, 0.08), transparent 70%);
+  background: radial-gradient(circle at top center, var(--theme-app-halo-a), transparent 70%);
   pointer-events: none;
 }
 
@@ -348,7 +359,7 @@ h3,
     var(--panel-gradient);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    inset 0 0 0 1px rgba(141, 240, 255, 0.03),
+    inset 0 0 0 1px var(--theme-search-highlight),
     var(--shadow-panel);
   backdrop-filter: blur(26px);
 }
@@ -363,8 +374,8 @@ h3,
 
 .command-panel-grid {
   background:
-    linear-gradient(rgba(141, 240, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(141, 240, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(var(--theme-panel-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--theme-panel-grid) 1px, transparent 1px);
   background-size: 22px 22px;
   opacity: 0.25;
   mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.6), transparent 88%);
@@ -379,8 +390,8 @@ h3,
 
 .command-panel-glow {
   background:
-    radial-gradient(circle at top right, rgba(141, 240, 255, 0.16), transparent 30%),
-    radial-gradient(circle at bottom left, rgba(90, 140, 255, 0.1), transparent 28%);
+    radial-gradient(circle at top right, var(--theme-panel-glow-a), transparent 30%),
+    radial-gradient(circle at bottom left, var(--theme-panel-glow-b), transparent 28%);
 }
 
 .command-panel-tone-cyan {
@@ -441,20 +452,48 @@ h3,
   align-items: center;
   gap: 0.45rem;
   border-radius: 999px;
-  border: 1px solid rgba(141, 240, 255, 0.18);
-  background: rgba(8, 18, 40, 0.68);
+  border: 1px solid var(--theme-live-chip-border);
+  background: var(--theme-live-chip-bg);
   color: var(--accent-glow);
   font-family: "Space Mono", monospace;
   font-size: 0.68rem;
   letter-spacing: 0.18em;
   padding: 0.45rem 0.72rem;
   text-transform: uppercase;
-  box-shadow: inset 0 0 16px rgba(141, 240, 255, 0.06);
+  box-shadow: var(--theme-live-chip-shadow);
 }
 
 .command-recommended-chip {
   border-color: rgba(84, 240, 197, 0.22);
   color: var(--accent-secondary);
+}
+
+.command-theme-select-shell {
+  filter: drop-shadow(var(--theme-chip-shadow));
+}
+
+.command-theme-select {
+  background: var(--theme-select-bg);
+  box-shadow:
+    inset 0 0 0 1px var(--theme-search-highlight),
+    0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.command-theme-select option {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.command-sidebar-aura {
+  background: radial-gradient(circle at top, var(--theme-sidebar-aura), transparent 36%);
+}
+
+.command-background-vignette {
+  background: radial-gradient(circle at center, transparent, var(--theme-vignette-mid) 62%, var(--theme-vignette-deep) 100%);
+}
+
+.command-background-wash {
+  background: linear-gradient(180deg, var(--theme-wash-start), var(--theme-wash-end));
 }
 
 .command-holo-title {

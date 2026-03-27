@@ -1,13 +1,18 @@
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { DashboardExperience } from "./components/dashboard/DashboardExperience";
 import { EntryExperience } from "./components/entry/EntryExperience";
 import { useAppBootstrap } from "./hooks/useAppBootstrap";
+import {
+  DEFAULT_DASHBOARD_THEME_ID,
+  isDashboardThemeId,
+} from "./lib/dashboardThemes";
 import { DEFAULT_OKAB_MODEL_ID, isOkabModelId } from "./lib/okabModels";
 
 const ENTRY_COMPLETE_KEY = "prototype111.entry.complete";
 const ENTRY_MODEL_KEY = "prototype111.entry.model";
+const DASHBOARD_THEME_KEY = "prototype111.dashboard.theme";
 
 function getStoredEntryState() {
   if (typeof window === "undefined") {
@@ -34,9 +39,23 @@ function getStoredModelId() {
   }
 }
 
+function getStoredDashboardThemeId() {
+  if (typeof window === "undefined") {
+    return DEFAULT_DASHBOARD_THEME_ID;
+  }
+
+  try {
+    const storedThemeId = window.localStorage.getItem(DASHBOARD_THEME_KEY);
+    return isDashboardThemeId(storedThemeId) ? storedThemeId : DEFAULT_DASHBOARD_THEME_ID;
+  } catch {
+    return DEFAULT_DASHBOARD_THEME_ID;
+  }
+}
+
 export default function App() {
   const [hasEntered, setHasEntered] = useState(getStoredEntryState);
   const [selectedModelId, setSelectedModelId] = useState(getStoredModelId);
+  const [selectedThemeId, setSelectedThemeId] = useState(getStoredDashboardThemeId);
   const bootstrap = useAppBootstrap();
 
   const persistSelectedModel = (modelId: string) => {
@@ -64,6 +83,36 @@ export default function App() {
     setHasEntered(true);
   };
 
+  const persistSelectedTheme = (themeId: string) => {
+    const nextThemeId = isDashboardThemeId(themeId) ? themeId : DEFAULT_DASHBOARD_THEME_ID;
+
+    try {
+      window.localStorage.setItem(DASHBOARD_THEME_KEY, nextThemeId);
+    } catch {
+      // Storage access can fail in private contexts; the selected theme still works in memory.
+    }
+
+    setSelectedThemeId(nextThemeId);
+    return nextThemeId;
+  };
+
+  useEffect(() => {
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    if (!hasEntered) {
+      document.body.removeAttribute("data-dashboard-theme");
+      return;
+    }
+
+    document.body.setAttribute("data-dashboard-theme", selectedThemeId);
+
+    return () => {
+      document.body.removeAttribute("data-dashboard-theme");
+    };
+  }, [hasEntered, selectedThemeId]);
+
   return (
     <AnimatePresence mode="wait" initial={false}>
       {hasEntered ? (
@@ -78,6 +127,8 @@ export default function App() {
             bootstrap={bootstrap}
             selectedModelId={selectedModelId}
             onSelectedModelChange={persistSelectedModel}
+            selectedThemeId={selectedThemeId}
+            onSelectedThemeChange={persistSelectedTheme}
           />
         </motion.div>
       ) : (

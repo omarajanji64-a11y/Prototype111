@@ -47,12 +47,16 @@ interface DashboardExperienceProps {
   bootstrap: AppBootstrapState;
   selectedModelId: string;
   onSelectedModelChange: (modelId: string) => void;
+  selectedThemeId: string;
+  onSelectedThemeChange: (themeId: string) => void;
 }
 
 export function DashboardExperience({
   bootstrap,
   selectedModelId,
   onSelectedModelChange,
+  selectedThemeId,
+  onSelectedThemeChange,
 }: DashboardExperienceProps) {
   const [linkedCameraStream, setLinkedCameraStream] = useState<MediaStream | null>(null);
   const [linkedCameraSnapshot, setLinkedCameraSnapshot] = useState<string | null>(null);
@@ -477,6 +481,8 @@ export function DashboardExperience({
             }
             alertCount={alerts.length}
             focusedCamera={focusedCamera}
+            selectedThemeId={selectedThemeId}
+            onThemeChange={onSelectedThemeChange}
           >
             <AnimatePresence mode="wait" initial={false}>
               {!bootstrap.isReady ? (
