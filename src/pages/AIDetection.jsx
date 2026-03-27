@@ -98,6 +98,22 @@ function clearCanvas(canvas) {
   context.clearRect(0, 0, canvas.width, canvas.height);
 }
 
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function normalizeScore(value) {
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
+
+  if (value >= 0 && value <= 1) {
+    return value;
+  }
+
+  return 1 / (1 + Math.exp(-value));
+}
+
 function drawRoundedRect(context, x, y, width, height, radius) {
   if (typeof context.roundRect === "function") {
     context.beginPath();
@@ -251,81 +267,135 @@ function buildInferenceInput(imageData, targetBuffer) {
   return targetBuffer;
 }
 
-function parseDetections(outputTensor, videoWidth, videoHeight) {
-  if (!outputTensor?.data || !outputTensor?.dims?.length) {
-    return [];
-  }
+function getTensorAccessor(outputTensor) {
+  const dims = outputTensor?.dims || [];
+  const data = outputTensor?.data;
 
-  const { data, dims } = outputTensor;
-  let featureCount = 0;
-  let candidateCount = 0;
-  let readValue = () => 0;
+  if (!data || dims.length === 0) {
+    return null;
+  }
 
   if (dims.length === 3) {
-    const secondDimension = dims[1];
-    const thirdDimension = dims[2];
+    const [, secondDimension, thirdDimension] = dims;
 
-    if (secondDimension <= 16 && thirdDimension > 16) {
-      featureCount = secondDimension;
-      candidateCount = thirdDimension;
-      readValue = (candidateIndex, featureIndex) => data[featureIndex * candidateCount + candidateIndex];
-    } else {
-      candidateCount = secondDimension;
-      featureCount = thirdDimension;
-      readValue = (candidateIndex, featureIndex) => data[candidateIndex * featureCount + featureIndex];
+    if (secondDimension <= 128 && thirdDimension > secondDimension) {
+      return {
+        featureCount: secondDimension,
+        candidateCount: thirdDimension,
+        getValue(candidateIndex, featureIndex) {
+          return data[featureIndex * thirdDimension + candidateIndex];
+        },
+      };
     }
-  } else if (dims.length === 2) {
-    candidateCount = dims[0];
-    featureCount = dims[1];
-    readValue = (candidateIndex, featureIndex) => data[candidateIndex * featureCount + featureIndex];
-  } else {
+
+    return {
+      featureCount: thirdDimension,
+      candidateCount: secondDimension,
+      getValue(candidateIndex, featureIndex) {
+        return data[candidateIndex * thirdDimension + featureIndex];
+      },
+    };
+  }
+
+  if (dims.length === 2) {
+    const [firstDimension, secondDimension] = dims;
+
+    if (firstDimension > secondDimension) {
+      return {
+        featureCount: secondDimension,
+        candidateCount: firstDimension,
+        getValue(candidateIndex, featureIndex) {
+          return data[candidateIndex * secondDimension + featureIndex];
+        },
+      };
+    }
+
+    return {
+      featureCount: firstDimension,
+      candidateCount: secondDimension,
+      getValue(candidateIndex, featureIndex) {
+        return data[featureIndex * secondDimension + candidateIndex];
+      },
+    };
+  }
+
+  return null;
+}
+
+function parseDetections(outputTensor, videoWidth, videoHeight) {
+  const accessor = getTensorAccessor(outputTensor);
+
+  if (!accessor) {
     return [];
   }
 
-  if (featureCount < 5 || !candidateCount) {
-    return [];
-  }
-
-  const scaleX = videoWidth / INPUT_SIZE;
-  const scaleY = videoHeight / INPUT_SIZE;
   const rawDetections = [];
 
-  for (let candidateIndex = 0; candidateIndex < candidateCount; candidateIndex += 1) {
-    const xCenter = readValue(candidateIndex, 0);
-    const yCenter = readValue(candidateIndex, 1);
-    const width = readValue(candidateIndex, 2);
-    const height = readValue(candidateIndex, 3);
+  for (let candidateIndex = 0; candidateIndex < accessor.candidateCount; candidateIndex += 1) {
+    const centerXRaw = accessor.getValue(candidateIndex, 0);
+    const centerYRaw = accessor.getValue(candidateIndex, 1);
+    const widthRaw = accessor.getValue(candidateIndex, 2);
+    const heightRaw = accessor.getValue(candidateIndex, 3);
 
-    const classScores =
-      featureCount === 5
-        ? [readValue(candidateIndex, 4), 0]
-        : [readValue(candidateIndex, 4), readValue(candidateIndex, 5)];
-
-    const smokeScore = classScores[1] ?? 0;
-    const fireScore = classScores[0] ?? 0;
-    const type = fireScore >= smokeScore ? "fire" : "smoke";
-    const confidence = Math.max(fireScore, smokeScore);
-
-    if (confidence <= DETECTION_THRESHOLD || width <= 1 || height <= 1) {
+    if (
+      !Number.isFinite(centerXRaw) ||
+      !Number.isFinite(centerYRaw) ||
+      !Number.isFinite(widthRaw) ||
+      !Number.isFinite(heightRaw)
+    ) {
       continue;
     }
 
-    const left = Math.max(0, (xCenter - width / 2) * scaleX);
-    const top = Math.max(0, (yCenter - height / 2) * scaleY);
-    const scaledWidth = Math.min(videoWidth - left, width * scaleX);
-    const scaledHeight = Math.min(videoHeight - top, height * scaleY);
+    let type = "fire";
+    let confidence = 0;
 
-    if (scaledWidth <= 1 || scaledHeight <= 1) {
+    if (accessor.featureCount === 7) {
+      const objectness = normalizeScore(accessor.getValue(candidateIndex, 4));
+      const fireScore = normalizeScore(accessor.getValue(candidateIndex, 5));
+      const smokeScore = normalizeScore(accessor.getValue(candidateIndex, 6));
+      type = smokeScore > fireScore ? "smoke" : "fire";
+      confidence = objectness * Math.max(fireScore, smokeScore);
+    } else if (accessor.featureCount >= 6) {
+      const fireScore = normalizeScore(accessor.getValue(candidateIndex, 4));
+      const smokeScore = normalizeScore(accessor.getValue(candidateIndex, 5));
+      type = smokeScore > fireScore ? "smoke" : "fire";
+      confidence = Math.max(fireScore, smokeScore);
+    } else if (accessor.featureCount === 5) {
+      type = "fire";
+      confidence = normalizeScore(accessor.getValue(candidateIndex, 4));
+    } else {
+      continue;
+    }
+
+    if (confidence < DETECTION_THRESHOLD) {
+      continue;
+    }
+
+    const scale =
+      Math.max(Math.abs(centerXRaw), Math.abs(centerYRaw), Math.abs(widthRaw), Math.abs(heightRaw)) <= 2
+        ? INPUT_SIZE
+        : 1;
+
+    const centerX = centerXRaw * scale;
+    const centerY = centerYRaw * scale;
+    const width = Math.abs(widthRaw * scale);
+    const height = Math.abs(heightRaw * scale);
+    const left = clamp(centerX - width / 2, 0, INPUT_SIZE);
+    const top = clamp(centerY - height / 2, 0, INPUT_SIZE);
+    const right = clamp(centerX + width / 2, 0, INPUT_SIZE);
+    const bottom = clamp(centerY + height / 2, 0, INPUT_SIZE);
+
+    if (right <= left || bottom <= top) {
       continue;
     }
 
     rawDetections.push({
       type,
       confidence,
-      left,
-      top,
-      width: scaledWidth,
-      height: scaledHeight,
+      left: (left / INPUT_SIZE) * videoWidth,
+      top: (top / INPUT_SIZE) * videoHeight,
+      width: ((right - left) / INPUT_SIZE) * videoWidth,
+      height: ((bottom - top) / INPUT_SIZE) * videoHeight,
     });
   }
 

@@ -26,7 +26,7 @@ export const OKAB_MODEL_OPTIONS: OkabModelOption[] = [
     label: "OKAB - Hybrid",
     description:
       "Combines smoke and fire detection with faster, more accurate alerts for complete hazard awareness.",
-    sessionPaths: ["/best.onnx", "/forest.onnx"],
+    sessionPaths: ["/best.onnx"],
     allowedTypes: ["smoke", "fire"],
     recommended: true,
   },
