@@ -1,166 +1,61 @@
-import { AnimatePresence, MotionConfig, motion } from "motion/react";
-import { lazy, Suspense, useState, startTransition } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
 
-import { pageVariants, transitionDefaults } from "./animations/variants";
-import { AlertPanel } from "./components/dashboard/AlertPanel";
-import { AnalyticsChart } from "./components/dashboard/AnalyticsChart";
-import { CameraGrid } from "./components/dashboard/CameraGrid";
-import { DashboardSkeleton } from "./components/dashboard/DashboardSkeleton";
-import { HomeQuickActions } from "./components/dashboard/HomeQuickActions";
-import { MapCard } from "./components/dashboard/MapCard";
-import { SystemStatus } from "./components/dashboard/SystemStatus";
-import { UavResponsePanel } from "./components/dashboard/UavResponsePanel";
-import { AppShell } from "./components/layout/AppShell";
-import { EmberBackground } from "./components/layout/EmberBackground";
-import {
-  cameraFeeds,
-  forestZones,
-  type NavigationId,
-} from "./data/dashboard";
-import { useDashboardBootstrap } from "./hooks/useDashboardBootstrap";
-const AIDetection = lazy(() => import("../pages/AIDetection.jsx"));
+import { DashboardExperience } from "./components/dashboard/DashboardExperience";
+import { EntryExperience } from "./components/entry/EntryExperience";
 
-const initialFocusedCamera =
-  cameraFeeds.find((camera) => camera.status === "safe")?.id ?? cameraFeeds[0]?.id ?? "";
+const ENTRY_COMPLETE_KEY = "prototype111.entry.complete";
+const ENTRY_MODEL_KEY = "prototype111.entry.model";
+
+function getStoredEntryState() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  try {
+    return window.sessionStorage.getItem(ENTRY_COMPLETE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
 
 export default function App() {
-  const [activeNav, setActiveNav] = useState<NavigationId>("overview");
-  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
-  const [focusedCameraId, setFocusedCameraId] = useState(initialFocusedCamera);
-  const [alerts, setAlerts] = useState([]);
-  const { isLoading } = useDashboardBootstrap(1100);
+  const [hasEntered, setHasEntered] = useState(getStoredEntryState);
 
-  const focusedCamera =
-    cameraFeeds.find((camera) => camera.id === focusedCameraId) ?? cameraFeeds[0];
-  const criticalCount = alerts.filter((alert) => alert.severity === "critical").length;
-  const warningCount = cameraFeeds.filter((camera) => camera.status === "warning").length;
-  const safeCount = cameraFeeds.filter((camera) => camera.status === "safe").length;
-
-  const focusCamera = (cameraId: string) => {
-    setFocusedCameraId(cameraId);
-    startTransition(() => {
-      setActiveNav("cameras");
-    });
-  };
-
-  const handleActiveNavChange = (nextNav: NavigationId) => {
-    startTransition(() => {
-      setActiveNav(nextNav);
-    });
-  };
-
-  const renderTaskView = () => {
-    if (activeNav === "overview") {
-      return (
-        <HomeQuickActions
-          alerts={alerts}
-          criticalCount={criticalCount}
-          warningTowerCount={warningCount}
-          safeTowerCount={safeCount}
-          onNavigate={handleActiveNavChange}
-          onFocusTower={focusCamera}
-          onDismissAlert={(alertId) =>
-            setAlerts((currentAlerts) => currentAlerts.filter((alert) => alert.id !== alertId))
-          }
-        />
-      );
+  const handleEntryComplete = (modelId: string) => {
+    try {
+      window.sessionStorage.setItem(ENTRY_COMPLETE_KEY, "true");
+      window.sessionStorage.setItem(ENTRY_MODEL_KEY, modelId);
+    } catch {
+      // Storage access can fail in private contexts; the intro still works without persistence.
     }
 
-    if (activeNav === "cameras") {
-      return (
-        <CameraGrid
-          cameras={cameraFeeds}
-          focusedCameraId={focusedCameraId}
-          alertCount={alerts.length}
-          onFocusCamera={focusCamera}
-        />
-      );
-    }
-
-    if (activeNav === "alerts") {
-      return (
-        <AlertPanel
-          alerts={alerts}
-          sticky={false}
-          onDismiss={(alertId) =>
-            setAlerts((currentAlerts) => currentAlerts.filter((alert) => alert.id !== alertId))
-          }
-          onFocusCamera={focusCamera}
-        />
-      );
-    }
-
-    if (activeNav === "analytics") {
-      return (
-        <div className="space-y-6 lg:space-y-8">
-          <SystemStatus />
-          <AnalyticsChart />
-        </div>
-      );
-    }
-
-    if (activeNav === "map") {
-      return <MapCard zones={forestZones} onFocusCamera={focusCamera} />;
-    }
-
-    if (activeNav === "aiDetection") {
-      return (
-        <Suspense fallback={<DashboardSkeleton />}>
-          <AIDetection />
-        </Suspense>
-      );
-    }
-
-    return (
-      <UavResponsePanel
-        alerts={alerts}
-        onFocusTower={focusCamera}
-        onOpenAlerts={() => handleActiveNavChange("alerts")}
-      />
-    );
+    setHasEntered(true);
   };
 
   return (
-    <MotionConfig reducedMotion="user" transition={transitionDefaults}>
-      <div className="relative min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)]">
-        <EmberBackground />
-
-        <div className="relative z-20">
-          <AppShell
-            activeNav={activeNav}
-            onActiveChange={handleActiveNavChange}
-            isSidebarExpanded={isSidebarExpanded}
-            onSidebarToggle={() => setIsSidebarExpanded((current) => !current)}
-            alertCount={alerts.length}
-            focusedCamera={focusedCamera}
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              {isLoading ? (
-                <motion.div
-                  key="dashboard-loading"
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <DashboardSkeleton />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key={`dashboard-${activeNav}`}
-                  variants={pageVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  className="space-y-6 lg:space-y-8"
-                >
-                  {renderTaskView()}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </AppShell>
-        </div>
-      </div>
-    </MotionConfig>
+    <AnimatePresence mode="wait" initial={false}>
+      {hasEntered ? (
+        <motion.div
+          key="dashboard"
+          initial={{ opacity: 0, filter: "blur(18px)" }}
+          animate={{ opacity: 1, filter: "blur(0px)" }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <DashboardExperience />
+        </motion.div>
+      ) : (
+        <motion.div
+          key="entry"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <EntryExperience onComplete={handleEntryComplete} />
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
