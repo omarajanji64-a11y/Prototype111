@@ -39,7 +39,7 @@ h3,
 }
 
 ::selection {
-  background: rgba(201, 162, 39, 0.22);
+  background: rgba(201, 162, 39, 0.24);
   color: var(--text-primary);
 }
 
@@ -66,7 +66,7 @@ h3,
   position: relative;
   overflow: hidden;
   border: 1px solid var(--border);
-  background: linear-gradient(90deg, rgba(42, 42, 42, 0.92) 0%, rgba(62, 62, 62, 1) 50%, rgba(42, 42, 42, 0.92) 100%);
+  background: linear-gradient(90deg, rgba(242, 242, 242, 0.92) 0%, rgba(250, 247, 239, 1) 50%, rgba(242, 242, 242, 0.92) 100%);
   background-size: 200% 100%;
   animation: shimmer 1.4s linear infinite;
 }
@@ -74,10 +74,10 @@ h3,
 .command-app-bg {
   background-color: var(--bg-base);
   background-image:
-    radial-gradient(circle at top left, rgba(230, 210, 143, 0.05), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(201, 162, 39, 0.05), transparent 24%),
-    linear-gradient(rgba(248, 248, 248, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(248, 248, 248, 0.03) 1px, transparent 1px);
+    radial-gradient(circle at top left, rgba(240, 220, 134, 0.12), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(201, 162, 39, 0.08), transparent 24%),
+    linear-gradient(rgba(18, 18, 18, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 18, 18, 0.03) 1px, transparent 1px);
   background-size: auto, auto, 28px 28px, 28px 28px;
   background-position: 0 0, 100% 100%, 0 0, 0 0;
 }
@@ -135,14 +135,14 @@ h3,
   justify-content: center;
   border: 1px dashed var(--border-hover);
   border-radius: 12px;
-  background: rgba(42, 42, 42, 0.52);
+  background: rgba(250, 247, 239, 0.72);
   color: var(--text-secondary);
 }
 
 .command-map-grid {
   background-image:
-    repeating-linear-gradient(0deg, rgba(201, 162, 39, 0.03) 0, rgba(201, 162, 39, 0.03) 1px, transparent 1px, transparent 32px),
-    repeating-linear-gradient(90deg, rgba(201, 162, 39, 0.03) 0, rgba(201, 162, 39, 0.03) 1px, transparent 1px, transparent 32px);
+    repeating-linear-gradient(0deg, rgba(201, 162, 39, 0.05) 0, rgba(201, 162, 39, 0.05) 1px, transparent 1px, transparent 32px),
+    repeating-linear-gradient(90deg, rgba(201, 162, 39, 0.05) 0, rgba(201, 162, 39, 0.05) 1px, transparent 1px, transparent 32px);
 }
 
 .command-live-dot {
@@ -169,7 +169,7 @@ h3,
 
 .command-dashed-placeholder {
   border: 1px dashed var(--border-hover);
-  background: rgba(42, 42, 42, 0.35);
+  background: rgba(250, 247, 239, 0.72);
 }
 
 .command-topbar-search::placeholder {

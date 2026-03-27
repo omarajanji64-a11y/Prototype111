@@ -11,7 +11,7 @@ interface ActionButtonProps extends HTMLMotionProps<"button"> {
 
 const variantClasses = {
   primary:
-    "border border-transparent bg-[var(--accent-primary)] text-white hover:brightness-110",
+    "border border-transparent bg-[var(--accent-primary)] text-[var(--text-primary)] hover:brightness-105",
   secondary:
     "border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-card-hover)]",
   ghost:

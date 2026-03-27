@@ -1035,7 +1035,7 @@ export default function AIDetection() {
                   onClick={() => handleSourceChange(tab.id)}
                   className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors duration-150 ${
                     activeSource === tab.id
-                      ? "border-transparent bg-[var(--accent-primary)] text-white"
+                      ? "border-transparent bg-[var(--accent-primary)] text-[var(--text-primary)]"
                       : "border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)]"
                   }`}
                 >
@@ -1060,7 +1060,7 @@ export default function AIDetection() {
                 <button
                   type="button"
                   onClick={loadIpCamera}
-                  className="rounded-lg bg-[var(--accent-primary)] px-4 py-2.5 text-sm font-medium text-white transition duration-150 hover:brightness-110"
+                  className="rounded-lg bg-[var(--accent-primary)] px-4 py-2.5 text-sm font-medium text-[var(--text-primary)] transition duration-150 hover:brightness-105"
                 >
                   Load Stream
                 </button>
@@ -1114,8 +1114,8 @@ export default function AIDetection() {
                 disabled={!isRunning && !canStartDetection}
                 className={`rounded-lg px-4 py-2.5 text-sm font-medium text-white transition duration-150 ${
                   isRunning
-                    ? "bg-[var(--critical)] hover:brightness-110"
-                    : "bg-[var(--accent-primary)] hover:brightness-110"
+                    ? "bg-[var(--critical)] text-[var(--text-primary)] hover:brightness-105"
+                    : "bg-[var(--accent-primary)] text-[var(--text-primary)] hover:brightness-105"
                 } disabled:cursor-not-allowed disabled:opacity-50`}
               >
                 {isRunning ? "Stop Detection" : "Start Detection"}
