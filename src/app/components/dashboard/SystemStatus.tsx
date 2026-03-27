@@ -7,10 +7,10 @@ import { performanceMetrics, systemCards } from "../../data/dashboard";
 import { GlassPanel } from "../shared/GlassPanel";
 
 const toneClassMap = {
-  cyan: "border-cyan-300/12 bg-cyan-300/10 text-cyan-100",
-  green: "border-emerald-300/12 bg-emerald-300/10 text-emerald-100",
-  orange: "border-orange-300/12 bg-orange-300/10 text-orange-100",
-  slate: "border-slate-300/12 bg-slate-300/10 text-slate-100",
+  cyan: "text-[var(--accent-primary)]",
+  green: "text-[var(--safe)]",
+  orange: "text-[var(--warning)]",
+  slate: "text-[var(--text-secondary)]",
 } as const;
 
 const iconMap: Record<string, LucideIcon> = {
@@ -26,9 +26,9 @@ export function SystemStatus() {
       variants={createStagger(0.08)}
       initial="hidden"
       animate="visible"
-      className="space-y-6"
+      className="space-y-3"
     >
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {systemCards.map((card) => {
           const Icon = iconMap[card.id];
 
@@ -37,19 +37,15 @@ export function SystemStatus() {
               key={card.id}
               variants={cardVariants}
               interactive
-              className="p-5"
+              className="min-h-[144px] p-5"
             >
-              <div className="relative flex items-start justify-between gap-4">
+              <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-slate-500">
-                    {card.label}
-                  </p>
-                  <p className="mt-4 text-3xl font-semibold tracking-[-0.06em] text-white">{card.value}</p>
-                  <p className="mt-2 text-sm text-slate-400">{card.detail}</p>
+                  <p className="command-section-label text-[var(--text-muted)]">{card.label}</p>
+                  <p className="mt-3 text-[28px] font-bold leading-none text-[var(--text-primary)]">{card.value}</p>
+                  <p className="mt-2 max-w-[22ch] text-xs leading-5 text-[var(--text-secondary)]">{card.detail}</p>
                 </div>
-                <div
-                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border ${toneClassMap[card.tone]}`}
-                >
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${toneClassMap[card.tone]}`}>
                   <Icon className="h-5 w-5" />
                 </div>
               </div>
@@ -58,29 +54,25 @@ export function SystemStatus() {
         })}
       </div>
 
-      <GlassPanel variants={cardVariants} className="p-6">
-        <div className="relative">
+      <GlassPanel variants={cardVariants} className="p-5">
+        <div className="space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.26em] text-slate-500">
-                Prototype metrics
-              </p>
-              <h3 className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-white">
-                Feasibility and sustainability indicators
-              </h3>
+              <p className="command-section-label">Prototype metrics</p>
+              <h3 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">Feasibility and sustainability indicators</h3>
             </div>
 
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/14 bg-emerald-300/10 px-4 py-2 text-sm text-emerald-100">
+            <div className="inline-flex items-center gap-2 rounded-md border border-[rgba(14,165,233,0.2)] bg-[rgba(14,165,233,0.1)] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--accent-glow)]">
               <motion.span
-                animate={{ scale: [1, 1.35, 1], opacity: [0.75, 1, 0.75] }}
-                transition={{ duration: 1.8, repeat: Number.POSITIVE_INFINITY }}
-                className="h-2.5 w-2.5 rounded-full bg-emerald-300 shadow-[0_0_18px_rgba(110,231,183,0.9)]"
+                animate={{ opacity: [1, 0.4, 1] }}
+                transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                className="h-2 w-2 rounded-full bg-[var(--accent-glow)]"
               />
               LoRa network online
             </div>
           </div>
 
-          <motion.div variants={createStagger(0.08)} className="mt-8 grid gap-4 lg:grid-cols-3">
+          <motion.div variants={createStagger(0.08)} className="grid gap-3 lg:grid-cols-3">
             {performanceMetrics.map((metric) => {
               const TrendIcon = metric.trend === "up" ? TrendingUp : TrendingDown;
 
@@ -88,32 +80,30 @@ export function SystemStatus() {
                 <motion.div
                   key={metric.label}
                   variants={listItemVariants}
-                  className="rounded-[24px] border border-white/8 bg-white/[0.045] p-5"
+                  className="rounded-xl border border-[var(--border)] border-l-2 border-l-[var(--accent-primary)] bg-[var(--bg-card)] p-5"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="text-sm text-slate-400">{metric.label}</p>
-                      <p className="mt-3 text-3xl font-semibold tracking-[-0.06em] text-white">
-                        {metric.value}
-                      </p>
+                      <p className="command-section-label text-[var(--text-muted)]">{metric.label}</p>
+                      <p className="mt-3 text-[28px] font-bold leading-none text-[var(--text-primary)]">{metric.value}</p>
                     </div>
                     <div
-                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${
+                      className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${
                         metric.trend === "up"
-                          ? "bg-emerald-300/10 text-emerald-100"
-                          : "bg-cyan-300/10 text-cyan-100"
+                          ? "bg-[var(--safe-dim)] text-[var(--safe)]"
+                          : "bg-[rgba(14,165,233,0.1)] text-[var(--accent-glow)]"
                       }`}
                     >
                       <TrendIcon className="h-3.5 w-3.5" />
                       {metric.change}
                     </div>
                   </div>
-                  <div className="mt-5 h-2 overflow-hidden rounded-full bg-white/[0.06]">
+                  <div className="mt-5 h-2 overflow-hidden rounded-full bg-[rgba(255,255,255,0.06)]">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${metric.progress}%` }}
-                      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-                      className="h-full rounded-full bg-[linear-gradient(90deg,rgba(34,211,238,0.96),rgba(249,115,22,0.88))]"
+                      transition={{ duration: 0.5, ease: "easeOut" }}
+                      className="h-full rounded-full bg-[var(--accent-primary)]"
                     />
                   </div>
                 </motion.div>
@@ -121,8 +111,8 @@ export function SystemStatus() {
             })}
           </motion.div>
 
-          <div className="mt-6 flex flex-wrap items-center gap-3 rounded-[24px] border border-white/8 bg-white/[0.04] px-5 py-4 text-sm text-slate-300">
-            <Activity className="h-4 w-4 text-cyan-200" />
+          <div className="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-3 text-sm text-[var(--text-secondary)]">
+            <Activity className="h-4 w-4 text-[var(--accent-primary)]" />
             Designed for school-level implementation with low-cost, scalable hardware.
           </div>
         </div>

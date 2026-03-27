@@ -32,8 +32,8 @@ const iconMap: Record<NavigationId, LucideIcon> = {
 export function MobileDock({ activeItem, onActiveChange }: MobileDockProps) {
   return (
     <div className="fixed inset-x-4 bottom-4 z-50 lg:hidden">
-      <div className="overflow-x-auto rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(11,17,30,0.92),rgba(5,8,16,0.94))] p-2 shadow-[0_24px_90px_rgba(2,6,23,0.5)] backdrop-blur-2xl">
-        <div className="flex min-w-max items-center gap-1">
+      <div className="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-2">
+        <div className="flex min-w-max items-center gap-1.5">
           {navigationItems.map((item) => {
             const Icon = iconMap[item.id];
             const isActive = item.id === activeItem;
@@ -45,25 +45,19 @@ export function MobileDock({ activeItem, onActiveChange }: MobileDockProps) {
                 whileTap={buttonTap}
                 onClick={() => onActiveChange(item.id)}
                 className={cn(
-                  "relative flex min-w-[88px] flex-col items-center gap-2 rounded-[22px] px-4 py-3 text-[0.7rem] font-medium tracking-[0.02em] transition-colors duration-300",
-                  isActive ? "text-white" : "text-slate-400",
+                  "relative flex min-w-[80px] flex-col items-center gap-1.5 rounded-lg border border-transparent px-3 py-2 text-[11px] font-medium transition-colors duration-200",
+                  isActive ? "bg-[var(--bg-card)] text-[var(--text-primary)]" : "text-[var(--text-secondary)]",
                 )}
               >
                 {isActive ? (
                   <motion.div
                     layoutId="mobile-active-indicator"
-                    className="absolute inset-0 rounded-[22px] border border-cyan-200/12 bg-cyan-400/10"
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="absolute inset-y-1 left-0 w-0.5 rounded-full bg-[var(--accent-primary)]"
+                    transition={{ duration: 0.2, ease: "easeOut" }}
                   />
                 ) : null}
-                <motion.div
-                  whileHover={{ rotate: 6, scale: 1.08 }}
-                  transition={{ duration: 0.2 }}
-                  className="relative"
-                >
-                  <Icon className="h-5 w-5" />
-                </motion.div>
-                <span className="relative">{item.shortLabel}</span>
+                <Icon className={cn("relative h-[18px] w-[18px]", isActive && "text-[var(--accent-primary)]")} />
+                <span className="relative">{item.label}</span>
               </motion.button>
             );
           })}

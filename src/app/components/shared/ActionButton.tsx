@@ -6,16 +6,18 @@ import { cn } from "../ui/utils";
 
 interface ActionButtonProps extends HTMLMotionProps<"button"> {
   icon?: LucideIcon;
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "secondary" | "ghost" | "danger";
 }
 
 const variantClasses = {
   primary:
-    "border border-orange-300/20 bg-[linear-gradient(135deg,rgba(249,115,22,0.26),rgba(251,146,60,0.12))] text-orange-50 shadow-[0_16px_40px_rgba(249,115,22,0.18)] hover:border-orange-200/30",
+    "border border-transparent bg-[var(--accent-primary)] text-white hover:brightness-110",
   secondary:
-    "border border-cyan-300/16 bg-[linear-gradient(135deg,rgba(34,211,238,0.18),rgba(14,165,233,0.08))] text-cyan-50 hover:border-cyan-200/26",
+    "border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-card-hover)]",
   ghost:
-    "border border-white/10 bg-white/[0.04] text-slate-100 hover:border-white/16 hover:bg-white/[0.07]",
+    "border border-[var(--border)] bg-transparent text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:bg-[rgba(255,255,255,0.02)] hover:text-[var(--text-primary)]",
+  danger:
+    "border border-[rgba(239,68,68,0.2)] bg-[var(--critical-dim)] text-[var(--critical)] hover:border-[rgba(239,68,68,0.32)]",
 };
 
 export function ActionButton({
@@ -30,13 +32,13 @@ export function ActionButton({
       whileHover={buttonHover}
       whileTap={buttonTap}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold tracking-[-0.02em] transition-colors duration-300",
+        "inline-flex h-10 items-center justify-center gap-2 rounded-lg px-4 py-2 text-[13px] font-medium transition-[background-color,border-color,filter,color] duration-150",
         variantClasses[variant],
         className,
       )}
       {...props}
     >
-      {Icon ? <Icon className="h-4 w-4" /> : null}
+      {Icon ? <Icon className="h-4 w-4 shrink-0" /> : null}
       <span>{children}</span>
     </motion.button>
   );

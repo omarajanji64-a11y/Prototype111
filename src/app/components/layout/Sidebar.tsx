@@ -13,7 +13,7 @@ import {
 import { motion } from "motion/react";
 
 import { navigationItems, type NavigationId } from "../../data/dashboard";
-import { buttonHover, buttonTap, sidebarLabelVariants } from "../../animations/variants";
+import { buttonHover, buttonTap } from "../../animations/variants";
 import { cn } from "../ui/utils";
 
 interface SidebarProps {
@@ -41,41 +41,26 @@ export function Sidebar({
 }: SidebarProps) {
   return (
     <motion.aside
-      animate={{ width: isExpanded ? 296 : 104 }}
-      transition={{ duration: 0.46, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed inset-y-4 left-4 z-50 hidden overflow-hidden rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(10,15,28,0.94),rgba(5,9,18,0.92))] shadow-[0_24px_100px_rgba(2,6,23,0.52)] backdrop-blur-2xl lg:flex"
+      animate={{ width: isExpanded ? 240 : 64 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className="fixed inset-y-0 left-0 z-50 hidden overflow-hidden border-r border-[var(--border)] bg-[var(--bg-surface)] lg:flex"
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_42%),radial-gradient(circle_at_bottom,rgba(249,115,22,0.12),transparent_36%)]" />
-      <div className="relative flex h-full w-full flex-col p-4">
-        <div className="flex items-center justify-between gap-3 rounded-[24px] border border-white/8 bg-white/[0.035] px-3 py-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,rgba(249,115,22,0.9),rgba(251,191,36,0.82))] shadow-[0_16px_40px_rgba(249,115,22,0.24)]">
-              <ShieldCheck className="h-6 w-6 text-white" />
-            </div>
-            <motion.div
-              animate={isExpanded ? "expanded" : "collapsed"}
-              variants={sidebarLabelVariants}
-              className={cn("overflow-hidden", !isExpanded && "pointer-events-none")}
-            >
-              <p className="text-sm font-semibold tracking-[-0.03em] text-white">OKAB Core</p>
-              <p className="text-xs text-slate-400">Forest early detection prototype</p>
-            </motion.div>
+      <div className="flex h-full w-full flex-col px-3 py-3">
+        <div className="flex h-[56px] items-center gap-3 px-2">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-card)] text-[var(--accent-primary)]">
+            <ShieldCheck className="h-4.5 w-4.5" />
           </div>
-
-          <motion.button
-            whileHover={buttonHover}
-            whileTap={buttonTap}
-            onClick={onToggle}
-            className="hidden h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-slate-200 lg:inline-flex"
-            aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
-          >
-            <motion.div animate={{ rotate: isExpanded ? 0 : 180 }} transition={{ duration: 0.28 }}>
-              <ChevronLeft className="h-4 w-4" />
-            </motion.div>
-          </motion.button>
+          {isExpanded ? (
+            <div className="min-w-0">
+              <p className="truncate text-base font-semibold leading-none">
+                <span className="text-[var(--accent-primary)]">OKAB</span>{" "}
+                <span className="text-[var(--text-secondary)]">Core</span>
+              </p>
+            </div>
+          ) : null}
         </div>
 
-        <nav className="mt-6 flex-1 space-y-2">
+        <nav className="mt-4 flex-1 space-y-2">
           {navigationItems.map((item) => {
             const Icon = iconMap[item.id];
             const isActive = item.id === activeItem;
@@ -86,61 +71,49 @@ export function Sidebar({
                 whileHover={buttonHover}
                 whileTap={buttonTap}
                 onClick={() => onActiveChange(item.id)}
+                title={!isExpanded ? item.label : undefined}
                 className={cn(
-                  "relative flex w-full items-center gap-3 overflow-hidden rounded-[22px] px-3 py-3 text-left transition-colors duration-300",
-                  isActive ? "text-white" : "text-slate-400 hover:text-white",
+                  "relative flex h-10 w-full items-center rounded-lg border border-transparent px-3 text-left transition-[background-color,border-color,color] duration-200",
+                  isExpanded ? "justify-start gap-3" : "justify-center",
+                  isActive
+                    ? "bg-[var(--bg-card)] text-[var(--text-primary)]"
+                    : "text-[var(--text-secondary)] hover:bg-[rgba(28,36,51,0.5)] hover:text-[var(--text-primary)]",
                 )}
               >
                 {isActive ? (
-                  <motion.div
+                  <motion.span
                     layoutId="sidebar-active-indicator"
-                    className="absolute inset-0 rounded-[22px] border border-cyan-300/14 bg-[linear-gradient(135deg,rgba(14,165,233,0.2),rgba(249,115,22,0.12))]"
-                    transition={{ type: "spring", stiffness: 320, damping: 30 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className="absolute inset-y-1 left-0 w-0.5 rounded-full bg-[var(--accent-primary)]"
                   />
                 ) : null}
-
-                <div
+                <Icon
                   className={cn(
-                    "relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border transition-colors duration-300",
-                    isActive
-                      ? "border-cyan-200/18 bg-cyan-300/10 text-cyan-100"
-                      : "border-white/8 bg-white/[0.03] text-slate-400 group-hover:text-white",
+                    "relative h-[18px] w-[18px] shrink-0",
+                    isActive ? "text-[var(--accent-primary)]" : "text-[var(--text-secondary)]",
                   )}
-                >
-                  <motion.div whileHover={{ rotate: 8, scale: 1.08 }} transition={{ duration: 0.2 }}>
-                    <Icon className="h-5 w-5" />
-                  </motion.div>
-                </div>
-
-                <motion.div
-                  animate={isExpanded ? "expanded" : "collapsed"}
-                  variants={sidebarLabelVariants}
-                  className={cn("relative min-w-0", !isExpanded && "pointer-events-none")}
-                >
-                  <p className="truncate text-sm font-medium tracking-[-0.02em]">{item.label}</p>
-                  <p className="truncate text-xs text-slate-500">{item.shortLabel}</p>
-                </motion.div>
+                />
+                {isExpanded ? (
+                  <span className="relative truncate text-[13px] font-medium">{item.label}</span>
+                ) : null}
               </motion.button>
             );
           })}
         </nav>
 
-        <div className="rounded-[24px] border border-white/8 bg-white/[0.04] p-4">
-          <div className="flex items-start gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/12 text-cyan-100">
-              <Sparkles className="h-5 w-5" />
-            </div>
-            <motion.div
-              animate={isExpanded ? "expanded" : "collapsed"}
-              variants={sidebarLabelVariants}
-              className={cn("space-y-1", !isExpanded && "pointer-events-none")}
-            >
-              <p className="text-sm font-medium text-white">Student-Built System</p>
-              <p className="text-xs text-slate-400">
-                3 mini towers + LoRa + Raspberry Pi + UAV simulation.
-              </p>
+        <div className="mt-auto pt-3">
+          <motion.button
+            whileHover={buttonHover}
+            whileTap={buttonTap}
+            onClick={onToggle}
+            className="flex h-10 w-full items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] transition-colors duration-200 hover:border-[var(--border-hover)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)]"
+            aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
+            title={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
+          >
+            <motion.div animate={{ rotate: isExpanded ? 0 : 180 }} transition={{ duration: 0.2, ease: "easeOut" }}>
+              <ChevronLeft className="h-4 w-4" />
             </motion.div>
-          </div>
+          </motion.button>
         </div>
       </div>
     </motion.aside>

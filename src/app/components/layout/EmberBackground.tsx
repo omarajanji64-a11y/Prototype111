@@ -7,15 +7,13 @@ const EMBER_SCENE_URL = "https://prod.spline.design/3Isx5AaM5wrJ1V27/scene.splin
 export function EmberBackground() {
   return (
     <div className="fixed inset-0 z-0 overflow-hidden">
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 opacity-[0.14] saturate-0">
         <Suspense fallback={null}>
           <Spline scene={EMBER_SCENE_URL} />
         </Suspense>
       </div>
-
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(5,8,22,0.2)_0%,rgba(5,8,22,0.58)_44%,rgba(5,8,22,0.92)_100%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,18,0.62),rgba(4,8,18,0.84))]" />
+      <div className="command-app-bg pointer-events-none absolute inset-0" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(10,13,20,0.68),rgba(10,13,20,0.9))]" />
     </div>
   );
 }
-

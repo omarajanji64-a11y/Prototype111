@@ -75,8 +75,8 @@ function getSeverity(confidence) {
 
 function getSeverityClasses(confidence) {
   return confidence > ALERT_THRESHOLD
-    ? "border-red-500/25 bg-red-500/10 text-red-200"
-    : "border-[#d97706]/25 bg-[#d97706]/10 text-amber-200";
+    ? "border-[rgba(239,68,68,0.2)] bg-[var(--critical-dim)] text-[var(--critical)]"
+    : "border-[rgba(251,191,36,0.2)] bg-[var(--warning-dim)] text-[var(--warning)]";
 }
 
 function clearCanvas(canvas) {
@@ -153,7 +153,7 @@ function drawDetectionShapes(context, detections, scaleX, scaleY) {
   context.textBaseline = "top";
 
   detections.forEach((detection) => {
-    const color = detection.type === "fire" ? "#ef4444" : "#9ca3af";
+    const color = detection.type === "fire" ? "#ef4444" : "#22d3ee";
     const label = `${getDetectionLabel(detection.type)} ${formatConfidence(detection.confidence)}`;
     const x = detection.left * scaleX;
     const y = detection.top * scaleY;
@@ -169,7 +169,7 @@ function drawDetectionShapes(context, detections, scaleX, scaleY) {
     const pillX = x;
     const pillY = Math.max(6, y - pillHeight - 6);
 
-    context.fillStyle = "rgba(13, 17, 23, 0.92)";
+    context.fillStyle = "rgba(17, 24, 39, 0.92)";
     drawRoundedRect(context, pillX, pillY, pillWidth, pillHeight, 999);
     context.fill();
 
@@ -560,9 +560,9 @@ function useDetectionEngine(videoRef, canvasRef, isRunning, modelPath) {
 
 function StatCard({ label, value }) {
   return (
-    <div className="rounded-2xl border border-white/5 bg-[#0d1117] p-4">
-      <p className="text-[0.68rem] font-medium uppercase tracking-[0.28em] text-gray-400">{label}</p>
-      <p className="mt-2 text-xl font-semibold tracking-[-0.04em] text-white sm:text-2xl">{value}</p>
+    <div className="rounded-xl border border-[var(--border)] border-l-2 border-l-[var(--accent-primary)] bg-[var(--bg-card)] p-4">
+      <p className="command-section-label text-[var(--text-muted)]">{label}</p>
+      <p className="mt-2 text-[28px] font-bold leading-none text-[var(--text-primary)]">{value}</p>
     </div>
   );
 }
@@ -943,23 +943,23 @@ export default function AIDetection() {
             animate={{ opacity: [0, 0.95, 0.45, 0] }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="pointer-events-none fixed inset-3 z-[70] rounded-[30px] border border-red-500/80 shadow-[0_0_0_3px_rgba(239,68,68,0.12)]"
+            className="pointer-events-none fixed inset-3 z-[70] rounded-xl border border-[var(--critical)]"
           />
         ) : null}
       </AnimatePresence>
 
-      <div className="space-y-5 pb-6">
+      <div className="space-y-3 pb-6">
         <motion.section
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.28, ease: "easeOut" }}
-          className="rounded-2xl border border-white/5 bg-[#161b22] p-4 sm:p-6"
+          transition={{ duration: 0.25, ease: "easeOut" }}
+          className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-5"
         >
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="space-y-3">
-              <p className="text-[0.68rem] font-medium uppercase tracking-[0.28em] text-gray-400">AI DETECTION</p>
+              <p className="command-section-label">AI Detection</p>
               <div className="flex flex-wrap items-center gap-3">
-                <div className="relative flex h-3 w-3 items-center justify-center">
+                <div className="relative flex h-2 w-2 items-center justify-center">
                   <motion.span
                     animate={
                       isRunning
@@ -971,31 +971,31 @@ export default function AIDetection() {
                       repeat: isRunning ? Number.POSITIVE_INFINITY : 0,
                       ease: "easeInOut",
                     }}
-                    className="absolute h-3 w-3 rounded-full bg-red-500"
+                    className="absolute h-2 w-2 rounded-full bg-[var(--critical)]"
                   />
-                  <span className="relative h-3 w-3 rounded-full bg-red-500" />
+                  <span className="relative h-2 w-2 rounded-full bg-[var(--critical)]" />
                 </div>
 
-                <h1 className="text-2xl font-semibold tracking-[-0.04em] text-white sm:text-3xl">AI Detection</h1>
+                <h1 className="text-2xl font-semibold text-[var(--text-primary)]">AI Detection</h1>
 
-                <span className="rounded-full border border-white/10 bg-[#0d1117] px-3 py-1 text-xs font-medium text-gray-300">
+                <span className="rounded-md bg-[rgba(14,165,233,0.1)] px-2 py-0.5 text-xs font-medium text-[var(--accent-glow)]">
                   {currentModel}
                 </span>
               </div>
 
-              <p className="max-w-2xl text-sm text-gray-400">
+              <p className="max-w-2xl text-sm text-[var(--text-secondary)]">
                 Run live fire and smoke inference with model switching, annotated snapshots in the log, and alerting
                 tuned for rapid incident review.
               </p>
             </div>
 
             <div className="space-y-2">
-              <p className="text-[0.68rem] font-medium uppercase tracking-[0.28em] text-gray-400">MODEL SELECTOR</p>
+              <p className="command-section-label">Model Selector</p>
               <div className="relative">
                 <select
                   value={modelPath}
                   onChange={(event) => setModelPath(event.target.value)}
-                  className="appearance-none rounded-full border border-white/10 bg-[#0d1117] py-3 pl-4 pr-20 text-sm font-medium text-white outline-none transition focus:border-[#c2410c]/70"
+                  className="appearance-none rounded-lg border border-[var(--border)] bg-[var(--bg-card)] py-2.5 pl-4 pr-16 text-sm font-medium text-[var(--text-primary)] outline-none transition-colors duration-150 focus:border-[var(--border-hover)]"
                 >
                   {MODEL_OPTIONS.map((option) => (
                     <option key={option.path} value={option.path}>
@@ -1008,24 +1008,24 @@ export default function AIDetection() {
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 0.9, ease: "linear", repeat: Number.POSITIVE_INFINITY }}
-                    className="pointer-events-none absolute right-10 top-1/2 -translate-y-1/2 text-[#c2410c]"
+                    className="pointer-events-none absolute right-10 top-1/2 -translate-y-1/2 text-[var(--accent-primary)]"
                   >
                     <LoaderCircle className="h-4.5 w-4.5" />
                   </motion.div>
                 ) : null}
 
-                <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-secondary)]" />
               </div>
             </div>
           </div>
         </motion.section>
 
-        <div className="grid gap-5 xl:grid-cols-[minmax(0,3fr)_minmax(320px,2fr)]">
+        <div className="grid gap-3 xl:grid-cols-[minmax(0,3fr)_minmax(320px,2fr)]">
           <motion.section
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.04, ease: "easeOut" }}
-            className="rounded-2xl border border-white/5 bg-[#161b22] p-4 sm:p-6"
+            transition={{ duration: 0.25, delay: 0.04, ease: "easeOut" }}
+            className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-5"
           >
             <div className="flex flex-wrap items-center gap-2">
               {SOURCE_TABS.map((tab) => (
@@ -1033,10 +1033,10 @@ export default function AIDetection() {
                   key={tab.id}
                   type="button"
                   onClick={() => handleSourceChange(tab.id)}
-                  className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                  className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors duration-150 ${
                     activeSource === tab.id
-                      ? "bg-[#c2410c] text-white"
-                      : "bg-[#0d1117] text-gray-400 hover:text-white"
+                      ? "border-transparent bg-[var(--accent-primary)] text-white"
+                      : "border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)]"
                   }`}
                 >
                   {tab.label}
@@ -1047,27 +1047,27 @@ export default function AIDetection() {
             {activeSource === "ip" ? (
               <div className="mt-4 flex flex-col gap-3 sm:flex-row">
                 <div className="relative flex-1">
-                  <Link2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+                  <Link2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-secondary)]" />
                   <input
                     type="text"
                     value={ipCameraUrl}
                     onChange={(event) => setIpCameraUrl(event.target.value)}
                     placeholder="Enter IP camera stream URL"
-                    className="w-full rounded-2xl border border-white/5 bg-[#0d1117] py-3 pl-10 pr-4 text-sm text-white outline-none transition placeholder:text-gray-500 focus:border-[#c2410c]/70"
+                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-card)] py-2.5 pl-10 pr-4 text-sm text-[var(--text-primary)] outline-none transition-colors duration-150 placeholder:text-[var(--text-secondary)] focus:border-[var(--border-hover)]"
                   />
                 </div>
 
                 <button
                   type="button"
                   onClick={loadIpCamera}
-                  className="rounded-2xl bg-[#c2410c] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#9a3412]"
+                  className="rounded-lg bg-[var(--accent-primary)] px-4 py-2.5 text-sm font-medium text-white transition duration-150 hover:brightness-110"
                 >
                   Load Stream
                 </button>
               </div>
             ) : null}
 
-            <div className="relative mt-4 overflow-hidden rounded-2xl border border-white/5 bg-black">
+            <div className="relative mt-4 overflow-hidden rounded-xl border border-[var(--border)] bg-black">
               <div className="relative aspect-video min-h-[240px] w-full">
                 <video
                   ref={videoRef}
@@ -1081,7 +1081,7 @@ export default function AIDetection() {
                 <button
                   type="button"
                   onClick={() => setIsMuted((currentMuted) => !currentMuted)}
-                  className="absolute right-4 top-4 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/60 text-white backdrop-blur transition hover:bg-black/75"
+                  className="absolute right-4 top-4 z-20 inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--border)] bg-[rgba(17,24,39,0.82)] text-[var(--text-primary)] backdrop-blur transition-colors duration-150 hover:border-[var(--border-hover)] hover:bg-[rgba(28,36,51,0.92)]"
                   aria-label={isMuted ? "Unmute alert sound" : "Mute alert sound"}
                 >
                   {isMuted ? <VolumeX className="h-4.5 w-4.5" /> : <Volume2 className="h-4.5 w-4.5" />}
@@ -1089,11 +1089,11 @@ export default function AIDetection() {
 
                 {videoMessage ? (
                   <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/70 px-6 text-center backdrop-blur-sm">
-                    <div className="max-w-md space-y-3 rounded-2xl border border-white/10 bg-[#161b22]/92 p-6">
+                    <div className="max-w-md space-y-3 rounded-xl border border-[var(--border)] bg-[rgba(28,36,51,0.92)] p-6">
                       <div className="mx-auto flex justify-center">{videoMessage.icon}</div>
                       <div>
-                        <p className="text-sm font-semibold text-white">{videoMessage.title}</p>
-                        <p className="mt-2 text-sm text-gray-400">{videoMessage.description}</p>
+                        <p className="text-sm font-semibold text-[var(--text-primary)]">{videoMessage.title}</p>
+                        <p className="mt-2 text-sm text-[var(--text-secondary)]">{videoMessage.description}</p>
                       </div>
                     </div>
                   </div>
@@ -1102,20 +1102,20 @@ export default function AIDetection() {
             </div>
 
             <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/5 bg-[#0d1117] px-4 py-2 text-sm text-gray-400">
-                <Video className="h-4 w-4 text-[#c2410c]" />
+              <div className="inline-flex items-center gap-2 rounded-md border border-[var(--border)] bg-[var(--bg-surface)] px-3 py-2 text-sm text-[var(--text-secondary)]">
+                <Video className="h-4 w-4 text-[var(--accent-primary)]" />
                 Inference cadence:
-                <span className="text-white">every 200ms</span>
+                <span className="text-[var(--text-primary)]">every 200ms</span>
               </div>
 
               <button
                 type="button"
                 onClick={() => setIsRunning((currentState) => !currentState)}
                 disabled={!isRunning && !canStartDetection}
-                className={`rounded-2xl px-4 py-2.5 text-sm font-semibold transition ${
+                className={`rounded-lg px-4 py-2.5 text-sm font-medium text-white transition duration-150 ${
                   isRunning
-                    ? "bg-[#c2410c] text-white hover:bg-[#9a3412]"
-                    : "border border-white/10 bg-[#0d1117] text-gray-200 hover:bg-white/[0.03]"
+                    ? "bg-[var(--critical)] hover:brightness-110"
+                    : "bg-[var(--accent-primary)] hover:brightness-110"
                 } disabled:cursor-not-allowed disabled:opacity-50`}
               >
                 {isRunning ? "Stop Detection" : "Start Detection"}
@@ -1126,14 +1126,14 @@ export default function AIDetection() {
           <motion.section
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.08, ease: "easeOut" }}
-            className="rounded-2xl border border-white/5 bg-[#161b22] p-4 sm:p-6"
+            transition={{ duration: 0.25, delay: 0.08, ease: "easeOut" }}
+            className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-5"
           >
-            <p className="text-[0.68rem] font-medium uppercase tracking-[0.28em] text-gray-400">DETECTION LOG</p>
+            <p className="command-section-label">Detection Log</p>
 
             <div className="mt-4 max-h-[50vh] space-y-3 overflow-y-auto pr-1 xl:max-h-[520px]">
               {detections.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-white/10 bg-[#0d1117] p-6 text-sm text-gray-400">
+                <div className="command-empty-state min-h-[180px] rounded-xl p-6 text-sm">
                   No detections yet. Start a source to begin.
                 </div>
               ) : (
@@ -1143,10 +1143,10 @@ export default function AIDetection() {
                     initial={{ opacity: 0, y: 12, scale: 0.985 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{ duration: 0.2, ease: "easeOut" }}
-                    className="overflow-hidden rounded-2xl border border-white/5 bg-[#0d1117]"
+                    className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-card)]"
                   >
                     {detection.snapshot ? (
-                      <div className="border-b border-white/5 bg-black">
+                      <div className="border-b border-[var(--border)] bg-black">
                         <img
                           src={detection.snapshot}
                           alt={`${detection.label} snapshot`}
@@ -1154,7 +1154,7 @@ export default function AIDetection() {
                         />
                       </div>
                     ) : (
-                      <div className="flex h-32 items-center justify-center border-b border-dashed border-white/8 bg-black/40 px-4 text-center text-xs text-gray-500">
+                      <div className="flex h-32 items-center justify-center border-b border-dashed border-[var(--border)] bg-black/40 px-4 text-center text-xs text-[var(--text-secondary)]">
                         Snapshot unavailable for this source.
                       </div>
                     )}
@@ -1164,16 +1164,16 @@ export default function AIDetection() {
                         <div className="space-y-1.5">
                           <div className="flex items-center gap-2">
                             <span className="text-base">{getDetectionEmoji(detection.type)}</span>
-                            <p className="text-sm font-semibold text-white">
+                            <p className="text-sm font-semibold text-[var(--text-primary)]">
                               {detection.type === "fire" ? "Fire" : "Smoke"} {formatConfidence(detection.confidence)}
                             </p>
                           </div>
 
-                          <p className="text-xs text-gray-400">{formatElapsed(detection.timestamp, now)}</p>
+                          <p className="text-xs text-[var(--text-secondary)]">{formatElapsed(detection.timestamp, now)}</p>
                         </div>
 
                         <div
-                          className={`rounded-full border px-2.5 py-1 text-[0.68rem] font-medium uppercase tracking-[0.22em] ${getSeverityClasses(
+                          className={`rounded-md border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.22em] ${getSeverityClasses(
                             detection.confidence,
                           )}`}
                         >
@@ -1182,13 +1182,13 @@ export default function AIDetection() {
                       </div>
 
                       <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-                        <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-gray-300">
+                        <span className="rounded-md border border-[var(--border)] bg-[var(--bg-surface)] px-2.5 py-1 text-[var(--text-secondary)]">
                           {getSourceBadge(detection.source)}
                         </span>
-                        <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-gray-300">
+                        <span className="rounded-md border border-[var(--border)] bg-[var(--bg-surface)] px-2.5 py-1 text-[var(--text-secondary)]">
                           {getDetectionLabel(detection.type)}
                         </span>
-                        <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-gray-300">
+                        <span className="rounded-md border border-[var(--border)] bg-[var(--bg-surface)] px-2.5 py-1 text-[var(--text-secondary)]">
                           {getModelLabel(detection.modelPath)}
                         </span>
                       </div>
@@ -1198,9 +1198,9 @@ export default function AIDetection() {
               )}
             </div>
 
-            <div className="my-6 h-px bg-white/5" />
+            <div className="my-6 h-px bg-[var(--border)]" />
 
-            <p className="text-[0.68rem] font-medium uppercase tracking-[0.28em] text-gray-400">LIVE STATS</p>
+            <p className="command-section-label">Live Stats</p>
 
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               <StatCard label="Detections Today" value={String(stats.detectionsToday)} />
@@ -1218,26 +1218,26 @@ export default function AIDetection() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 24 }}
             transition={{ duration: 0.24, ease: "easeOut" }}
-            className="fixed bottom-4 right-4 z-50 w-72 rounded-2xl border border-white/10 bg-black/80 p-4 backdrop-blur"
+            className="fixed bottom-4 right-4 z-50 w-72 rounded-xl border border-[var(--border)] bg-[rgba(17,24,39,0.92)] p-4 backdrop-blur"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2">
-                <div className="relative flex h-3 w-3 items-center justify-center">
+                <div className="relative flex h-2 w-2 items-center justify-center">
                   <motion.span
                     animate={{ scale: [1, 1.7, 1], opacity: [0.35, 1, 0.35] }}
                     transition={{ duration: 1.2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-                    className="absolute h-3 w-3 rounded-full bg-red-500"
+                    className="absolute h-2 w-2 rounded-full bg-[var(--critical)]"
                   />
-                  <span className="relative h-3 w-3 rounded-full bg-red-500" />
+                  <span className="relative h-2 w-2 rounded-full bg-[var(--critical)]" />
                 </div>
 
-                <p className="text-sm font-semibold text-white">LIVE DETECTING</p>
+                <p className="text-sm font-semibold text-[var(--text-primary)]">LIVE DETECTING</p>
               </div>
 
               <button
                 type="button"
                 onClick={() => setIsOverlayDismissed(true)}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-gray-300 transition hover:text-white"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] transition-colors duration-150 hover:border-[var(--border-hover)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)]"
                 aria-label="Dismiss overlay"
               >
                 <X className="h-4 w-4" />
@@ -1246,22 +1246,22 @@ export default function AIDetection() {
 
             <div className="mt-4 space-y-2">
               {latestOverlayDetections.length === 0 ? (
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-sm text-gray-400">
+                <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 text-sm text-[var(--text-secondary)]">
                   Watching for activity on the shared screen.
                 </div>
               ) : (
                 latestOverlayDetections.map((detection) => (
                   <div
                     key={detection.id}
-                    className="rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-gray-200"
+                    className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-primary)]"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <span>
                         {getDetectionEmoji(detection.type)} {detection.type === "fire" ? "Fire" : "Smoke"}
                       </span>
-                      <span className="text-white">{formatConfidence(detection.confidence)}</span>
+                      <span className="text-[var(--text-primary)]">{formatConfidence(detection.confidence)}</span>
                     </div>
-                    <p className="mt-1 text-xs text-gray-400">{formatElapsed(detection.timestamp, now)}</p>
+                    <p className="mt-1 text-xs text-[var(--text-secondary)]">{formatElapsed(detection.timestamp, now)}</p>
                   </div>
                 ))
               )}
@@ -1279,9 +1279,9 @@ export default function AIDetection() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 40 }}
               transition={{ duration: 0.22, ease: "easeOut" }}
-              className="pointer-events-auto rounded-2xl border border-red-500/20 bg-[#161b22] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.34)]"
+              className="pointer-events-auto rounded-xl border border-[rgba(239,68,68,0.2)] bg-[var(--bg-card)] p-4"
             >
-              <p className="text-sm font-semibold text-white">{toast.message}</p>
+              <p className="text-sm font-semibold text-[var(--text-primary)]">{toast.message}</p>
             </motion.div>
           ))}
         </AnimatePresence>

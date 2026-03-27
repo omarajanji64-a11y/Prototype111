@@ -20,8 +20,8 @@ export function UavResponsePanel({
   onOpenAlerts,
 }: UavResponsePanelProps) {
   return (
-    <GlassPanel variants={cardVariants} className="p-5 sm:p-6">
-      <div className="relative">
+    <GlassPanel variants={cardVariants} className="p-5">
+      <div className="space-y-5">
         <SectionTitle
           eyebrow="UAV Response"
           title="Autonomous Mission Tasks"
@@ -33,18 +33,21 @@ export function UavResponsePanel({
           }
         />
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-3">
-          <div className="rounded-[22px] border border-cyan-300/16 bg-cyan-300/10 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-cyan-100/90">Active Missions</p>
-            <p className="mt-2 text-3xl font-semibold tracking-[-0.05em] text-white">{alerts.length}</p>
+        <div className="grid gap-3 lg:grid-cols-3">
+          <div className="rounded-xl border border-[var(--border)] border-l-2 border-l-[var(--accent-primary)] bg-[var(--bg-card)] p-5">
+            <p className="command-section-label text-[var(--text-muted)]">Active Missions</p>
+            <p className="mt-2 text-[36px] font-bold leading-none text-[var(--text-primary)]">{alerts.length}</p>
+            <p className="mt-2 text-xs text-[var(--text-secondary)]">Pending autonomous launches</p>
           </div>
-          <div className="rounded-[22px] border border-orange-300/16 bg-orange-300/10 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-orange-100/90">Estimated Launch</p>
-            <p className="mt-2 text-3xl font-semibold tracking-[-0.05em] text-white">40s</p>
+          <div className="rounded-xl border border-[var(--border)] border-l-2 border-l-[var(--warning)] bg-[var(--bg-card)] p-5">
+            <p className="command-section-label text-[var(--text-muted)]">Estimated Launch</p>
+            <p className="mt-2 text-[36px] font-bold leading-none text-[var(--text-primary)]">40s</p>
+            <p className="mt-2 text-xs text-[var(--text-secondary)]">Average response queue time</p>
           </div>
-          <div className="rounded-[22px] border border-emerald-300/16 bg-emerald-300/10 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-emerald-100/90">Coverage Radius</p>
-            <p className="mt-2 text-3xl font-semibold tracking-[-0.05em] text-white">2.4 km</p>
+          <div className="rounded-xl border border-[var(--border)] border-l-2 border-l-[var(--safe)] bg-[var(--bg-card)] p-5">
+            <p className="command-section-label text-[var(--text-muted)]">Coverage Radius</p>
+            <p className="mt-2 text-[36px] font-bold leading-none text-[var(--text-primary)]">2.4 km</p>
+            <p className="mt-2 text-xs text-[var(--text-secondary)]">Prototype drone coverage envelope</p>
           </div>
         </div>
 
@@ -52,27 +55,36 @@ export function UavResponsePanel({
           variants={createStagger(0.06, 0.06)}
           initial="hidden"
           animate="visible"
-          className="mt-6 space-y-3"
+          className="space-y-3"
         >
+          {alerts.length === 0 ? (
+            <div className="command-empty-state flex-col gap-3 px-6 text-center">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-dashed border-[var(--border-hover)] text-[var(--text-secondary)]">
+                <Plane className="h-5 w-5" />
+              </div>
+              <p className="text-sm text-[var(--text-secondary)]">No UAV missions active</p>
+            </div>
+          ) : null}
+
           {alerts.slice(0, 3).map((alert, index) => (
             <motion.div
               key={alert.id}
               variants={listItemVariants}
-              className="rounded-[22px] border border-white/10 bg-white/[0.045] p-4"
+              className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="space-y-2">
-                  <StatusBadge severity={alert.severity} className="text-[0.62rem]" />
-                  <p className="text-sm font-semibold text-white">
+                  <StatusBadge severity={alert.severity} />
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">
                     Mission {index + 1}: {alert.location}
                   </p>
-                  <p className="text-xs text-slate-400">{alert.description}</p>
+                  <p className="text-xs text-[var(--text-secondary)]">{alert.description}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <ActionButton className="px-3 py-2 text-xs" icon={Route} onClick={() => onFocusTower(alert.cameraId)}>
+                  <ActionButton variant="secondary" className="px-3 py-2 text-xs" icon={Route} onClick={() => onFocusTower(alert.cameraId)}>
                     Open Route
                   </ActionButton>
-                  <ActionButton className="px-3 py-2 text-xs" icon={TimerReset} onClick={onOpenAlerts}>
+                  <ActionButton variant="secondary" className="px-3 py-2 text-xs" icon={TimerReset} onClick={onOpenAlerts}>
                     Review Alert
                   </ActionButton>
                 </div>

@@ -34,6 +34,7 @@ export function AppShell({
         onToggle={onSidebarToggle}
       />
       <TopNavbar
+        activeNav={activeNav}
         alertCount={alertCount}
         focusedCamera={focusedCamera}
         isSidebarExpanded={isSidebarExpanded}
@@ -42,11 +43,11 @@ export function AppShell({
 
       <main
         className={cn(
-          "relative pb-28 pt-28 transition-[padding-left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:pb-10 lg:pr-6",
-          isSidebarExpanded ? "lg:pl-[20rem]" : "lg:pl-[8rem]",
+          "relative pb-24 pt-[72px] transition-[padding-left] duration-300 ease-out lg:pb-8 lg:pr-4",
+          isSidebarExpanded ? "lg:pl-[240px]" : "lg:pl-[64px]",
         )}
       >
-        <div className="mx-auto max-w-[1720px] px-4 sm:px-6 lg:px-8">{children}</div>
+        <div className="mx-auto max-w-[1720px] px-4 sm:px-5 lg:px-6">{children}</div>
       </main>
     </div>
   );

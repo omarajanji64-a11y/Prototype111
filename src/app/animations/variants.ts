@@ -8,55 +8,55 @@ export const easings = {
 } as const;
 
 export const transitionDefaults: Transition = {
-  duration: 0.42,
-  ease: easings.smooth,
+  duration: 0.25,
+  ease: "easeOut",
 };
 
 export const pageVariants: Variants = {
-  hidden: { opacity: 0, y: 18 },
+  hidden: { opacity: 0, y: 8 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.6,
-      ease: easings.emphasized,
+      duration: 0.25,
+      ease: "easeOut",
       when: "beforeChildren",
-      staggerChildren: 0.08,
-      delayChildren: 0.08,
+      staggerChildren: 0.06,
+      delayChildren: 0.04,
     },
   },
   exit: {
     opacity: 0,
-    y: 10,
+    y: 8,
     transition: {
-      duration: 0.24,
-      ease: easings.exit,
+      duration: 0.2,
+      ease: "easeOut",
     },
   },
 };
 
 export const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 18, scale: 0.97 },
+  hidden: { opacity: 0, y: 8, scale: 0.995 },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
     transition: {
-      duration: 0.52,
-      ease: easings.emphasized,
+      duration: 0.25,
+      ease: "easeOut",
     },
   },
 };
 
 export const listItemVariants: Variants = {
-  hidden: { opacity: 0, y: 16, scale: 0.98 },
+  hidden: { opacity: 0, y: 8, scale: 0.995 },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
     transition: {
-      duration: 0.4,
-      ease: easings.smooth,
+      duration: 0.25,
+      ease: "easeOut",
     },
   },
 };
@@ -92,20 +92,20 @@ export const sidebarLabelVariants: Variants = {
 };
 
 export const hoverLift = {
-  y: -6,
-  scale: 1.02,
+  y: 0,
+  scale: 1.005,
   transition: {
-    duration: 0.28,
-    ease: easings.standard,
+    duration: 0.15,
+    ease: "easeOut",
   },
 };
 
 export const buttonHover = {
-  scale: 1.03,
-  y: -1,
+  scale: 1.005,
+  y: 0,
   transition: {
-    duration: 0.2,
-    ease: easings.standard,
+    duration: 0.15,
+    ease: "easeOut",
   },
 };
 
@@ -113,7 +113,6 @@ export const buttonTap = {
   scale: 0.98,
   transition: {
     duration: 0.14,
-    ease: easings.standard,
+    ease: "easeOut",
   },
 };
-

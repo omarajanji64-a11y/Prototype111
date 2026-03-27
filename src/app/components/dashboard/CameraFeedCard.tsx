@@ -15,25 +15,22 @@ interface CameraFeedCardProps {
 
 const statusFrame = {
   safe: {
-    glow: "shadow-[0_20px_60px_rgba(16,185,129,0.14)]",
-    border: "border-emerald-300/16",
-    overlay: "from-emerald-400/16 via-transparent to-transparent",
-    scan: "from-emerald-300/0 via-emerald-300/35 to-emerald-300/0",
-    box: "border-emerald-300/60 bg-emerald-300/10 text-emerald-50",
+    border: "border-[var(--border)]",
+    overlay: "from-[rgba(34,211,238,0.08)] via-transparent to-transparent",
+    scan: "from-transparent via-[rgba(34,211,238,0.24)] to-transparent",
+    box: "border-[rgba(34,211,238,0.55)] bg-[rgba(10,42,51,0.4)] text-[var(--text-primary)]",
   },
   warning: {
-    glow: "shadow-[0_20px_70px_rgba(245,158,11,0.18)]",
-    border: "border-amber-300/18",
-    overlay: "from-amber-300/16 via-transparent to-transparent",
-    scan: "from-amber-300/0 via-amber-300/35 to-amber-300/0",
-    box: "border-amber-300/60 bg-amber-300/10 text-amber-50",
+    border: "border-[rgba(251,191,36,0.2)]",
+    overlay: "from-[rgba(251,191,36,0.08)] via-transparent to-transparent",
+    scan: "from-transparent via-[rgba(251,191,36,0.24)] to-transparent",
+    box: "border-[rgba(251,191,36,0.55)] bg-[rgba(69,26,3,0.4)] text-[var(--text-primary)]",
   },
   fire: {
-    glow: "shadow-[0_22px_80px_rgba(249,115,22,0.24)]",
-    border: "border-orange-300/22",
-    overlay: "from-orange-400/20 via-transparent to-transparent",
-    scan: "from-orange-300/0 via-orange-300/45 to-orange-300/0",
-    box: "border-orange-300/70 bg-orange-300/12 text-orange-50",
+    border: "border-[rgba(249,115,22,0.2)]",
+    overlay: "from-[rgba(249,115,22,0.12)] via-transparent to-transparent",
+    scan: "from-transparent via-[rgba(249,115,22,0.26)] to-transparent",
+    box: "border-[rgba(249,115,22,0.7)] bg-[rgba(124,58,14,0.4)] text-[var(--text-primary)]",
   },
 } as const;
 
@@ -48,44 +45,39 @@ export function CameraFeedCard({ camera, isFocused, onFocus }: CameraFeedCardPro
       whileTap={{ scale: 0.99 }}
       onClick={() => onFocus(camera.id)}
       className={cn(
-        "group relative overflow-hidden rounded-[28px] border bg-[linear-gradient(180deg,rgba(10,16,30,0.92),rgba(7,11,21,0.92))] text-left transition-[border-color,box-shadow] duration-300",
-        theme.glow,
-        isFocused ? cn("border-white/20", theme.border) : "border-white/10 hover:border-white/18",
+        "group relative overflow-hidden rounded-xl border bg-[var(--bg-card)] text-left transition-[border-color,background-color] duration-200",
+        isFocused ? theme.border : "border-[var(--border)] hover:border-[var(--border-hover)]",
       )}
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.14),transparent_42%)]" />
-      <div className="pointer-events-none absolute inset-px rounded-[27px] border border-white/[0.05]" />
-
-      <div className="relative aspect-[1.32] overflow-hidden rounded-t-[28px]">
+      <div className="relative aspect-[1.32] overflow-hidden rounded-t-xl">
         <ImageWithFallback
           src={camera.imageUrl}
           alt={camera.name}
           className="h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
         />
 
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,6,23,0.18),rgba(2,6,23,0.15),rgba(2,6,23,0.78))]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,13,20,0.1),rgba(10,13,20,0.2),rgba(10,13,20,0.78))]" />
         <div className={cn("absolute inset-0 bg-gradient-to-br opacity-90", theme.overlay)} />
 
         <div className="absolute left-4 right-4 top-4 flex items-start justify-between gap-3">
-          <div className="rounded-full border border-white/14 bg-slate-950/55 px-3 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-slate-100 backdrop-blur-md">
+          <div className="rounded-md border border-[var(--border)] bg-[rgba(17,24,39,0.88)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--text-primary)] backdrop-blur-sm">
             {camera.id}
           </div>
           <StatusBadge status={camera.status} />
         </div>
 
-        <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-full border border-white/14 bg-slate-950/55 px-3 py-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-white backdrop-blur-md">
+        <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-md border border-[rgba(14,165,233,0.24)] bg-[rgba(17,24,39,0.88)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--accent-glow)] backdrop-blur-sm">
           <motion.span
             animate={{
-              scale: [1, 1.25, 1],
-              opacity: [0.8, 1, 0.8],
+              opacity: [1, 0.4, 1],
             }}
-            transition={{ duration: 1.8, repeat: Number.POSITIVE_INFINITY }}
-            className="h-2.5 w-2.5 rounded-full bg-red-400 shadow-[0_0_18px_rgba(248,113,113,0.92)]"
+            transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+            className="h-2 w-2 rounded-full border border-[var(--accent-glow)]"
           />
           Live tower
         </div>
 
-        <div className="absolute bottom-4 right-4 rounded-full border border-white/14 bg-slate-950/55 px-3 py-1.5 text-xs text-slate-100 backdrop-blur-md">
+        <div className="absolute bottom-4 right-4 rounded-md border border-[var(--border)] bg-[var(--bg-card)] px-2.5 py-1 text-xs text-[var(--text-secondary)] backdrop-blur-sm">
           {camera.detections > 0 ? `${camera.detections} detections` : "Nominal"}
         </div>
 
@@ -96,7 +88,7 @@ export function CameraFeedCard({ camera, isFocused, onFocus }: CameraFeedCardPro
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.12 + index * 0.08 }}
             className={cn(
-              "absolute rounded-[18px] border-2 backdrop-blur-[1px]",
+              "absolute rounded-xl border-2 backdrop-blur-[1px]",
               theme.box,
             )}
             style={{
@@ -115,9 +107,9 @@ export function CameraFeedCard({ camera, isFocused, onFocus }: CameraFeedCardPro
                     }
               }
               transition={{ duration: 2.4, repeat: Number.POSITIVE_INFINITY }}
-              className="absolute inset-0 rounded-[16px] border border-white/12"
+              className="absolute inset-0 rounded-[10px] border border-white/12"
             />
-            <div className="absolute -top-3 left-3 rounded-full border border-white/12 bg-slate-950/70 px-2.5 py-1 text-[0.65rem] font-medium tracking-[0.02em] text-white backdrop-blur-md">
+            <div className="absolute -top-3 left-3 rounded-md border border-[var(--border)] bg-[rgba(17,24,39,0.88)] px-2 py-1 text-[10px] font-medium tracking-[0.02em] text-[var(--text-primary)] backdrop-blur-sm">
               {box.label} · {box.confidence}%
             </div>
           </motion.div>
@@ -132,45 +124,45 @@ export function CameraFeedCard({ camera, isFocused, onFocus }: CameraFeedCardPro
         ) : null}
       </div>
 
-      <div className="relative space-y-4 p-5">
+      <div className="relative border-t border-[var(--border)] bg-black/40 p-5 backdrop-blur-sm">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h3 className="text-xl font-semibold tracking-[-0.04em] text-white">{camera.name}</h3>
-            <p className="mt-1 text-sm text-slate-400">
+            <h3 className="text-base font-semibold text-[var(--text-primary)]">{camera.name}</h3>
+            <p className="mt-1 text-xs text-[var(--text-secondary)]">
               {camera.location} · {camera.zone}
             </p>
           </div>
           <motion.div
-            whileHover={{ rotate: 10, scale: 1.08 }}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/8 bg-white/[0.045] text-slate-200"
+            whileHover={{ scale: 1.005 }}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)]"
           >
-            <Camera className="h-5 w-5" />
+            <Camera className="h-4.5 w-4.5" />
           </motion.div>
         </div>
 
-        <p className="text-sm leading-7 text-slate-300/82">{camera.summary}</p>
+        <p className="mt-4 text-sm leading-6 text-[var(--text-secondary)]">{camera.summary}</p>
 
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-[20px] border border-white/8 bg-white/[0.04] p-3">
-            <div className="flex items-center gap-2 text-slate-400">
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-card)] p-3">
+            <div className="flex items-center gap-2 text-[var(--text-secondary)]">
               <ThermometerSun className="h-4 w-4" />
-              <span className="text-xs uppercase tracking-[0.18em]">Temp</span>
+              <span className="command-card-label">Temp</span>
             </div>
-            <p className="mt-2 text-lg font-semibold tracking-[-0.04em] text-white">{camera.temperature}°C</p>
+            <p className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{camera.temperature}°C</p>
           </div>
-          <div className="rounded-[20px] border border-white/8 bg-white/[0.04] p-3">
-            <div className="flex items-center gap-2 text-slate-400">
+          <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-card)] p-3">
+            <div className="flex items-center gap-2 text-[var(--text-secondary)]">
               <Zap className="h-4 w-4" />
-              <span className="text-xs uppercase tracking-[0.18em]">Fire Prob.</span>
+              <span className="command-card-label">Fire Prob.</span>
             </div>
-            <p className="mt-2 text-lg font-semibold tracking-[-0.04em] text-white">{camera.confidence}%</p>
+            <p className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{camera.confidence}%</p>
           </div>
-          <div className="rounded-[20px] border border-white/8 bg-white/[0.04] p-3">
-            <div className="flex items-center gap-2 text-slate-400">
+          <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-card)] p-3">
+            <div className="flex items-center gap-2 text-[var(--text-secondary)]">
               <TimerReset className="h-4 w-4" />
-              <span className="text-xs uppercase tracking-[0.18em]">Sweep</span>
+              <span className="command-card-label">Sweep</span>
             </div>
-            <p className="mt-2 text-lg font-semibold tracking-[-0.04em] text-white">{camera.lastSweep}</p>
+            <p className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{camera.lastSweep}</p>
           </div>
         </div>
       </div>
