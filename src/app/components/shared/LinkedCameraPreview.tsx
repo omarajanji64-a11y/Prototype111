@@ -59,13 +59,13 @@ export function LinkedCameraPreview({
 
   if (!cameraConfigured) {
     return (
-      <div className={`flex items-center justify-center bg-[radial-gradient(circle_at_top,rgba(30,216,255,0.16),transparent_46%)] px-6 text-center ${className}`}>
+      <div className={`flex items-center justify-center bg-[linear-gradient(180deg,rgba(17,29,20,0.72),rgba(7,16,10,0.92))] px-6 text-center ${className}`}>
         <div className="max-w-lg space-y-4">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[1.25rem] border border-[var(--border)] bg-[rgba(8,18,40,0.82)] text-[var(--accent-primary)]">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[12px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--accent)]">
             <Camera className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-lg font-semibold text-[var(--text-primary)]">{placeholderTitle}</p>
+            <p className="font-display text-lg font-semibold tracking-[0.03em] text-[var(--text-primary)]">{placeholderTitle}</p>
             <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">{placeholderDescription}</p>
           </div>
         </div>
@@ -110,17 +110,17 @@ export function LinkedCameraPreview({
     <div className={`relative bg-black ${className}`}>
       <img src={imageSrc} alt={alt} className="h-full w-full object-cover" />
       {showError ? (
-        <div className="absolute inset-x-4 bottom-4 rounded-[1rem] border border-[rgba(239,68,68,0.22)] bg-[rgba(40,10,14,0.88)] p-4 text-left text-sm text-[var(--text-primary)] backdrop-blur">
+        <div className="absolute inset-x-4 bottom-4 rounded-[12px] border border-[rgba(248,113,113,0.3)] bg-[rgba(17,22,18,0.92)] p-4 text-left text-sm text-[var(--text-primary)] backdrop-blur">
           <div className="flex items-start gap-3">
             <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0 text-[var(--critical)]" />
             <div>
-              <p className="font-semibold">Camera feed needs attention</p>
+              <p className="font-display text-[13px] font-semibold tracking-[0.03em]">Camera feed needs attention</p>
               <p className="mt-1 text-[var(--text-secondary)]">{errorMessage}</p>
             </div>
           </div>
         </div>
       ) : (
-        <div className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[rgba(8,18,40,0.82)] px-3 py-1.5 font-sci-mono text-[10px] uppercase tracking-[0.2em] text-[var(--text-primary)]">
+        <div className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-[var(--border-strong)] bg-[rgba(7,16,10,0.84)] px-3 py-1.5 font-display text-[11px] font-semibold uppercase tracking-[0.04em] text-[var(--accent)]">
           {cameraSource === "screen" ? <MonitorUp className="h-3.5 w-3.5" /> : cameraSource === "ip" ? <Link2 className="h-3.5 w-3.5" /> : <Camera className="h-3.5 w-3.5" />}
           Linked
         </div>

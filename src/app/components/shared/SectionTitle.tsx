@@ -19,11 +19,11 @@ export function SectionTitle({
 }: SectionTitleProps) {
   return (
     <div className={cn("flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between", className)}>
-      <div className="min-w-0 space-y-1.5">
+      <div className="min-w-0 space-y-2">
         {eyebrow ? (
-          <p className="command-section-label font-sci-mono">{eyebrow}</p>
+          <p className="command-section-label">{eyebrow}</p>
         ) : null}
-        <h2 className="command-page-title command-holo-title">{title}</h2>
+        <h2 className="command-page-title">{title}</h2>
         {description ? <p className="command-page-description max-w-2xl">{description}</p> : null}
       </div>
       {action ? <div className="shrink-0 self-start">{action}</div> : null}

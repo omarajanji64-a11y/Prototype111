@@ -20,7 +20,7 @@ export function UavResponsePanel({
   onOpenAlerts,
 }: UavResponsePanelProps) {
   return (
-    <GlassPanel variants={cardVariants} className="p-5">
+    <GlassPanel variants={cardVariants} className="p-6">
       <div className="space-y-5">
         <SectionTitle
           eyebrow="UAV Response"
@@ -33,21 +33,21 @@ export function UavResponsePanel({
           }
         />
 
-        <div className="grid gap-3 lg:grid-cols-3">
-          <div className="rounded-xl border border-[var(--border)] border-l-2 border-l-[var(--accent-primary)] bg-[var(--bg-card)] p-5">
-            <p className="command-section-label text-[var(--text-muted)]">Active Missions</p>
-            <p className="mt-2 text-[36px] font-bold leading-none text-[var(--text-primary)]">{alerts.length}</p>
-            <p className="mt-2 text-xs text-[var(--text-secondary)]">Pending autonomous launches</p>
+        <div className="grid gap-4 lg:grid-cols-3">
+          <div className="command-metric-tile p-6">
+            <p className="command-section-label">Active Missions</p>
+            <p className={`okab-metric-value mt-4 text-[36px] leading-none ${alerts.length === 0 ? "text-[var(--text-muted)]" : ""}`}>{alerts.length}</p>
+            <p className="mt-3 text-[13px] leading-6 text-[var(--text-secondary)]">Pending autonomous launches</p>
           </div>
-          <div className="rounded-xl border border-[var(--border)] border-l-2 border-l-[var(--warning)] bg-[var(--bg-card)] p-5">
-            <p className="command-section-label text-[var(--text-muted)]">Estimated Launch</p>
-            <p className="mt-2 text-[36px] font-bold leading-none text-[var(--text-primary)]">40s</p>
-            <p className="mt-2 text-xs text-[var(--text-secondary)]">Average response queue time</p>
+          <div className="command-metric-tile p-6">
+            <p className="command-section-label">Estimated Launch</p>
+            <p className="okab-metric-value mt-4 text-[36px] leading-none text-[var(--text-data)]">40s</p>
+            <p className="mt-3 text-[13px] leading-6 text-[var(--text-secondary)]">Average response queue time</p>
           </div>
-          <div className="rounded-xl border border-[var(--border)] border-l-2 border-l-[var(--safe)] bg-[var(--bg-card)] p-5">
-            <p className="command-section-label text-[var(--text-muted)]">Coverage Radius</p>
-            <p className="mt-2 text-[36px] font-bold leading-none text-[var(--text-primary)]">2.4 km</p>
-            <p className="mt-2 text-xs text-[var(--text-secondary)]">Prototype drone coverage envelope</p>
+          <div className="command-metric-tile p-6">
+            <p className="command-section-label">Coverage Radius</p>
+            <p className="okab-metric-value mt-4 text-[36px] leading-none text-[var(--text-data)]">2.4 km</p>
+            <p className="mt-3 text-[13px] leading-6 text-[var(--text-secondary)]">Prototype drone coverage envelope</p>
           </div>
         </div>
 
@@ -59,7 +59,7 @@ export function UavResponsePanel({
         >
           {alerts.length === 0 ? (
             <div className="command-empty-state flex-col gap-3 px-6 text-center">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-dashed border-[var(--border-hover)] text-[var(--text-secondary)]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-dashed border-[var(--border-subtle)] text-[var(--text-muted)]">
                 <Plane className="h-5 w-5" />
               </div>
               <p className="text-sm text-[var(--text-secondary)]">No UAV missions active</p>
@@ -70,7 +70,7 @@ export function UavResponsePanel({
             <motion.div
               key={alert.id}
               variants={listItemVariants}
-              className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4"
+              className="command-subpanel p-4"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="space-y-2">

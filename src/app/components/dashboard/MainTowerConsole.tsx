@@ -74,7 +74,7 @@ export function MainTowerConsole({
   }, [tower.sensors.length]);
 
   return (
-    <GlassPanel variants={cardVariants} className="p-5">
+    <GlassPanel variants={cardVariants} className="p-6">
       <div className="space-y-5">
         <SectionTitle
           eyebrow="Main Tower"
@@ -82,8 +82,8 @@ export function MainTowerConsole({
           description="Camera preview stays on the left. Use Open Tower to expand the live view and Configure to change its setup."
         />
 
-        <div className="grid gap-3 xl:grid-cols-[minmax(0,1.25fr)_380px]">
-          <div className="overflow-hidden rounded-[1.5rem] border border-[var(--border)] bg-black">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_380px]">
+          <div className="overflow-hidden rounded-[12px] border border-[var(--border-subtle)] bg-black">
             <LinkedCameraPreview
               cameraConfigured={towerSetup.cameraConfigured}
               cameraSource={towerSetup.cameraSource as CameraSourceId}
@@ -100,11 +100,11 @@ export function MainTowerConsole({
           </div>
 
           <div className="space-y-3">
-            <div className="command-subpanel p-5">
+            <div className="command-subpanel p-6">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="command-section-label text-[var(--text-muted)]">Camera Preview</p>
-                  <h3 className="mt-2 text-2xl font-semibold text-[var(--text-primary)]">{tower.name}</h3>
+                  <p className="command-section-label">Camera Preview</p>
+                  <h3 className="mt-2 font-display text-2xl font-semibold tracking-[0.04em] text-[var(--text-primary)]">{tower.name}</h3>
                   <p className="mt-1 text-sm text-[var(--text-secondary)]">{tower.linkedCamera.name}</p>
                 </div>
                 <StatusBadge status={tower.status} />
@@ -113,25 +113,25 @@ export function MainTowerConsole({
               <div className="mt-5 space-y-3 text-sm text-[var(--text-secondary)]">
                 <div className="flex items-center justify-between gap-3">
                   <span>Camera link</span>
-                  <strong className="font-sci-mono text-[var(--text-primary)]">
+                  <strong className="font-sci-mono text-[var(--text-data)]">
                     {towerSetup.cameraConfigured ? tower.linkedCamera.streamHint : "Unlinked"}
                   </strong>
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <span>AI status</span>
-                  <strong className="font-sci-mono text-[var(--text-primary)]">{aiLabel}</strong>
+                  <strong className="font-sci-mono text-[var(--text-data)]">{aiLabel}</strong>
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <span>Detections</span>
-                  <strong className="font-sci-mono text-[var(--text-primary)]">{detectionLabel}</strong>
+                  <strong className="font-sci-mono text-[var(--text-data)]">{detectionLabel}</strong>
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <span>Model</span>
-                  <strong className="font-sci-mono text-[var(--text-primary)]">{getOkabModelLabel(towerSetup.modelId)}</strong>
+                  <strong className="font-sci-mono text-[var(--text-data)]">{getOkabModelLabel(towerSetup.modelId)}</strong>
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <span>UAV</span>
-                  <strong className="font-sci-mono text-[var(--text-primary)]">{uavSetup.enabled ? "Linked" : "Unlinked"}</strong>
+                  <strong className="font-sci-mono text-[var(--text-data)]">{uavSetup.enabled ? "Linked" : "Unlinked"}</strong>
                 </div>
               </div>
 
@@ -156,16 +156,16 @@ export function MainTowerConsole({
                 <div className="flex items-center gap-3">
                   <Bot className="h-5 w-5 text-[var(--warning)]" />
                   <div>
-                    <p className="command-section-label text-[var(--text-muted)]">AI Detection</p>
+                    <p className="command-section-label">AI Detection</p>
                     <p className="mt-1 text-sm text-[var(--text-secondary)]">{aiLabel}</p>
                   </div>
                 </div>
               </div>
               <div className="command-subpanel p-4">
                 <div className="flex items-center gap-3">
-                  <Flame className="h-5 w-5 text-[var(--fire)]" />
+                  <Flame className="h-5 w-5 text-[var(--danger)]" />
                   <div>
-                    <p className="command-section-label text-[var(--text-muted)]">Latest Event</p>
+                    <p className="command-section-label">Latest Event</p>
                     <p className="mt-1 text-sm text-[var(--text-secondary)]">{latestEventLabel}</p>
                   </div>
                 </div>
@@ -182,24 +182,24 @@ export function MainTowerConsole({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.24, ease: "easeOut" }}
-              className="space-y-3"
+              className="space-y-4"
             >
-              <div className="grid gap-3 xl:grid-cols-4">
+              <div className="grid gap-4 xl:grid-cols-4">
                 <div className="command-subpanel p-4">
-                  <p className="command-section-label text-[var(--text-muted)]">Camera Source</p>
-                  <p className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{tower.linkedCamera.streamHint}</p>
+                  <p className="command-section-label">Camera Source</p>
+                  <p className="mt-3 font-display text-lg font-semibold tracking-[0.03em] text-[var(--text-primary)]">{tower.linkedCamera.streamHint}</p>
                 </div>
                 <div className="command-subpanel p-4">
-                  <p className="command-section-label text-[var(--text-muted)]">AI Model</p>
-                  <p className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{getOkabModelLabel(towerSetup.modelId)}</p>
+                  <p className="command-section-label">AI Model</p>
+                  <p className="mt-3 font-display text-lg font-semibold tracking-[0.03em] text-[var(--text-primary)]">{getOkabModelLabel(towerSetup.modelId)}</p>
                 </div>
                 <div className="command-subpanel p-4">
-                  <p className="command-section-label text-[var(--text-muted)]">Alerts</p>
-                  <p className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{alertCount}</p>
+                  <p className="command-section-label">Alerts</p>
+                  <p className="okab-metric-value mt-3 text-lg">{alertCount}</p>
                 </div>
                 <div className="command-subpanel p-4">
-                  <p className="command-section-label text-[var(--text-muted)]">Sensors</p>
-                  <p className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{sensorSummary}</p>
+                  <p className="command-section-label">Sensors</p>
+                  <p className="mt-3 font-display text-lg font-semibold tracking-[0.03em] text-[var(--text-primary)]">{sensorSummary}</p>
                 </div>
               </div>
 
@@ -242,7 +242,7 @@ export function MainTowerConsole({
                 <button
                   type="button"
                   onClick={() => setIsTowerOpen(false)}
-                  className="inline-flex items-center gap-2 rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.82)] px-4 py-2 font-sci-mono text-[12px] uppercase tracking-[0.16em] text-[var(--text-secondary)] transition-colors duration-150 hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]"
+                  className="inline-flex h-9 items-center gap-2 rounded-[10px] border border-[var(--border-subtle)] bg-transparent px-4 py-2 font-display text-[13px] font-semibold tracking-[0.04em] text-[var(--text-secondary)] transition-colors duration-150 hover:border-[var(--border-default)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
                 >
                   Close Tower
                   <motion.div animate={{ rotate: 180 }} transition={{ duration: 0.2, ease: "easeOut" }}>

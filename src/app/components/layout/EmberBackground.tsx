@@ -1,45 +1,9 @@
-import type { CSSProperties } from "react";
-
-const BACKGROUND_PARTICLES = [
-  { left: "8%", top: "20%", size: "0.42rem", color: "var(--theme-particle-1)", delay: "0s", duration: "8s" },
-  { left: "16%", top: "74%", size: "0.3rem", color: "var(--theme-particle-2)", delay: "1.4s", duration: "7.2s" },
-  { left: "31%", top: "32%", size: "0.36rem", color: "var(--theme-particle-3)", delay: "0.8s", duration: "9.6s" },
-  { left: "42%", top: "64%", size: "0.48rem", color: "var(--theme-particle-1)", delay: "1.8s", duration: "10.4s" },
-  { left: "58%", top: "18%", size: "0.34rem", color: "var(--theme-particle-2)", delay: "2.6s", duration: "8.8s" },
-  { left: "66%", top: "54%", size: "0.42rem", color: "var(--theme-particle-4)", delay: "0.4s", duration: "11.2s" },
-  { left: "78%", top: "26%", size: "0.38rem", color: "var(--theme-particle-1)", delay: "2.1s", duration: "9.2s" },
-  { left: "87%", top: "68%", size: "0.28rem", color: "var(--theme-particle-3)", delay: "1.1s", duration: "7.8s" },
-];
-
 export function EmberBackground() {
   return (
     <div className="fixed inset-0 z-0 overflow-hidden">
-      <div className="command-app-bg absolute inset-0" />
-      <div className="command-grid-overlay pointer-events-none absolute inset-0" />
-      <div className="command-energy-beam command-energy-beam-a pointer-events-none" />
-      <div className="command-energy-beam command-energy-beam-b pointer-events-none" />
-
-      <div className="pointer-events-none absolute inset-0">
-        {BACKGROUND_PARTICLES.map((particle, index) => (
-          <span
-            key={`${particle.left}-${particle.top}-${index}`}
-            className="command-energy-particle"
-            style={
-              {
-                "--particle-left": particle.left,
-                "--particle-top": particle.top,
-                "--particle-size": particle.size,
-                "--particle-color": particle.color,
-                "--particle-delay": particle.delay,
-                "--particle-duration": particle.duration,
-              } as CSSProperties
-            }
-          />
-        ))}
-      </div>
-
-      <div className="command-background-vignette pointer-events-none absolute inset-0" />
-      <div className="command-background-wash pointer-events-none absolute inset-0" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_10%,rgba(74,222,128,0.07),transparent_22%),radial-gradient(circle_at_82%_14%,rgba(122,158,130,0.07),transparent_28%),linear-gradient(180deg,#040a05_0%,#07100a_48%,#09140d_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(122,158,130,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(122,158,130,0.03)_1px,transparent_1px)] bg-[size:72px_72px] opacity-60" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_72%,rgba(74,222,128,0.05),transparent_22%),radial-gradient(circle_at_78%_18%,rgba(74,222,128,0.04),transparent_20%)]" />
     </div>
   );
 }

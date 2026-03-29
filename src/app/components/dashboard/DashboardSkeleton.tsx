@@ -10,29 +10,29 @@ export function DashboardSkeleton({
   statusLabel = "Preparing live monitoring resources…",
 }: DashboardSkeletonProps) {
   return (
-    <div className="space-y-3 lg:space-y-4">
-      <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-5">
+    <div className="space-y-4 lg:space-y-6">
+      <div className="command-glass-panel p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="command-section-label">Initializing</p>
-            <h2 className="mt-2 text-2xl font-semibold text-[var(--text-primary)]">OKAB</h2>
+            <h2 className="mt-2 font-display text-2xl font-semibold tracking-[0.04em] text-[var(--text-primary)]">OKAB CORE</h2>
             <p className="mt-2 text-sm text-[var(--text-secondary)]">{statusLabel}</p>
           </div>
-          <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-3 py-2 text-sm font-medium text-[var(--text-primary)]">
+          <div className="rounded-[10px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3 py-2 text-sm font-medium text-[var(--text-primary)]">
             {progress}%
           </div>
         </div>
 
-        <div className="mt-4 h-2 overflow-hidden rounded-full bg-[var(--bg-surface)]">
+        <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-[var(--bg-elevated)]">
           <div
-            className="h-full rounded-full bg-[var(--accent-primary)] transition-[width] duration-300 ease-out"
+            className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-300 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
       </div>
 
-      <div className="grid gap-3 xl:grid-cols-[minmax(0,1.2fr)_minmax(360px,0.92fr)]">
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-6">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(360px,0.92fr)]">
+        <div className="command-glass-panel p-6">
           <SkeletonBlock className="h-8 w-36 rounded-full" />
           <SkeletonBlock className="mt-6 h-14 w-full max-w-3xl rounded-xl" />
           <SkeletonBlock className="mt-4 h-14 w-[82%] rounded-xl" />
@@ -47,7 +47,7 @@ export function DashboardSkeleton({
             <SkeletonBlock className="h-32 rounded-xl" />
           </div>
         </div>
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-6">
+        <div className="command-glass-panel p-6">
           <SkeletonBlock className="h-8 w-40 rounded-full" />
           <SkeletonBlock className="mt-4 h-6 w-56 rounded-full" />
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -59,7 +59,7 @@ export function DashboardSkeleton({
         </div>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <SkeletonBlock className="h-40 rounded-xl" />
         <SkeletonBlock className="h-40 rounded-xl" />
         <SkeletonBlock className="h-40 rounded-xl" />
@@ -68,8 +68,8 @@ export function DashboardSkeleton({
 
       <SkeletonBlock className="h-[280px] rounded-xl" />
 
-      <div className="grid gap-3 xl:grid-cols-[minmax(0,1.45fr)_minmax(360px,0.8fr)]">
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-6">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(360px,0.8fr)]">
+        <div className="command-glass-panel p-6">
           <SkeletonBlock className="h-8 w-44 rounded-full" />
           <div className="mt-6 grid gap-3 xl:grid-cols-2">
             <SkeletonBlock className="h-[420px] rounded-xl" />

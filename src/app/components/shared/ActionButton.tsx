@@ -11,13 +11,13 @@ interface ActionButtonProps extends HTMLMotionProps<"button"> {
 
 const variantClasses = {
   primary:
-    "border border-[var(--theme-primary-button-border)] bg-[var(--theme-primary-button-bg)] text-white shadow-[var(--theme-primary-button-shadow)] hover:brightness-110",
+    "border border-[var(--border-strong)] bg-[var(--accent-dim)] text-[var(--accent)] hover:border-[var(--border-strong)] hover:bg-[rgba(74,222,128,0.2)]",
   secondary:
-    "border border-[var(--border)] bg-[var(--chrome-surface)] text-[var(--text-primary)] hover:border-[var(--border-hover)] hover:bg-[var(--chrome-surface-hover)]",
+    "border border-[var(--border-subtle)] bg-transparent text-[var(--text-secondary)] hover:border-[var(--border-default)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]",
   ghost:
-    "border border-[var(--border)] bg-transparent text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:bg-[var(--theme-ghost-hover)] hover:text-[var(--text-primary)]",
+    "border border-[var(--border-subtle)] bg-transparent text-[var(--text-secondary)] hover:border-[var(--border-default)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]",
   danger:
-    "border border-[rgba(255,88,116,0.2)] bg-[var(--critical-dim)] text-[var(--critical)] hover:border-[rgba(255,88,116,0.32)]",
+    "border border-[rgba(248,113,113,0.3)] bg-[var(--danger-dim)] text-[var(--danger)] hover:border-[rgba(248,113,113,0.42)] hover:bg-[rgba(248,113,113,0.18)]",
 };
 
 export function ActionButton({
@@ -32,7 +32,7 @@ export function ActionButton({
       whileHover={buttonHover}
       whileTap={buttonTap}
       className={cn(
-        "inline-flex h-11 items-center justify-center gap-2 rounded-[1rem] px-4 py-2 font-sci-mono text-[12px] font-medium uppercase tracking-[0.18em] transition-[background-color,border-color,filter,color,box-shadow] duration-150",
+        "inline-flex h-9 items-center justify-center gap-2 rounded-[10px] px-4 py-2 font-display text-[13px] font-semibold tracking-[0.04em] transition-[background-color,border-color,color,transform] duration-150",
         variantClasses[variant],
         className,
       )}

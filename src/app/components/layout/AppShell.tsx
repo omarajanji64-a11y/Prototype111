@@ -54,11 +54,11 @@ export function AppShell({
 
       <main
         className={cn(
-          "relative pb-24 pt-[72px] transition-[padding-left] duration-300 ease-out lg:pb-8 lg:pr-4",
-          isSidebarExpanded ? "lg:pl-[240px]" : "lg:pl-[64px]",
+          "relative pb-24 pt-[56px] transition-[padding-left] duration-300 ease-out lg:pb-8 lg:pr-6",
+          isSidebarExpanded ? "lg:pl-[220px]" : "lg:pl-[68px]",
         )}
       >
-        <div className="mx-auto max-w-[1720px] px-4 sm:px-5 lg:px-6">
+        <div className="mx-auto max-w-[1680px] px-4 sm:px-5 lg:px-6">
           <div className="command-shell-main">{children}</div>
         </div>
       </main>

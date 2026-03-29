@@ -8,7 +8,6 @@ import {
   LayoutDashboard,
   MapPinned,
   Settings2,
-  ShieldCheck,
   Sparkles,
 } from "lucide-react";
 import { motion } from "motion/react";
@@ -43,30 +42,29 @@ export function Sidebar({
 }: SidebarProps) {
   return (
     <motion.aside
-      animate={{ width: isExpanded ? 240 : 64 }}
+      animate={{ width: isExpanded ? 220 : 68 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className="command-sidebar-shell fixed inset-y-0 left-0 z-50 hidden overflow-hidden border-r border-[var(--border)] lg:flex"
+      className="command-sidebar-shell fixed inset-y-0 left-0 z-50 hidden overflow-hidden lg:flex"
     >
-      <div className="command-sidebar-aura pointer-events-none absolute inset-0" />
-      <div className="flex h-full w-full flex-col px-3 py-3">
-        <div className="flex h-[56px] items-center gap-3 px-2">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[1rem] border border-[var(--border-hover)] bg-[var(--chrome-surface)] text-[var(--accent-primary)] shadow-[var(--theme-glow-shadow)]">
-            <ShieldCheck className="h-4.5 w-4.5" />
+      <div className="flex h-full w-full flex-col px-3 py-4">
+        <div className="flex h-16 items-center gap-3 px-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border border-[var(--border-default)] bg-[var(--bg-surface)]">
+            <div className="grid grid-cols-2 gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[rgba(74,222,128,0.55)]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[rgba(74,222,128,0.55)]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
+            </div>
           </div>
           {isExpanded ? (
             <div className="min-w-0">
-              <p className="command-holo-title truncate text-base font-semibold leading-none">
-                <span className="text-[var(--accent-primary)]">OKAB</span>{" "}
-                <span className="text-[var(--text-secondary)]">Core</span>
-              </p>
-              <p className="mt-1 font-sci-mono text-[0.62rem] uppercase tracking-[0.24em] text-[var(--text-secondary)]">
-                Autonomous Forest Grid
-              </p>
+              <p className="okab-brand-title truncate leading-none">OKAB CORE</p>
+              <p className="okab-brand-subtitle truncate">Autonomous Forest Grid</p>
             </div>
           ) : null}
         </div>
 
-        <nav className="mt-4 flex-1 space-y-2">
+        <nav className="mt-5 flex-1 space-y-1.5">
           {navigationItems.map((item) => {
             const Icon = iconMap[item.id];
             const isActive = item.id === activeItem;
@@ -79,28 +77,21 @@ export function Sidebar({
                 onClick={() => onActiveChange(item.id)}
                 title={!isExpanded ? item.label : undefined}
                 className={cn(
-                  "relative flex h-11 w-full items-center rounded-[1rem] border border-transparent px-3 text-left transition-[background-color,border-color,color,box-shadow] duration-200",
+                  "relative flex min-h-[42px] w-full items-center rounded-[8px] border border-transparent px-5 py-[10px] text-left transition-[background-color,border-color,color] duration-150",
                   isExpanded ? "justify-start gap-3" : "justify-center",
                   isActive
-                    ? "border-[var(--nav-active-border)] bg-[var(--nav-active-bg)] text-[var(--text-primary)] shadow-[var(--nav-active-shadow)]"
-                    : "text-[var(--text-secondary)] hover:border-[var(--nav-hover-border)] hover:bg-[var(--nav-hover-bg)] hover:text-[var(--text-primary)]",
+                    ? "ml-[-1px] border-l-2 border-l-[var(--accent)] bg-[var(--accent-dim)] text-[var(--accent)]"
+                    : "text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]",
                 )}
               >
-                {isActive ? (
-                  <motion.span
-                    layoutId="sidebar-active-indicator"
-                    transition={{ duration: 0.2, ease: "easeOut" }}
-                    className="absolute inset-y-1 left-0 w-0.5 rounded-full bg-[var(--accent-primary)]"
-                  />
-                ) : null}
                 <Icon
                   className={cn(
-                    "relative h-[18px] w-[18px] shrink-0",
-                    isActive ? "text-[var(--accent-primary)]" : "text-[var(--text-secondary)]",
+                    "relative h-[17px] w-[17px] shrink-0",
+                    isActive ? "text-[var(--accent)]" : "text-[var(--text-secondary)]",
                   )}
                 />
                 {isExpanded ? (
-                  <span className="relative truncate text-[13px] font-medium uppercase tracking-[0.08em]">{item.label}</span>
+                  <span className="relative truncate font-['Inter'] text-[13px] font-normal tracking-[0.06em]">{item.label}</span>
                 ) : null}
               </motion.button>
             );
@@ -112,7 +103,7 @@ export function Sidebar({
             whileHover={buttonHover}
             whileTap={buttonTap}
             onClick={onToggle}
-            className="flex h-11 w-full items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[var(--chrome-surface)] text-[var(--text-secondary)] transition-colors duration-200 hover:border-[var(--border-hover)] hover:bg-[var(--chrome-surface-hover)] hover:text-[var(--text-primary)]"
+            className="flex h-10 w-full items-center justify-center rounded-[10px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)] transition-colors duration-150 hover:border-[var(--border-default)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
             aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
             title={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
           >

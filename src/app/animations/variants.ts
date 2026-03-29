@@ -8,26 +8,24 @@ export const easings = {
 } as const;
 
 export const transitionDefaults: Transition = {
-  duration: 0.25,
+  duration: 0.3,
   ease: "easeOut",
 };
 
 export const pageVariants: Variants = {
-  hidden: { opacity: 0, y: 8 },
+  hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    y: 0,
     transition: {
-      duration: 0.25,
+      duration: 0.3,
       ease: "easeOut",
       when: "beforeChildren",
-      staggerChildren: 0.06,
-      delayChildren: 0.04,
+      staggerChildren: 0.05,
+      delayChildren: 0.02,
     },
   },
   exit: {
     opacity: 0,
-    y: 8,
     transition: {
       duration: 0.2,
       ease: "easeOut",
@@ -36,26 +34,24 @@ export const pageVariants: Variants = {
 };
 
 export const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 8, scale: 0.995 },
+  hidden: { opacity: 0, y: 4 },
   visible: {
     opacity: 1,
     y: 0,
-    scale: 1,
     transition: {
-      duration: 0.25,
+      duration: 0.3,
       ease: "easeOut",
     },
   },
 };
 
 export const listItemVariants: Variants = {
-  hidden: { opacity: 0, y: 8, scale: 0.995 },
+  hidden: { opacity: 0, y: 4 },
   visible: {
     opacity: 1,
     y: 0,
-    scale: 1,
     transition: {
-      duration: 0.25,
+      duration: 0.3,
       ease: "easeOut",
     },
   },
@@ -93,7 +89,7 @@ export const sidebarLabelVariants: Variants = {
 
 export const hoverLift = {
   y: 0,
-  scale: 1.005,
+  scale: 1,
   transition: {
     duration: 0.15,
     ease: "easeOut",
@@ -101,7 +97,7 @@ export const hoverLift = {
 };
 
 export const buttonHover = {
-  scale: 1.005,
+  scale: 1,
   y: 0,
   transition: {
     duration: 0.15,
@@ -110,7 +106,7 @@ export const buttonHover = {
 };
 
 export const buttonTap = {
-  scale: 0.98,
+  scale: 0.97,
   transition: {
     duration: 0.14,
     ease: "easeOut",

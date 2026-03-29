@@ -44,10 +44,10 @@ function ToggleButton({
       type="button"
       onClick={onClick}
       className={cn(
-        "inline-flex h-11 items-center justify-center rounded-[1rem] border px-4 font-sci-mono text-[11px] font-medium uppercase tracking-[0.16em] transition-colors duration-150",
+        "inline-flex h-9 items-center justify-center rounded-[10px] border px-4 font-display text-[13px] font-semibold tracking-[0.04em] transition-colors duration-150 active:scale-[0.97]",
         active
-          ? "border-[rgba(141,240,255,0.22)] bg-[rgba(30,216,255,0.14)] text-[var(--text-primary)]"
-          : "border-[var(--border)] bg-[rgba(8,18,40,0.82)] text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]",
+          ? "border-[var(--border-strong)] bg-[var(--accent-dim)] text-[var(--accent)]"
+          : "border-[var(--border-subtle)] bg-transparent text-[var(--text-secondary)] hover:border-[var(--border-default)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]",
       )}
     >
       {label}
@@ -68,13 +68,13 @@ function SetupInput({
 }) {
   return (
     <label className="space-y-2">
-      <span className="command-section-label text-[var(--text-muted)]">{label}</span>
+      <span className="command-section-label">{label}</span>
       <input
         type="text"
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.82)] px-4 py-3 text-sm text-[var(--text-primary)] outline-none transition-colors duration-150 placeholder:text-[var(--text-secondary)] focus:border-[var(--border-hover)]"
+        className="okab-input w-full px-4 py-3 text-sm placeholder:text-[var(--text-muted)]"
       />
     </label>
   );
@@ -122,9 +122,9 @@ export function SetupConsole({
         variants={createStagger(0.08)}
         initial="hidden"
         animate="visible"
-        className="space-y-3"
+        className="space-y-4"
       >
-        <GlassPanel variants={cardVariants} className="p-5">
+        <GlassPanel variants={cardVariants} className="p-6">
           <div className="space-y-5">
             <SectionTitle
               eyebrow="Setup"
@@ -132,27 +132,27 @@ export function SetupConsole({
               description="Link the Main Tower camera, decide whether OKAB AI should run, link sensors, and prepare the UAV response stack."
             />
 
-            <div className="grid gap-3 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-3">
               <div className="command-metric-tile p-5" data-tone="safe">
-                <p className="command-section-label text-[var(--text-muted)]">Camera Source</p>
-                <p className="command-holo-title mt-2 text-[28px] font-bold leading-none text-[var(--text-primary)]">
+                <p className="command-section-label">Camera Source</p>
+                <p className={cn("mt-3 font-display text-[28px] font-bold leading-none tracking-[0.04em]", setup.tower.cameraConfigured ? "text-[var(--text-primary)]" : "text-[var(--text-muted)]")}>
                   {setup.tower.cameraConfigured ? getCameraSourceLabel(setup.tower.cameraSource) : "Unlinked"}
                 </p>
-                <p className="mt-2 text-xs text-[var(--text-secondary)]">This source will appear in the preview and tower details</p>
+                <p className="mt-3 text-[13px] leading-6 text-[var(--text-secondary)]">This source will appear in the preview and tower details</p>
               </div>
               <div className="command-metric-tile p-5" data-tone={setup.tower.aiEnabled ? "warning" : "safe"}>
-                <p className="command-section-label text-[var(--text-muted)]">AI Detection</p>
-                <p className="command-holo-title mt-2 text-[28px] font-bold leading-none text-[var(--text-primary)]">
+                <p className="command-section-label">AI Detection</p>
+                <p className={cn("mt-3 font-display text-[28px] font-bold leading-none tracking-[0.04em]", setup.tower.aiEnabled ? "text-[var(--accent)]" : "text-[var(--text-muted)]")}>
                   {setup.tower.aiEnabled ? "Enabled" : "Disabled"}
                 </p>
-                <p className="mt-2 text-xs text-[var(--text-secondary)]">Live analysis only runs when the camera is linked</p>
+                <p className="mt-3 text-[13px] leading-6 text-[var(--text-secondary)]">Live analysis only runs when the camera is linked</p>
               </div>
               <div className="command-metric-tile p-5" data-tone={setup.uav.enabled ? "critical" : "safe"}>
-                <p className="command-section-label text-[var(--text-muted)]">UAV</p>
-                <p className="command-holo-title mt-2 text-[28px] font-bold leading-none text-[var(--text-primary)]">
-                  {setup.uav.enabled ? "Armed" : "Unlinked"}
+                <p className="command-section-label">UAV</p>
+                <p className={cn("mt-3 font-display text-[28px] font-bold leading-none tracking-[0.04em]", setup.uav.enabled ? "text-[var(--accent)]" : "text-[var(--text-muted)]")}>
+                  {setup.uav.enabled ? "Enabled" : "Unlinked"}
                 </p>
-                <p className="mt-2 text-xs text-[var(--text-secondary)]">Response system readiness for escalation</p>
+                <p className="mt-3 text-[13px] leading-6 text-[var(--text-secondary)]">Response system readiness for escalation</p>
               </div>
             </div>
           </div>
@@ -160,9 +160,9 @@ export function SetupConsole({
 
         <motion.div
           variants={createStagger(0.08)}
-          className="grid gap-3 xl:grid-cols-[minmax(0,1.2fr)_minmax(360px,0.8fr)]"
+          className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(360px,0.8fr)]"
         >
-          <GlassPanel variants={cardVariants} className="p-5">
+          <GlassPanel variants={cardVariants} className="p-6">
             <div className="space-y-5">
               <SectionTitle
                 eyebrow="Towers"
@@ -170,15 +170,15 @@ export function SetupConsole({
                 description="Link the camera first, then decide whether OKAB should analyze the feed."
               />
 
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 <div className="command-subpanel p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.72)] text-[var(--accent-primary)]">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-[10px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] text-[var(--accent)]">
                         <Camera className="h-5 w-5" />
                       </div>
                       <div>
-                        <p className="command-section-label text-[var(--text-muted)]">Camera</p>
+                        <p className="command-section-label">Camera</p>
                         <p className="mt-1 text-sm text-[var(--text-secondary)]">
                           {setup.tower.cameraConfigured ? getCameraSourceLabel(setup.tower.cameraSource) : "No camera linked"}
                         </p>
@@ -207,11 +207,11 @@ export function SetupConsole({
                 <div className="command-subpanel p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.72)] text-[var(--warning)]">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-[10px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] text-[var(--warning)]">
                         <Bot className="h-5 w-5" />
                       </div>
                       <div>
-                        <p className="command-section-label text-[var(--text-muted)]">AI Detection</p>
+                        <p className="command-section-label">AI Detection</p>
                         <p className="mt-1 text-sm text-[var(--text-secondary)]">
                           {setup.tower.cameraConfigured ? "Use OKAB on the linked source" : "Link a camera first"}
                         </p>
@@ -238,11 +238,11 @@ export function SetupConsole({
                 <div className="command-subpanel p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.72)] text-[var(--accent-primary)]">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-[10px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] text-[var(--accent)]">
                         <Settings2 className="h-5 w-5" />
                       </div>
                       <div>
-                        <p className="command-section-label text-[var(--text-muted)]">Current Model</p>
+                        <p className="command-section-label">Current Model</p>
                         <p className="mt-1 text-sm text-[var(--text-secondary)]">{currentModelLabel}</p>
                       </div>
                     </div>
@@ -255,15 +255,15 @@ export function SetupConsole({
               </div>
 
               {setup.tower.cameraConfigured && setup.tower.cameraSource === "ip" && setup.tower.ipCameraUrl ? (
-                <div className="rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.72)] p-4 text-sm text-[var(--text-secondary)]">
+                <div className="rounded-[12px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-4 text-sm text-[var(--text-secondary)]">
                   Linked IP stream: {setup.tower.ipCameraUrl}
                 </div>
               ) : null}
             </div>
           </GlassPanel>
 
-          <div className="space-y-3">
-            <GlassPanel variants={cardVariants} className="p-5">
+          <div className="space-y-4">
+            <GlassPanel variants={cardVariants} className="p-6">
               <div className="space-y-5">
                 <SectionTitle
                   eyebrow="Sensors"
@@ -280,7 +280,7 @@ export function SetupConsole({
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="text-sm font-semibold text-[var(--text-primary)]">{sensor.name}</p>
+                          <p className="font-display text-[14px] font-semibold tracking-[0.03em] text-[var(--text-primary)]">{sensor.name}</p>
                           <p className="mt-1 text-xs text-[var(--text-secondary)]">
                             {sensor.type} · {sensor.location}
                           </p>
@@ -297,7 +297,7 @@ export function SetupConsole({
               </div>
             </GlassPanel>
 
-            <GlassPanel variants={cardVariants} className="p-5">
+            <GlassPanel variants={cardVariants} className="p-6">
               <div className="space-y-5">
                 <SectionTitle
                   eyebrow="UAV"
@@ -305,15 +305,15 @@ export function SetupConsole({
                   description="Prepare the UAV stack for assessment or suppression once Main Tower escalates an alert."
                 />
 
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid gap-4 sm:grid-cols-2">
                   <div className="command-subpanel p-4">
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.72)] text-[var(--fire)]">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-[10px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] text-[var(--danger)]">
                           <Plane className="h-5 w-5" />
                         </div>
                         <div>
-                          <p className="command-section-label text-[var(--text-muted)]">UAV Readiness</p>
+                          <p className="command-section-label">UAV Readiness</p>
                           <p className="mt-1 text-sm text-[var(--text-secondary)]">Make the UAV stack available to the response queue.</p>
                         </div>
                       </div>
@@ -333,11 +333,11 @@ export function SetupConsole({
                   <div className="command-subpanel p-4">
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.72)] text-[var(--accent-primary)]">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-[10px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] text-[var(--accent)]">
                           <ShieldCheck className="h-5 w-5" />
                         </div>
                         <div>
-                          <p className="command-section-label text-[var(--text-muted)]">Auto Dispatch</p>
+                          <p className="command-section-label">Auto Dispatch</p>
                           <p className="mt-1 text-sm text-[var(--text-secondary)]">Allow Main Tower alerts to queue UAV review automatically.</p>
                         </div>
                       </div>
@@ -355,7 +355,7 @@ export function SetupConsole({
                   </div>
                 </div>
 
-                <div className="grid gap-3 lg:grid-cols-2">
+                <div className="grid gap-4 lg:grid-cols-2">
                   <SetupInput
                     label="Callsign"
                     value={setup.uav.callsign}
@@ -397,7 +397,7 @@ export function SetupConsole({
                           responseMode: event.target.value as UavResponseMode,
                         })
                       }
-                      className="w-full rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.82)] px-4 py-3 text-sm capitalize text-[var(--text-primary)] outline-none transition-colors duration-150 focus:border-[var(--border-hover)]"
+                      className="okab-select w-full px-4 py-3 text-sm capitalize"
                     >
                       {responseModes.map((mode) => (
                         <option key={mode} value={mode}>
@@ -426,12 +426,12 @@ export function SetupConsole({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 12, scale: 0.98 }}
               transition={{ duration: 0.22, ease: "easeOut" }}
-              className="w-full max-w-xl rounded-[1.5rem] border border-[var(--border)] bg-[rgba(8,18,40,0.96)] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.38)]"
+              className="w-full max-w-xl rounded-[12px] border border-[var(--border-subtle)] bg-[rgba(7,16,10,0.96)] p-6"
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="command-section-label text-[var(--text-muted)]">Link Camera</p>
-                  <h3 className="mt-2 text-2xl font-semibold text-[var(--text-primary)]">Choose a camera source</h3>
+                  <p className="command-section-label">Link Camera</p>
+                  <h3 className="mt-2 font-display text-2xl font-semibold tracking-[0.04em] text-[var(--text-primary)]">Choose a camera source</h3>
                   <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
                     The source you choose here will feed the Main Tower preview and its full details page.
                   </p>
@@ -439,7 +439,7 @@ export function SetupConsole({
                 <button
                   type="button"
                   onClick={() => setIsCameraModalOpen(false)}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.82)] text-[var(--text-secondary)] transition-colors duration-150 hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-[10px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)] transition-colors duration-150 hover:border-[var(--border-default)] hover:text-[var(--text-primary)]"
                   aria-label="Close camera setup"
                 >
                   <X className="h-4 w-4" />
@@ -467,8 +467,8 @@ export function SetupConsole({
                   />
                 </div>
               ) : (
-                <div className="mt-6 flex items-start gap-3 rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.72)] p-4 text-sm text-[var(--text-secondary)]">
-                  <Link2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent-primary)]" />
+                <div className="mt-6 flex items-start gap-3 rounded-[12px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-4 text-sm text-[var(--text-secondary)]">
+                  <Link2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent)]" />
                   <p>
                     {draftSource === "screen"
                       ? "Screen Share will request a shared screen or window when the tower details open."
@@ -478,7 +478,7 @@ export function SetupConsole({
               )}
 
               {cameraLinkError ? (
-                <div className="mt-4 rounded-[1rem] border border-[rgba(239,68,68,0.22)] bg-[rgba(40,10,14,0.78)] p-4 text-sm text-[var(--text-primary)]">
+                <div className="mt-4 rounded-[12px] border border-[rgba(248,113,113,0.3)] bg-[rgba(40,10,14,0.42)] p-4 text-sm text-[var(--text-primary)]">
                   {cameraLinkError}
                 </div>
               ) : null}
@@ -487,7 +487,7 @@ export function SetupConsole({
                 <button
                   type="button"
                   onClick={() => setIsCameraModalOpen(false)}
-                  className="inline-flex h-11 items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[rgba(8,18,40,0.82)] px-4 font-sci-mono text-[12px] uppercase tracking-[0.16em] text-[var(--text-secondary)] transition-colors duration-150 hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]"
+                  className="inline-flex h-9 items-center justify-center rounded-[10px] border border-[var(--border-subtle)] bg-transparent px-4 font-display text-[13px] font-semibold tracking-[0.04em] text-[var(--text-secondary)] transition-colors duration-150 hover:border-[var(--border-default)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
                 >
                   Cancel
                 </button>
@@ -497,7 +497,7 @@ export function SetupConsole({
                     void handleSaveCameraLink();
                   }}
                   disabled={isLinkingCamera || (draftSource === "ip" && !draftIpUrl.trim())}
-                  className="inline-flex h-11 items-center justify-center rounded-[1rem] border border-[rgba(141,240,255,0.24)] bg-[linear-gradient(135deg,rgba(30,216,255,0.2),rgba(90,140,255,0.34))] px-4 font-sci-mono text-[12px] uppercase tracking-[0.16em] text-white transition duration-150 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex h-9 items-center justify-center rounded-[10px] border border-[var(--border-strong)] bg-[var(--accent-dim)] px-4 font-display text-[13px] font-semibold tracking-[0.04em] text-[var(--accent)] transition duration-150 hover:bg-[rgba(74,222,128,0.2)] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isLinkingCamera ? "Linking..." : "Link Camera"}
                 </button>
